@@ -1,10 +1,16 @@
-import model._
+package de.htwg.se.munchkin
+
+import de.htwg.se.munchkin.controller.Controller
 
 /**
  * @author Vincent76;
  */
 object Main {
-  def main( args:Array[String] ): Unit = {
+  def main( args:Array[String] ):Unit = {
+    new Controller()
+  }
+
+  /*def main( args:Array[String] ): Unit = {
     val bob = new Player( "Bob",
       Vector( new DoorCard( "Zauberer", "Eine Zauberer Klasse" ),
         new TreasureCard( "Axt", "Eine Axt" ),
@@ -53,5 +59,5 @@ object Main {
         println()
       }
     }
-  }
+  }*/
 }
