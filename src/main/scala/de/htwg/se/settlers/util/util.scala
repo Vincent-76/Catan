@@ -1,4 +1,4 @@
-package de.htwg.se.settlers.util
+package de.htwg.se.settlers
 
 import java.util.function.{ Predicate, UnaryOperator }
 
