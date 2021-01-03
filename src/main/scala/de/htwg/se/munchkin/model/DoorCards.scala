@@ -131,9 +131,6 @@ object DoorCards {
       "Projectile vomiting attack! Discard your whole hand.",
       2,
       badStuffAction = null
-    ),
-    new MonsterCard(
-      13,
     )
   )
 }

@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.controller
 
-import de.htwg.se.settlers.model.{ Card, Game }
+import de.htwg.se.settlers.model.{ Card, Game, Phase }
 import de.htwg.se.settlers.ui.TUI
 
 /**
@@ -8,7 +8,7 @@ import de.htwg.se.settlers.ui.TUI
  */
 class Controller {
   var running:Boolean = true
-  var games:List[Game] = List( Game( 0 ) )
+  var games:List[Game] = List( Game() )
   var undone:List[Game] = List()
   val ui:TUI = new TUI( this )
 
@@ -45,9 +45,11 @@ class Controller {
   def addPlayer( name:String ):Unit = {
   }
 
-  def setTurn( turn:Int ):Unit = action( game.copy( turn = turn ) )
+  //def setTurn( turn:Int ):Unit = action( game.copy( turn = turn ) )
 
   def dropCard( card:Card ):Unit = dropCards( card :: Nil )
 
   def dropCards( cards:List[Card] ):Unit = action( game.dropCards( cards ) )
+
+  def setPhase( phase:Phase ):Unit = action( game.setPhase( phase ) )
 }
