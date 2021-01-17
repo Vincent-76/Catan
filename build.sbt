@@ -2,10 +2,10 @@ name := "SE-Project"
 
 version := "0.1"
 
-scalaVersion := "2.13.1"
+scalaVersion := "2.12.4"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % "test"
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
 addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.2.7")
