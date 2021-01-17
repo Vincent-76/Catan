@@ -187,7 +187,7 @@ class Controller {
           Option.empty
         }
       }
-    case _ => Some( WrongPhase )
+    case _ => Option.empty
   }
 
   def dropResourceCardsToRobber( playerID:Int, cards:ResourceCards ):ControllerAnswer = game.phase match {
