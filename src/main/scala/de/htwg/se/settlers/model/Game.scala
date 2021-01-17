@@ -123,7 +123,7 @@ case class Game( phase:Phase = InitPhase,
       if ( available.amount > 0 )
         (data._1.updated( playerID, available ), newStack)
       else
-        (data._1.removed( playerID ), data._2)
+        (data._1 - playerID, data._2)
     } )
     val newPlayers = playerResources.red( players, ( pl:Vector[Player], playerID:Int, cards:ResourceCards ) => {
       pl.updated( playerID, players( playerID ).addResourceCards( cards ) )
