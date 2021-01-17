@@ -187,6 +187,7 @@ class Controller {
           Option.empty
         }
       }
+    case _ => Some( WrongPhase )
   }
 
   def dropResourceCardsToRobber( playerID:Int, cards:ResourceCards ):ControllerAnswer = game.phase match {
@@ -338,6 +339,7 @@ class Controller {
         players = game.players.updated( newPlayer.get.id, newPlayer.get ),
         bonusCards = newBonusCards,
       ) )
+    case _ => Some( WrongPhase )
   }
 
   def yearOfPlentyAction( resources:ResourceCards ):Try[ResourceCards] = game.phase match {

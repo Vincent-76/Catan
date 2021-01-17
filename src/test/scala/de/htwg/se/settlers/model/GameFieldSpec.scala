@@ -1,14 +1,13 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Vertex }
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import de.htwg.se.settlers.util._
+import org.scalatest.{ Matchers, WordSpec }
 
 /**
  * @author Vincent76;
  */
-class GameFieldSpec extends AnyWordSpec with Matchers {
+class GameFieldSpec extends WordSpec with Matchers {
   "GameField" when {
     "new" should {
       val gameField = GameField()

@@ -81,6 +81,7 @@ case class Game( phase:Phase = InitPhase,
           turn = turn.addDrawnDevCard( developmentCards.head ),
           developmentCards = developmentCards.tail
         ) )
+      case Failure( e ) => Failure( e )
     }
   }
 

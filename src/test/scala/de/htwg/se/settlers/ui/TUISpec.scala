@@ -3,13 +3,11 @@ package de.htwg.se.settlers.ui
 import java.io.ByteArrayInputStream
 
 import de.htwg.se.settlers.controller.Controller
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 
 /**
  * @author Vincent76;
  */
-/*class TUISpec extends AnyWordSpec with Matchers {
+/*class TUISpec extends WordSpec with Matchers {
   "A TUI" when {
     "new" should {
       val controller = new Controller()
