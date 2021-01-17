@@ -3,7 +3,7 @@ package de.htwg.se.settlers.controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.GameField._
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.ui.tui.TUI
+import de.htwg.se.settlers.ui.tui.{ TUI, UI }
 import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Random, Success, Try }
@@ -14,7 +14,7 @@ import scala.util.{ Failure, Random, Success, Try }
 
 class Controller {
   var running:Boolean = true
-  val ui:TUI = new TUI( this )
+  val ui:UI = new TUI( this )
   var game:Game = Game()
 
   ui.start()

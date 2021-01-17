@@ -102,12 +102,12 @@ object TUI {
   }
 }
 
-class TUI( val controller:Controller ) {
+class TUI( val controller:Controller ) extends UI {
 
   TUI.clear()
   TUI.outln( "Loading ..." )
 
-  def start( ):Unit = {
+  override def start( ):Unit = {
     while ( controller.running )
       listen()
     if ( controller.game.winner.isDefined ) {
