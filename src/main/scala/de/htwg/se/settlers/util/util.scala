@@ -1,42 +1,53 @@
 package de.htwg.se.settlers
 
-import java.util.function.{ Predicate, UnaryOperator }
+import java.util.function.Predicate
+
+import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.{ InsufficientResources, Resource, Resources }
 
 import scala.reflect.ClassTag
+import scala.util.{ Failure, Random, Success, Try }
 
 /**
  * @author Vincent76;
  */
 
 package object util {
+
   implicit class RichAny[T]( val value:T ) {
     def check( check:Predicate[T] ):Boolean = check.test( value )
-    def validate( validator:Predicate[T], alt:T ):T = if( validator.test( value ) ) value else alt
+
+    def validate( validator:Predicate[T], alt:T ):T = if ( validator.test( value ) ) value else alt
+
     def use[R]( operation:Function[T, R] ):R = operation.apply( value )
   }
 
-  implicit class ModInt( val value:Int ) {
-    def toDisplay:String = {
-      if ( value >= 0 ) {
-        "+" + ( if ( value < Int.MaxValue ) value else "∞" )
-      } else
-        value.toString
+  implicit class RichInt( val value:Int ) {
+    def toLength( length:Int ):String = {
+      val s = value.toString
+      val newLength = if ( length < s.length ) s.length else length
+      "".toLength( newLength - s.length ) + s
     }
-
-    def toFullDisplay:String = toFullDisplay()
-    def toFullDisplay( prefix:String = "" ):String = if ( value != 0 ) "[" + prefix + ": " + toDisplay + "]" else ""
   }
 
   implicit class RichString( s:String ) {
     def tab:String = tab()
+
     def tab( tabs:Int = 1 ):String = {
       ( 1 to 10 ).red( s, ( s:String, _ ) => s.replace( "\n", "\n\t" ) )
     }
 
-    def toLength( length:Int ):String = if( s.length > length ) s.substring( 0, length ) else s.space( length - s.length )
+    def toLength( length:Int ):String = if ( s.length > length ) s.substring( 0, length ) else s.space( length - s.length )
 
     def space:String = space()
-    def space( spaces:Int = 1 ):String = (1 to spaces).red( s, ( s:String, _:Int ) => s + " " )
+
+    def space( spaces:Int = 1 ):String = ( 1 to spaces ).red( s, ( s:String, _:Int ) => s + " " )
+
+    def removeSpaces( ):String = s.replaceAll( "\\s+", "" )
+  }
+
+  implicit class RichRandom( r:Random ) {
+    def element[R]( i:Seq[R] ):Option[R] = if ( i.nonEmpty ) Some( i( Random.nextInt( i.size ) ) ) else Option.empty
   }
 
   implicit class RichIterable[A, B[A] <: Iterable[A]]( iterable:B[A] ) {
@@ -48,6 +59,26 @@ package object util {
     }
 
     def red[E]( e:E, action:AppendListElementAction[E, A] ):E = appendListElement( e, iterable.iterator, action )
+
+    def redByKey[E]( e:E, action:AppendListElementByKeyAction[E] ):E = appendListElementByKey( e, iterable.size - 1, action )
+
+    def removeAt( i:Int ):B[A] = {
+      iterable.splitAt( i ).use( d => ( d._1 ++ d._2.tail ).asInstanceOf[B[A]] )
+    }
+  }
+
+  implicit class RichGeneralIterable( val iterable:Iterable[_] ) {
+    def deepFind[R]( predicate:Predicate[R] )( implicit ct:ClassTag[R] ):Option[R] = {
+      iterable.foreach {
+        case e if ct.runtimeClass.isAssignableFrom( e.getClass ) =>
+          if ( predicate.test( e.asInstanceOf[R] ) )
+            return Some( e.asInstanceOf[R] )
+        case i:Iterable[_] => val res = i.deepFind( predicate )
+          if ( res.isDefined )
+            return res
+      }
+      Option.empty
+    }
   }
 
   implicit class RichStringIterable[T <: String]( iterable:Iterable[T] ) {
@@ -56,6 +87,8 @@ package object util {
 
   implicit class RichSequence[A]( seq:Seq[A] ) {
     def red[E]( e:E, action:AppendListElementAction[E, A] ):E = appendListElement( e, seq.reverseIterator, action )
+
+    def redByKey[E]( e:E, action:AppendListElementByKeyAction[E] ):E = appendListElementByKey( e, seq.size - 1, action )
   }
 
   implicit class RichMap[A, B]( map:Map[A, B] ) {
@@ -67,6 +100,12 @@ package object util {
       val next = iterator.next()
       return action.action( appendListElement( e, iterator, action ), next )
     }
+    e
+  }
+
+  private def appendListElementByKey[E]( e:E, i:Int, action:AppendListElementByKeyAction[E] ):E = {
+    if ( i >= 0 )
+      return action.action( appendListElementByKey( e, i - 1, action ), i )
     e
   }
 
@@ -82,19 +121,76 @@ package object util {
     def action( e:E, a:A ):E
   }
 
+  trait AppendListElementByKeyAction[E] extends AppendListElementAction[E, Int]
+
   trait AppendMapElementAction[E, A, B] {
     def action( e:E, a:A, b:B ):E
   }
 
-}
-
-object Util {
-  private var cardIDCounter = 0
-
-  def id:Int = {
-    cardIDCounter += 1
-    cardIDCounter
+  implicit class RichMatrix[E]( val iterable:Iterable[Iterable[E]] ) {
+    def deepFind( predicate:Predicate[E] ):Option[E] = {
+      iterable.foreach( _.foreach( e => if ( predicate.test( e ) ) return Some( e ) ) )
+      Option.empty
+    }
   }
+
+  implicit class RichTry[T]( t:Try[T] ) {
+    def throwable:Throwable = t match {
+      case Failure( e ) => e
+      case _ => throw new NullPointerException
+    }
+
+    def rethrow[B:ClassTag]( implicit ct:ClassTag[B] ):Failure[B] = t match {
+      case f:Failure[T] => f.asInstanceOf[Failure[B]]
+      case _ => throw new NullPointerException
+    }
+
+    def failureOption:Option[Throwable] = t match {
+      case Failure( t ) => Some( t )
+      case _ => Option.empty
+    }
+  }
+
+
+  implicit class RichResourceCards( resources:ResourceCards ) {
+
+    def add( r:Resource, amount:Int = 1 ):ResourceCards = resources.updated( r, resources.getOrElse( r, 0 ) + amount )
+
+    def add( toAdd:ResourceCards ):ResourceCards = Resources.get.red( resources, ( cards:ResourceCards, r:Resource ) => {
+      cards.updated( r, cards.getOrElse( r, 0 ) + toAdd.getOrElse( r, 0 ) )
+    } )
+
+    def subtract( r:Resource, amount:Int = 1 ):Try[ResourceCards] = {
+      val n = resources.getOrElse( r, 0 ) - amount
+      if ( n >= 0 )
+        Success( resources.updated( r, n ) )
+      else
+        Failure( InsufficientResources )
+    }
+
+    def subtract( toRemove:ResourceCards ):Try[ResourceCards] = Success( Resources.get.red( resources, ( cards:ResourceCards, r:Resource ) => {
+      val n = cards.getOrElse( r, 0 ) - toRemove.getOrElse( r, 0 )
+      if ( n < 0 )
+        return Failure( InsufficientResources )
+      cards.updated( r, n )
+    } ) )
+
+    def amount:Int = resources.values.sum
+
+    def display:String = resources.map( d => d._1.s + "[" + d._2 + "]" ).mkString( ", " )
+
+    def has( requiredResources:ResourceCards ):Boolean = {
+      requiredResources.foreach( data => if ( resources.get( data._1 ).isEmpty || resources( data._1 ) < data._2 ) return false )
+      true
+    }
+
+    def sort:Seq[(Resource, Int)] = Resources.get.zip( Resources.get.map( resources ) )
+  }
+
+  object Util {
+
+  }
+
 }
 
 

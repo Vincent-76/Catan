@@ -9,7 +9,7 @@ import org.scalatest.wordspec.AnyWordSpec
 /**
  * @author Vincent76;
  */
-class TUISpec extends AnyWordSpec with Matchers {
+/*class TUISpec extends AnyWordSpec with Matchers {
   "A TUI" when {
     "new" should {
       val controller = new Controller()
@@ -35,4 +35,4 @@ class TUISpec extends AnyWordSpec with Matchers {
       }
     }
   }
-}
+}*/

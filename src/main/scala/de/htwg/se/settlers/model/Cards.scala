@@ -1,28 +1,81 @@
 package de.htwg.se.settlers.model
 
+import scala.util.Random
+import de.htwg.se.settlers.util._
+
 /**
  * @author Vincent76;
  */
-abstract class Card( val amount:Int )
+object Cards {
+  private val resourceCardAmount:Int = 19
+
+  val developmentCardCost:ResourceCards = Map( Sheep -> 1, Wheat -> 1, Ore -> 1 )
+
+  val devCards:List[DevelopmentCard] = List(
+    KnightCard,
+    GreatHallCard,
+    YearOfPlentyCard,
+    RoadBuildingCard,
+    MonopolyCard
+  )
+
+  val bonusCards:List[BonusCard] = List(
+    LongestRoadCard,
+    LargestArmyCard
+  )
+
+  type ResourceCards = Map[Resource, Int]
+
+  object ResourceCards {
+    val empty:ResourceCards = Map.empty
+
+    def of( r:Resource, amount:Int ):ResourceCards = Map( r -> amount )
+  }
+
+  def getResourceCards( amount:Int = resourceCardAmount ):ResourceCards = {
+    Resources.get.map( r => r -> amount ).toMap
+  }
+
+  def getDevStack:List[DevelopmentCard] = {
+    Random.shuffle( devCards.red( List.empty, ( l:List[DevelopmentCard], d:DevelopmentCard ) => {
+      l ++ ( 1 to d.amount ).map( _ => d ).toList
+    } ) )
+  }
+
+  def usableDevCardOf( s:String ):Option[DevelopmentCard] =
+    devCards.filter( _.usable ).find( _.t.toLowerCase == s.toLowerCase )
+
+}
+
+abstract class Card
 
 
-abstract class ResourceCard extends Card( 19 )
+abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val t:String, val desc:String ) extends Card
 
-case object Wood extends ResourceCard
+case object KnightCard extends DevelopmentCard( 14, true, "Knight",
+  "Move the robber.\nSteal 1 resource from the owner of a settlement or city adjacent to the robber's new hex." )
 
-case object Clay extends ResourceCard
+case object GreatHallCard extends DevelopmentCard( 5, false, "GreatHall",
+  "1 Victory Point!\nReveal this card on your turn if, with it, you reach the number of points required for victory." )
 
-case object Sheep extends ResourceCard
+case object YearOfPlentyCard extends DevelopmentCard( 2, true, "YearOfPlenty",
+  "Take any 2 resources from the bank. Add them to your hand. They can be 2 of the same resource or 2 different resources." )
 
-case object Wheat extends ResourceCard
+case object RoadBuildingCard extends DevelopmentCard( 2, true, "RoadBuilding",
+  "Place 2 new roads as if you had just built them." )
 
-case object Ore extends ResourceCard
+case object MonopolyCard extends DevelopmentCard( 2, true, "Monopoly",
+  "When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type." )
 
 
-abstract class DevelopmentCard( amount:Int ) extends Card( amount )
+abstract class BonusCard( val bonus:Int, val required:Int, val t:String, desc:String ) extends Card
 
-case object KnightCard extends DevelopmentCard( 14 )
+case object LargestArmyCard extends BonusCard( 2, 3, "Largest Army",
+  "2 Victory Points!\nThe first player to play 3 knight cards gets this card. Another player who plays more knight cards takes this card." ) {
+  val minimumKnights:Int = 3
+}
 
-case object ResearchCard extends DevelopmentCard( 6 )
-
-case object VictoryPointCard extends DevelopmentCard( 5 )
+case object LongestRoadCard extends BonusCard( 2, 2, "Longest Road",
+  "2 Victory Points!\nThis cards gets to the player with the longest road of at least 5 segments. Another player who builds a longer road takes this card." ) {
+  val minimumRoads:Int = 5
+}
