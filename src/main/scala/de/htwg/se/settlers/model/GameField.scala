@@ -170,7 +170,7 @@ object GameField {
     private def apply( id:Int, h1:Hex, h2:Hex, port:Option[Port], building:Option[Road] ):Edge = new Edge( id, h1, h2, port, building )
   }
 
-  case class Vertex( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port] = Option.empty, building:Option[Building] = Option.empty )
+  case class Vertex private[GameField]( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port] = Option.empty, building:Option[Building] = Option.empty )
     extends PlacementPoint {
     def hexes:List[Hex] = List( h1, h2, h3 )
 
