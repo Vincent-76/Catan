@@ -7,6 +7,6 @@ import de.htwg.se.settlers.controller.Controller
  */
 object Main {
   def main( args:Array[String] ):Unit = {
-    new Controller()
+    new Controller( "TUI" )
   }
 }

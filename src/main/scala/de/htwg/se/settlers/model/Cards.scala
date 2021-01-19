@@ -29,7 +29,7 @@ object Cards {
   object ResourceCards {
     val empty:ResourceCards = Map.empty
 
-    def of( r:Resource, amount:Int ):ResourceCards = Map( r -> amount )
+    def of( r:Resource, amount:Int = 1 ):ResourceCards = Map( r -> amount )
   }
 
   def getResourceCards( amount:Int = resourceCardAmount ):ResourceCards = {

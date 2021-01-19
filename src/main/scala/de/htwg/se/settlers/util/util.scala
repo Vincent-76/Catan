@@ -44,6 +44,8 @@ package object util {
     def space( spaces:Int = 1 ):String = ( 1 to spaces ).red( s, ( s:String, _:Int ) => s + " " )
 
     def removeSpaces( ):String = s.replaceAll( "\\s+", "" )
+
+    def =^( c:String ):Boolean = s.toLowerCase == c.toLowerCase
   }
 
   implicit class RichRandom( r:Random ) {
@@ -89,6 +91,11 @@ package object util {
     def red[E]( e:E, action:AppendListElementAction[E, A] ):E = appendListElement( e, seq.reverseIterator, action )
 
     def redByKey[E]( e:E, action:AppendListElementByKeyAction[E] ):E = appendListElementByKey( e, seq.size - 1, action )
+
+    def removed( e:A ):Seq[A] = seq.indexOf( e ) match {
+      case -1 => seq
+      case i:Int => seq.removeAt( i )
+    }
   }
 
   implicit class RichMap[A, B]( map:Map[A, B] ) {

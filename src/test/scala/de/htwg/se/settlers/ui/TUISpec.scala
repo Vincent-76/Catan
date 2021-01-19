@@ -2,7 +2,6 @@ package de.htwg.se.settlers.ui
 
 import java.io.ByteArrayInputStream
 
-import de.htwg.se.settlers.controller.Controller
 
 /**
  * @author Vincent76;

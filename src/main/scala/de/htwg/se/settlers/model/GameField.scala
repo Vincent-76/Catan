@@ -1,5 +1,6 @@
 package de.htwg.se.settlers.model
 
+import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.GameField._
 import de.htwg.se.settlers.util._
 
@@ -64,6 +65,14 @@ case class GameField(
         return Some( vertex.get )
     }
     Option.empty
+  }
+
+  def adjacentPlayers( h:Hex ):List[PlayerID] = {
+    adjacentVertices( h ).red( List.empty, ( l:List[PlayerID], v:Vertex ) => {
+      if ( v.building.isDefined && !l.contains( v.building.get.owner ) )
+        l :+ v.building.get.owner
+      else l
+    } )
   }
 
 
@@ -140,7 +149,7 @@ object GameField {
     val hexagons = createHexagons
     val edges = createEdges( hexagons )
     val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area == DesertArea ).get.get
-    GameField( hexagons, createEdges( hexagons ), createVertices( hexagons, edges ), robber )
+    GameField( hexagons, edges, createVertices( hexagons, edges ), robber )
   }
 
   case class Hex private[GameField]( id:Int, r:Int, c:Int, area:Area ) {
@@ -163,7 +172,7 @@ object GameField {
 
     override def getStructure:Option[Structure] = road
 
-    def setRoad( road:Road ):Edge = new Edge( id, h1, h2, port, Some( road ) )
+    def setRoad( road:Option[Road] ):Edge = new Edge( id, h1, h2, port, road )
   }
 
   object Edge {
@@ -178,7 +187,7 @@ object GameField {
 
     override def getStructure:Option[Structure] = building
 
-    def setBuilding( building:Building ):Vertex = new Vertex( id, h1, h2, h3, port, Some( building ) )
+    def setBuilding( building:Option[Building] ):Vertex = new Vertex( id, h1, h2, h3, port, building )
   }
 
   object Vertex {
@@ -314,14 +323,13 @@ object GameField {
 
 
   def createEdges( hexagons:Hexagons ):Edges = {
-    hexagons.red( Map[(Hex, Hex), Edge](), ( map:Edges, r:Row[Hex] ) => r.red( map, ( m:Edges, hex:Option[Hex] ) => {
+    hexagons.red( Map.empty:Edges, ( map:Edges, r:Row[Hex] ) => r.red( map, ( m:Edges, hex:Option[Hex] ) => {
       if ( hex.isDefined ) {
         val h = hex.get
         val m1 = addEdge( m, h, (h.r + 1, h.c - 1), hexagons )
         val m2 = addEdge( m1, h, (h.r + 1, h.c), hexagons )
         addEdge( m2, h, (h.r, h.c + 1), hexagons )
-      } else
-        m
+      } else m
     } ) )
   }
 

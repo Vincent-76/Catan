@@ -1,6 +1,7 @@
 package de.htwg.se.settlers.ui.tui
 
 import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Vertex }
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
@@ -38,7 +39,7 @@ object GameDisplay {
     (generalPort, "3:1 exchange port"),
   )
 
-  def apply( controller:Controller, placement:Placement, playerID:Int, any:Boolean = false ):GameDisplay = {
+  def apply( controller:Controller, placement:Placement, playerID:PlayerID, any:Boolean = false ):GameDisplay = {
     new GameDisplay( controller.game, Some( placement, controller.game.getBuildableIDsForPlayer( playerID, placement, any ) ) )
   }
 
@@ -233,10 +234,10 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
   }
 
 
-  def buildPlayerDisplay( turnPlayer:Option[Int] = Option.empty ):String = {
+  def buildPlayerDisplay( turnPlayer:Option[PlayerID] = Option.empty ):String = {
     val otherPlayers = if ( turnPlayer.isDefined )
-      game.players.filter( _.id != turnPlayer.get )
-    else game.players
+      game.players.values.filter( _.id != turnPlayer.get )
+    else game.players.values
     val nameLength = otherPlayers.map( _.idName.length ).max
     val s = otherPlayers.map( p => {
       TUI.displayName( p, nameLength ) +

@@ -2,9 +2,13 @@ package de.htwg.se.settlers.ui.tui
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.ui.tui.command.{ CommandAction, ExitCommand, HelpCommand }
-import de.htwg.se.settlers.ui.tui.phaseaction._
+import de.htwg.se.settlers.ui.UI
+import de.htwg.se.settlers.ui.tui.TUI.InvalidFormat
+import de.htwg.se.settlers.ui.tui.command.{ ExitCommand, HelpCommand, RedoCommand, UndoCommand }
+import de.htwg.se.settlers.ui.tui.tuistate._
 import de.htwg.se.settlers.util._
 
 import scala.util.Try
@@ -15,11 +19,6 @@ import scala.util.Try
 object TUI {
   val reset:String = Console.RESET
 
-  val commands = List(
-    HelpCommand,
-    ExitCommand
-  )
-
   val textOnColor:String = Console.BLACK
 
   val text:String = Console.WHITE
@@ -28,10 +27,19 @@ object TUI {
 
   val errorColor:String = Console.RED
 
+  val resourcePattern:String = "(\\s*(" + Resources.get.map( r => regexIgnoreCase( r.s ) ).mkString( "|" ) + ")\\s*[1-9][0-9]*\\s*)"
 
-  val resourcePattern:String = "(\\s*(" + Resources.get.map( r => TUI.regexIgnoreCase( r.s ) ).mkString( "|" ) + ")\\s*[1-9][0-9]*\\s*)"
+  val resourcePatternInfo:String = "<" + Resources.get.map( _.s ).mkString( "|" ) + "> <amount>"
 
-  val resourcePatternInfo:String = "<" + Resources.get.map( _.s ).mkString( "|" ) + "> + <amount>"
+  val commands = List(
+    HelpCommand,
+    ExitCommand,
+    UndoCommand,
+    RedoCommand
+  )
+
+  case class InvalidFormat( input:String ) extends ControllerError
+
 
   def clear( ):Unit = {
     /*val os = System.getProperty( "os.name" )
@@ -43,12 +51,12 @@ object TUI {
     ( 1 to 50 ).foreach( _ => println() )
   }
 
-  def out( o:Any ):Unit = print( TUI.reset + o )
+  def out( o:Any = "" ):Unit = print( reset + o )
 
-  def outln( o:Any ):Unit = println( TUI.reset + o )
+  def outln( o:Any = "" ):Unit = println( reset + o )
 
-  def error( o:Any ):Unit = {
-    println( TUI.reset + errorColor + o )
+  def error( o:Any = "" ):Unit = {
+    println( reset + errorColor + o )
   }
 
   def action( s:String ):Unit = outln( "> " + s + " <" )
@@ -78,7 +86,7 @@ object TUI {
   }
 
   def displayName( p:Player, toLength:Int = -1 ):String = {
-    val length = if( toLength >= 0 ) toLength else p.idName.length
+    val length = if ( toLength >= 0 ) toLength else p.idName.length
     p.color.c.t + p.idName.toLength( length ) + reset
   }
 
@@ -100,6 +108,10 @@ object TUI {
       Some( resource.get, data._2.toInt )
     else Option.empty
   }
+
+  def resourceString( resources:ResourceCards, prefix:String = "" ):String = {
+    resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.s ).mkString( ", " )
+  }
 }
 
 class TUI( val controller:Controller ) extends UI {
@@ -108,93 +120,34 @@ class TUI( val controller:Controller ) extends UI {
   TUI.outln( "Loading ..." )
 
   override def start( ):Unit = {
-    while ( controller.running )
-      listen()
-    if ( controller.game.winner.isDefined ) {
-      val winner = controller.player( controller.game.winner.get )
-      TUI.out( TUI.displayName( winner ) + " won with " + winner.getVictoryPoints( controller.game ) + " victory points!" )
-      TUI.awaitKey( "Press Enter to quit" )
-    }
+    show()
   }
 
-  def listen( ):Boolean = {
-    val phaseAction = controller.game.phase match {
-      case InitPhase => InitAction( controller )
-      case InitPlayerPhase => InitPlayerAction( controller )
-      case InitBeginnerPhase => InitBeginnerAction( controller )
-      case InitBuildSettlementPhase => InitBuildSettlementAction( controller )
-      case p:InitBuildRoadPhase => InitBuildRoadAction( p, controller )
-      case NextPlayerPhase => NextPlayerAction( controller )
-      case TurnStartPhase => TurnStartAction( controller )
-      case DicePhase => DiceAction( controller )
-      case _:DropResourceCardPhase => DropResourceCardAction( controller )
-      case g:GatherPhase => GatherAction( g, controller )
-      case r:RobberPlacePhase => RobberPlaceAction( r, controller )
-      case r:RobberStealPhase => RobberStealAction( r, controller )
-      case ActionPhase => ActionAction( controller )
-      case b:BuildPhase => BuildAction( b, controller )
-      case t:PlayerTradePhase => PlayerTradeAction( t, controller )
-      case _:DevYearOfPlentyPhase => DevYearOfPlentyAction( controller )
-      case p:DevRoadBuildingPhase => DevRoadBuildingAction( p, controller )
-      case _:DevMonopolyPhase => DevMonopolyAction( controller )
-      case _ =>
-        TUI.outln( "Error!" )
-        TUI.outln( "Press Enter to exit game" )
-        TUI.awaitKey()
-        controller.exit()
-        return false
-      /*("Press Enter to undo", Option.empty, _ => {
-        if ( !controller.undo() ) {
-          outln( "Game Crash!" )
-          Some( "Type [help] for possible actions" )
-        } else
-          Option.empty
-      })*/
-    }
-    handlePhaseAction( phaseAction )
-    controller.running
-  }
-
-  private def handlePhaseAction( phaseAction:PhaseAction, error:Option[(String, String)] = Option.empty ):Unit = {
-    TUI.clear()
-    if ( phaseAction.gameDisplay.isDefined )
-      TUI.out( phaseAction.gameDisplay.get )
-    val actionInfo = phaseAction.actionInfo
-    if ( actionInfo.isEmpty )
-      return
-    println()
-    if ( error.isDefined ) {
-      TUI.error( error.get._2 + " [" + error.get._1 + "]" )
-    }
-    TUI.action( actionInfo.get )
-    val commandInput = CommandInput( scala.io.StdIn.readLine )
-    val globalCommand = findGlobalCommand( commandInput )
-    if ( globalCommand.isDefined ) {
-      if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
-        globalCommand.get.action( commandInput, controller ) match {
-          case Some( e:ControllerError ) => handlePhaseAction( phaseAction, Some( commandInput.input, getErrorMessage( e ) ) )
-          case Some( t ) => handlePhaseAction( phaseAction, Some( commandInput.input, "Error! " + t ) )
-          case _ =>
-        }
-      else
-        handlePhaseAction( phaseAction, Some( commandInput.input, "Invalid format!" ) )
-      return
-    }
-    val inputPattern = phaseAction.inputPattern
-    if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) ) {
-      phaseAction.action( commandInput ) match {
-        case Some( e:ControllerError ) => handlePhaseAction( phaseAction, Some( commandInput.input, getErrorMessage( e ) ) )
-        case Some( t ) => handlePhaseAction( phaseAction, Some( commandInput.input, "Error! " + t ) )
-        case _ =>
+  override def show( ):Unit = controller.game.state match {
+    case state:TUIState =>
+      TUI.clear()
+      val gameDisplay = state.getGameDisplay
+      if ( gameDisplay.isDefined )
+        TUI.out( gameDisplay.get )
+      //TUI.outln()
+      val actionInfo = state.getActionInfo
+      TUI.outln()
+      TUI.action( actionInfo )
+      val commandInput = CommandInput( scala.io.StdIn.readLine )
+      val globalCommand = findGlobalCommand( commandInput )
+      if ( globalCommand.isDefined ) {
+        if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
+          globalCommand.get.action( commandInput, state )
+        else
+          state.onError( InvalidFormat( commandInput.input ) )
+      } else {
+        val inputPattern = state.inputPattern
+        if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) )
+          state.action( commandInput )
+        else
+          state.onError( InvalidFormat( commandInput.input ) )
       }
-    } else
-      handlePhaseAction( phaseAction, Some( commandInput.input, "Invalid format!" ) )
-  }
-
-  def getErrorMessage( controllerError:ControllerError ):String = controllerError match {
-    case NotEnoughPlayers => "Minimum 3 Players required!"
-    case InvalidPlacementPoint => "Invalid place!"
-    case _ => controllerError.getClass.getSimpleName
+    case _ =>
   }
 
   def findGlobalCommand( commandInput:CommandInput ):Option[CommandAction] = {
@@ -202,4 +155,106 @@ class TUI( val controller:Controller ) extends UI {
       return TUI.commands.find( _.command == commandInput.command.get )
     Option.empty
   }
+
+  override def onInfo( info:Info ):Unit = {
+    info match {
+      case BeginnerInfo( beginner, diceValues ) =>
+        val nameLength = controller.game.players.map( _._2.idName.length ).max
+        diceValues.foreach( d => if ( d._2 > 0 ) TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "   " + d._2 ) )
+        TUI.outln( "\n->\t" + TUI.displayName( controller.player( beginner ) ) + " begins.\n" )
+      case info:DiceInfo => TUI.outln( info.dices._1 + " + " + info.dices._2 + " = " + ( info.dices._1 + info.dices._2 ) )
+      case GatherInfo( dices, playerResources ) =>
+        TUI.outln( dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) )
+        playerResources.foreach( d => {
+          TUI.outln( TUI.displayName( controller.player( d._1 ) ) + " " + TUI.resourceString( d._2, "+" ) )
+        } )
+      case GotResourcesInfo( pID, cards ) =>
+        TUI.outln( TUI.displayName( controller.player( pID ) ) + "  " + TUI.resourceString( cards, "+" ) )
+      case LostResourcesInfo( pID, cards ) =>
+        TUI.outln( TUI.displayName( controller.player( pID ) ) + "  " + TUI.resourceString( cards, "-" ) )
+      case ResourceChangeInfo( playerAdd, playerSub ) =>
+        val nameLength = ( playerAdd.keys ++ playerSub.keys ).map( controller.player( _ ).idName.length ).max
+        playerSub.foreach( d => TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + TUI.resourceString( d._2, "-" ) ) )
+        playerAdd.foreach( d => TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + TUI.resourceString( d._2, "+" ) ) )
+      case BankTradedInfo( _, give, get ) =>
+        TUI.outln( "You  traded " + give._2 + " " + give._1.s + " for " + get._2 + " " + get._1.s + "." )
+      case DrawnDevCardInfo( _, devCard ) =>
+        TUI.outln( "Drawn: " + devCard.t + "\n" + devCard.desc )
+      case InsufficientStructuresInfo( _, structure ) =>
+        TUI.outln( "You don't have enough structures of " + structure.s + " to build more." )
+      case NoPlacementPointsInfo( _, structure ) =>
+        TUI.outln( "There aren't any more possible placement points for structure " + structure.s + " to build more." )
+      case GameEndInfo( winner ) =>
+        val p = controller.player( winner )
+        TUI.out( TUI.displayName( p ) + " won with " + p.getVictoryPoints( controller.game ) + " victory points!" )
+      case _ => return
+    }
+    TUI.outln()
+    TUI.awaitKey()
+  }
+
+  override def onError( t:Throwable ):Unit = {
+    TUI.outln()
+    TUI.error( t match {
+      case NotEnoughPlayers => "Minimum " + Game.minPlayers + " players required!"
+      case InvalidPlacementPoint => "Invalid place!"
+      case e:ControllerError => e
+      case t:Throwable => t + ": " + t.getMessage
+    } )
+    TUI.outln()
+    TUI.awaitKey()
+    show()
+  }
+
+
+  override def getInitState:InitState =
+    new InitTUIState( controller )
+
+  override def getInitPlayerState:InitPlayerState =
+    new InitPlayerTUIState( controller )
+
+  override def getInitBeginnerState( diceValues:Map[PlayerID, Int], counter:Int ):InitBeginnerState =
+    new InitBeginnerTUIState( diceValues, counter, controller )
+
+  override def getBuildInitSettlementState:BuildInitSettlementState =
+    new BuildInitSettlementTUIState( controller )
+
+  override def getBuildInitRoadState( vID:Int ):BuildInitRoadState =
+    new BuildInitRoadTUIState( vID, controller )
+
+  override def getNextPlayerState:NextPlayerState =
+    new NextPlayerTUIState( controller )
+
+  override def getDiceState( dices:(Int, Int) ):DiceState =
+    new DiceTUIState( dices, controller )
+
+  override def getDropHandCardsState( pID:PlayerID, dropped:List[PlayerID] ):DropHandCardsState =
+    new DropHandCardsTUIState( pID, dropped, controller )
+
+  override def getRobberPlaceState( nextState:State ):RobberPlaceState =
+    new RobberPlaceTUIState( nextState, controller )
+
+  override def getRobberStealState( nextState:State ):RobberStealState =
+    new RobberStealTUIState( nextState, controller )
+
+  override def getActionState:ActionState =
+    new ActionTUIState( controller )
+
+  override def getBuildState( structure:StructurePlacement ):BuildState =
+    new BuildTUIState( structure, controller )
+
+  override def getPlayerTradeState( pID:PlayerID, give:ResourceCards, get:ResourceCards, decisions:Map[PlayerID, Boolean] ):PlayerTradeState =
+    new PlayerTradeTUIState( pID, give, get, decisions, controller )
+
+  override def getPlayerTradeEndState( give:ResourceCards, get:ResourceCards, decisions:Map[PlayerID, Boolean] ):PlayerTradeEndState =
+    new PlayerTradeEndTUIState( give, get, decisions, controller )
+
+  override def getYearOfPlentyState( nextState:State ):YearOfPlentyState =
+    new YearOfPlentyTUIState( nextState, controller )
+
+  override def getDevRoadBuildingState( nextState:State, roads:Int ):DevRoadBuildingState =
+    new DevRoadBuildingTUIState( nextState, roads, controller )
+
+  override def getMonopolyState( nextState:State ):MonopolyState =
+    new MonopolyTUIState( nextState, controller )
 }

@@ -1,16 +1,18 @@
 package de.htwg.se.settlers.model
 
+import de.htwg.se.settlers.model.Game.PlayerID
+
 /**
  * @author Vincent76;
  */
 
 //case object Success extends ControllerAnswer
 
-sealed trait ControllerError extends Throwable
+trait ControllerError extends Throwable
 
 case object Fail extends ControllerError
 
-case object WrongPhase extends ControllerError
+case object WrongState extends ControllerError
 
 case object InsufficientResources extends ControllerError
 
@@ -34,7 +36,7 @@ case object InvalidPlacementPoint extends ControllerError
 
 case object NotEnoughPlayers extends ControllerError
 
-case object InvalidPlayerColor extends ControllerError
+case class InvalidPlayerColor( color:String ) extends ControllerError
 
 case object RobberOnlyOnLand extends ControllerError
 
@@ -52,4 +54,22 @@ case class InsufficientDevCards( devCard:DevelopmentCard ) extends ControllerErr
 
 case object AlreadyUsedDevCardInTurn extends ControllerError
 
+case class DevCardDrawnInTurn( devCard:DevelopmentCard ) extends ControllerError
+
 case class InsufficientBankResources( r:Resource ) extends ControllerError
+
+case object InconsistentData extends ControllerError
+
+case object DevStackIsEmpty extends ControllerError
+
+case class PlayerNameAlreadyExists( name:String ) extends ControllerError
+
+case class PlayerColorIsAlreadyInUse( playerColor:PlayerColor ) extends ControllerError
+
+case class InvalidPlayerID( id:Int ) extends ControllerError
+
+case class InvalidPlayer( pID:PlayerID ) extends ControllerError
+
+case object NothingToUndo extends ControllerError
+
+case object NothingToRedo extends ControllerError

@@ -1,6 +1,7 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Random, Success, Try }
@@ -9,7 +10,7 @@ import scala.util.{ Failure, Random, Success, Try }
  * @author Vincent76;
  */
 object Player {
-  val colors:Vector[PlayerColor] = Vector(
+  val colors:List[PlayerColor] = List(
     Green,
     Red,
     Magenta,
@@ -20,8 +21,8 @@ object Player {
     colors.find( _.name.toLowerCase == cString.toLowerCase() ).use( c => if ( c.isDefined ) Some( c.get ) else Option.empty )
   }
 
-  def availableColors( players:Vector[Player] = Vector.empty ):Vector[PlayerColor] = {
-    players.red( colors, ( c:Vector[PlayerColor], p:Player ) => {
+  def availableColors( players:Iterable[Player] = Vector.empty ):List[PlayerColor] = {
+    players.red( colors, ( c:List[PlayerColor], p:Player ) => {
       val index = c.indexWhere( _ == p.color )
       if ( index >= 0 )
         c.removeAt( index )
@@ -31,7 +32,7 @@ object Player {
   }
 }
 
-case class Player( id:Int,
+case class Player( id:PlayerID,
                    color:PlayerColor,
                    name:String,
                    resources:ResourceCards = Cards.getResourceCards( 0 ),
@@ -41,7 +42,7 @@ case class Player( id:Int,
                    structures:Map[StructurePlacement, Int] = StructurePlacement.get.map( p => (p, p.available) ).toMap
                  ) {
 
-  def idName:String = "<" + id + ">" + name
+  def idName:String = "<" + id.id + ">" + name
 
   def removeResourceCard( resource:Resource, amount:Int = 1 ):Try[Player] = resources.subtract( resource, amount ) match {
     case Success( newResources ) => Success( copy( resources = newResources ) )
@@ -61,6 +62,8 @@ case class Player( id:Int,
 
   def addDevCard( card:DevelopmentCard ):Player = copy( devCards = devCards :+ card )
 
+  def removeDevCard():Player = copy( devCards = devCards.init )
+
   def addVictoryPoint( ):Player = copy( victoryPoints = victoryPoints + 1 )
 
   def getVictoryPoints( game:Game ):Int = {
@@ -77,10 +80,22 @@ case class Player( id:Int,
 
   def getStructure( structure:StructurePlacement ):Try[Player] = {
     val available = structures.getOrElse( structure, 0 )
-    if ( available > 0 )
-      Success( copy( structures = structures.updated( structure, available - 1 ) ) )
-    else
+    if ( available > 0 ) {
+      val newStructures = if ( structure.replaces.isDefined )
+        structures.updated( structure.replaces.get, structures( structure.replaces.get ) + 1 )
+      else structures
+      Success( copy( structures = newStructures.updated( structure, available - 1 ) ) )
+    } else
       Failure( InsufficientStructures( structure ) )
+  }
+
+  def addStructure( structure:StructurePlacement ):Player = {
+    val newStructures = if( structure.replaces.isDefined )
+      structures.updated( structure.replaces.get, structures.getOrElse( structure.replaces.get, 0 ) - 1 )
+    else structures
+    copy(
+      structures = newStructures.updated( structure, newStructures.getOrElse( structure, 0 ) + 1 )
+    )
   }
 
   def randomHandResource( ):Option[Resource] = {
