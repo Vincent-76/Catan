@@ -3,6 +3,7 @@ package de.htwg.se.settlers.model
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Row, Vertex }
+import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.util._
 
 import scala.collection.immutable.{ SortedMap, TreeMap }
@@ -23,6 +24,13 @@ object Game {
 
   class PlayerID private[Game]( val id:Int )
 
+  def apply( state:InitState, test:Boolean ):Game = {
+    if ( test )
+      new Game( state, gameField = GameField( new Random( 1 ) ), seed = 1, developmentCards = Cards.getDevStack( new Random( 1 ) ) )
+    else
+      Game( state )
+  }
+
 }
 
 object PlayerOrdering extends Ordering[PlayerID] {
@@ -32,7 +40,7 @@ object PlayerOrdering extends Ordering[PlayerID] {
 case class Game( state:State,
                  gameField:GameField = GameField(),
                  resourceStack:ResourceCards = Cards.getResourceCards(),
-                 developmentCards:List[DevelopmentCard] = Cards.getDevStack,
+                 developmentCards:List[DevelopmentCard] = Cards.getDevStack(),
                  players:SortedMap[PlayerID, Player] = TreeMap.empty[PlayerID, Player]( PlayerOrdering ),
                  turn:Turn = Turn( new PlayerID( -1 ) ),
                  bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, Option.empty) ).toMap,
@@ -112,7 +120,7 @@ case class Game( state:State,
   }
 
   def drawResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):Game =
-    drawResourceCards( pID, ResourceCards.of( r, amount ) )
+    drawResourceCards( pID, ResourceCards.ofResource( r, amount ) )
 
   def drawResourceCards( pID:PlayerID, cards:ResourceCards ):Game = {
     val (available, newStack) = getAvailableResourceCards( cards )
@@ -126,7 +134,7 @@ case class Game( state:State,
   }
 
   def dropResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):Try[Game] =
-    dropResourceCards( pID, ResourceCards.of( r, amount ) )
+    dropResourceCards( pID, ResourceCards.ofResource( r, amount ) )
 
   def dropResourceCards( pID:PlayerID, cards:ResourceCards ):Try[Game] = {
     players( pID ).removeResourceCards( cards ) match {

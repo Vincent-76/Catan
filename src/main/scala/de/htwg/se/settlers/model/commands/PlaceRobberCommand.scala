@@ -15,13 +15,13 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
     val hex = game.gameField.findHex( hID )
     if ( hex.isEmpty )
-      Failure( NonExistentPlacementPoint )
+      Failure( NonExistentPlacementPoint( hID ) )
     else if ( actualRobber != game.gameField.robber )
       Failure( InconsistentData )
     else if ( hex.get == actualRobber )
-      Failure( PlacementPointNotEmpty )
+      Failure( PlacementPointNotEmpty( hID ) )
     else if ( !hex.get.area.isInstanceOf[LandArea] )
-      Failure( RobberOnlyOnLand )
+      Failure( RobberOnlyOnWater )
     else {
       val newGameField = game.gameField.copy( robber = hex.get )
       game.gameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match {

@@ -24,8 +24,8 @@ class PlayerTradeTUIState( pID:PlayerID,
 
   override def getActionInfo:String = {
     TUI.outln( TUI.displayName( controller.game.player( pID ) ) + ", do you want to trade?" )
-    TUI.outln( "Get:\t" + give.display )
-    TUI.outln( "Give:\t" + get.display )
+    TUI.outln( "Get:\t" + TUI.resourceString( give ) )
+    TUI.outln( "Give:\t" + TUI.resourceString( get ) )
     "Type [Y] for yes or [N] for no"
   }
 

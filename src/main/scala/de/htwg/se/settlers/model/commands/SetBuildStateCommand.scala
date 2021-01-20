@@ -15,7 +15,7 @@ case class SetBuildStateCommand( structure:StructurePlacement, state:State ) ext
     if ( !game.player.hasStructure( structure ) )
       Failure( InsufficientStructures( structure ) )
     else if ( game.getBuildableIDsForPlayer( game.onTurn, structure ).isEmpty )
-      Failure( NoPlacementPoints )
+      Failure( NoPlacementPoints( structure ) )
     else game.dropResourceCards( game.onTurn, structure.resources ) match {
       case Success( newGame ) => Success(
         newGame.setState( controller.ui.getBuildState( structure ) ),

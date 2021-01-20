@@ -15,7 +15,6 @@ import scala.util.{ Success, Try }
 case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState ) extends Command {
 
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
-
     Settlement.build( game, game.onTurn, vID, anywhere = true ) match {
       case Success( game ) =>
         if ( game.settlementAmount( game.onTurn ) == 2 ) {

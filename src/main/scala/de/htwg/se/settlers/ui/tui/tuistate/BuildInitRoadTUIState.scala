@@ -12,7 +12,7 @@ class BuildInitRoadTUIState( vID:Int, controller:Controller
                            ) extends BuildInitRoadState( vID, controller ) with TUIState {
 
   override def getGameDisplay:Option[String] = {
-    Some( GameDisplay( controller, Road, controller.game.getBuildableRoadSpotsForSettlement( vID ) ).buildGameField )
+    Some( GameDisplay( controller, Road, controller.game.gameField.edges.map( _._2.id ).toList /*.getBuildableRoadSpotsForSettlement( vID )*/ ).buildGameField )
   }
 
   override def getActionInfo:String = {

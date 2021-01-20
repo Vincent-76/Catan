@@ -6,8 +6,6 @@ import de.htwg.se.settlers.model.Game.PlayerID
  * @author Vincent76;
  */
 
-//case object Success extends ControllerAnswer
-
 trait ControllerError extends Throwable
 
 case object Fail extends ControllerError
@@ -20,35 +18,33 @@ case object TradePlayerInsufficientResources extends ControllerError
 
 case class InsufficientStructures( structure:StructurePlacement ) extends ControllerError
 
-case object NonExistentPlacementPoint extends ControllerError
+case class NonExistentPlacementPoint( id:Int) extends ControllerError
 
-case object PlacementPointNotEmpty extends ControllerError
+case class PlacementPointNotEmpty( id:Int ) extends ControllerError
 
 case object NoAdjacentStructure extends ControllerError
 
-case object TooCloseToSettlement extends ControllerError
+case class TooCloseToBuilding( id:Int ) extends ControllerError
 
-case object NoConnectedStructures extends ControllerError
+case class NoConnectedStructures( id:Int ) extends ControllerError
 
-case object SettlementRequired extends ControllerError
+case class SettlementRequired( id:Int ) extends ControllerError
 
-case object InvalidPlacementPoint extends ControllerError
+case class InvalidPlacementPoint( id:Int ) extends ControllerError
 
 case object NotEnoughPlayers extends ControllerError
 
 case class InvalidPlayerColor( color:String ) extends ControllerError
 
-case object RobberOnlyOnLand extends ControllerError
+case object RobberOnlyOnWater extends ControllerError
 
-case object PlayerDoesntExists extends ControllerError
+case class NoPlacementPoints( structure:StructurePlacement ) extends ControllerError
 
-case object NoPlacementPoints extends ControllerError
-
-case class WrongResourceAmount( amount:Int ) extends ControllerError
+case class InvalidResourceAmount( amount:Int ) extends ControllerError
 
 case class InvalidTradeResources( give:Resource, get:Resource ) extends ControllerError
 
-case object InvalidDevCard extends ControllerError
+case class InvalidDevCard( devCard:String ) extends ControllerError
 
 case class InsufficientDevCards( devCard:DevelopmentCard ) extends ControllerError
 

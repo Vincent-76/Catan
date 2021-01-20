@@ -10,10 +10,10 @@ import scala.util.{ Failure, Success }
  * @author Vincent76;
  */
 
-class Controller( uiString:String ) {
+class Controller( uiString:String, test:Boolean = false ) {
   var running:Boolean = true
   val ui:UI = UI.get( uiString, this )
-  var game:Game = Game( ui.getInitState )
+  var game:Game = Game( ui.getInitState, test )
   private var undoStack:List[Command] = Nil
   private var redoStack:List[Command] = Nil
 
@@ -38,8 +38,7 @@ class Controller( uiString:String ) {
     checkWinner( game ) match {
       case None =>
         //if ( info.isEmpty || !ui.onInfoWait( info.get ) )
-        if ( info.isDefined )
-          ui.onInfo( info.get )
+        if ( info.isDefined ) ui.onInfo( info.get )
         game.state.show()
       case Some( pID ) =>
         running = false
@@ -67,10 +66,8 @@ class Controller( uiString:String ) {
   def redoAction( ):Unit = redoStack match {
     case Nil => ui.onError( NothingToRedo )
     case head :: stack =>
-      head.doStep( this, this.game ) match {
-        case Success( (game, info) ) => actionDone( game, head, stack, info )
-        case Failure( t ) => this.game.state.onError( t )
-      }
+      val (game, info) = head.doStep( this, this.game ).get
+      actionDone( game, head, stack, info )
   }
 
   def exit( ):Unit = running = false

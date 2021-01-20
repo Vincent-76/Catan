@@ -12,6 +12,4 @@ trait Command {
   def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])]
 
   def undoStep( game:Game ):Game
-
-  def redoStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = doStep( controller, game )
 }

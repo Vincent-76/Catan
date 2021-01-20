@@ -14,7 +14,7 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
 
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
     if ( !game.gameField.adjacentEdges( game.gameField.findVertex( state.settlementVID ).get ).exists( _.id == eID ) )
-      Failure( InvalidPlacementPoint )
+      Failure( InvalidPlacementPoint( eID ) )
     else Road.build( game, game.onTurn, eID ) match {
       case Success( game ) =>
         val (nTurn, nState) = game.settlementAmount( game.onTurn ) match {

@@ -145,9 +145,9 @@ case object West extends EdgeDir( "|" )
 
 object GameField {
 
-  def apply( ):GameField = {
-    val hexagons = createHexagons
-    val edges = createEdges( hexagons )
+  def apply( random:Random = Random ):GameField = {
+    val hexagons = createHexagons( random )
+    val edges = createEdges( hexagons, random )
     val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area == DesertArea ).get.get
     GameField( hexagons, edges, createVertices( hexagons, edges ), robber )
   }
@@ -230,10 +230,10 @@ object GameField {
   }
 
 
-  def createHexagons:Hexagons = {
+  def createHexagons( random:Random = Random ):Hexagons = {
     val (hexData:Vector[Vector[Option[(Int, Int, Int)]]], _) = createRow( Vector.empty, 6, 1 )
     type Result = (Hexagons, (List[WaterArea], List[WaterArea], List[Option[Resource]], List[Number]))
-    val areas = Area.getAvailableAreas
+    val areas = Area.getAvailableAreas( random )
     hexData.redByKey( (Vector.empty, areas), ( result:Result, i:Int ) => {
       hexData( i ).redByKey( result, ( res:Result, j:Int ) => {
         val data = hexData( i )( j )
@@ -255,7 +255,7 @@ object GameField {
             )
           } )
           if ( adjacent < 6 ) {
-            val (hex, portAreas, waterAreas) = if ( port && ( res._2._1 != areas._1 || res._2._2 != areas._2 || Random.nextBoolean() ) ) {
+            val (hex, portAreas, waterAreas) = if ( port && ( res._2._1 != areas._1 || res._2._2 != areas._2 || random.nextBoolean() ) ) {
               (new Hex( data.get._1, data.get._2, data.get._3, res._2._1.head ), res._2._1.tail, res._2._2)
             } else {
               (new Hex( data.get._1, data.get._2, data.get._3, res._2._2.head ), res._2._1, res._2._2.tail)
@@ -322,24 +322,24 @@ object GameField {
   }
 
 
-  def createEdges( hexagons:Hexagons ):Edges = {
+  def createEdges( hexagons:Hexagons, random:Random ):Edges = {
     hexagons.red( Map.empty:Edges, ( map:Edges, r:Row[Hex] ) => r.red( map, ( m:Edges, hex:Option[Hex] ) => {
       if ( hex.isDefined ) {
         val h = hex.get
-        val m1 = addEdge( m, h, (h.r + 1, h.c - 1), hexagons )
-        val m2 = addEdge( m1, h, (h.r + 1, h.c), hexagons )
-        addEdge( m2, h, (h.r, h.c + 1), hexagons )
+        val m1 = addEdge( m, h, (h.r + 1, h.c - 1), hexagons, random )
+        val m2 = addEdge( m1, h, (h.r + 1, h.c), hexagons, random )
+        addEdge( m2, h, (h.r, h.c + 1), hexagons, random )
       } else m
     } ) )
   }
 
-  def addEdge( m:Edges, h:Hex, c:(Int, Int), hexagons:Hexagons ):Edges = {
+  def addEdge( m:Edges, h:Hex, c:(Int, Int), hexagons:Hexagons, random:Random ):Edges = {
     val nHex = findHex( c._1, c._2, hexagons )
     if ( nHex.isDefined )
       return m + ( (h, nHex.get) -> ( if ( isPortHex( h ) && nHex.get.area.isInstanceOf[LandArea] )
-        createPortEdge( m, h, h, nHex.get, hexagons )
+        createPortEdge( m, h, h, nHex.get, hexagons, random )
       else if ( isPortHex( nHex.get ) && h.area.isInstanceOf[LandArea] )
-        createPortEdge( m, nHex.get, h, nHex.get, hexagons )
+        createPortEdge( m, nHex.get, h, nHex.get, hexagons, random )
       else
         new Edge( m.size, h, nHex.get )
         ) )
@@ -351,7 +351,7 @@ object GameField {
     case _ => false
   }
 
-  private def createPortEdge( m:Edges, portHex:Hex, h1:Hex, h2:Hex, hexagons:Hexagons ):Edge = {
+  private def createPortEdge( m:Edges, portHex:Hex, h1:Hex, h2:Hex, hexagons:Hexagons, random:Random ):Edge = {
     val adjacentLandHex = adjacentHexes( portHex, hexagons ).filter( h => {
       h.area.isInstanceOf[LandArea]
     } )
@@ -367,7 +367,7 @@ object GameField {
             false
         else true
       } )
-      Random.element( l ).use( h => {
+      random.element( l ).use( h => {
         if ( h.get == landHex )
           new Edge( m.size, h1, h2, port )
         else

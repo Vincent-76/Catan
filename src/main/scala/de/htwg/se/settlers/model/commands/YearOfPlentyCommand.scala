@@ -17,7 +17,7 @@ case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState
 
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
     if ( resources.amount != 2 )
-      Failure( WrongResourceAmount( resources.amount ) )
+      Failure( InvalidResourceAmount( resources.amount ) )
     else {
       val (availableResources, _) = game.getAvailableResourceCards( resources )
       drawnResources = Some( availableResources )

@@ -28,7 +28,7 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
         if ( !game.player.hasStructure( Road ) )
           return Failure( InsufficientStructures( Road ) )
         if ( game.getBuildableIDsForPlayer( game.onTurn, Road ).isEmpty )
-          return Failure( NoPlacementPoints )
+          return Failure( NoPlacementPoints( Road ) )
         controller.ui.getDevRoadBuildingState( state )
       case MonopolyCard => controller.ui.getMonopolyState( state )
       case _ => state

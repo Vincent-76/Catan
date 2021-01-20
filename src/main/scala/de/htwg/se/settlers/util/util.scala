@@ -34,7 +34,7 @@ package object util {
     def tab:String = tab()
 
     def tab( tabs:Int = 1 ):String = {
-      ( 1 to 10 ).red( s, ( s:String, _ ) => s.replace( "\n", "\n\t" ) )
+      ( 1 to tabs ).red( s, ( s:String, _ ) => s.replace( "\n", "\n\t" ) )
     }
 
     def toLength( length:Int ):String = if ( s.length > length ) s.substring( 0, length ) else s.space( length - s.length )
@@ -49,15 +49,16 @@ package object util {
   }
 
   implicit class RichRandom( r:Random ) {
-    def element[R]( i:Seq[R] ):Option[R] = if ( i.nonEmpty ) Some( i( Random.nextInt( i.size ) ) ) else Option.empty
+    def element[R]( i:Seq[R] ):Option[R] = if ( i.nonEmpty ) Some( i( r.nextInt( i.size ) ) ) else Option.empty
   }
 
   implicit class RichIterable[A, B[A] <: Iterable[A]]( iterable:B[A] ) {
     def withType[T <: A :ClassTag]( implicit ct:ClassTag[T] ):B[T] = {
-      iterable.filter {
-        case e if ct.runtimeClass.isAssignableFrom( e.getClass ) => true
+      val n = iterable.filter {
+        case e => ct.runtimeClass.isAssignableFrom( e.getClass )
         case _ => false
-      }.asInstanceOf[B[T]]
+      }
+      n.asInstanceOf[B[T]]
     }
 
     def red[E]( e:E, action:AppendListElementAction[E, A] ):E = appendListElement( e, iterable.iterator, action )
@@ -135,7 +136,7 @@ package object util {
   }
 
   implicit class RichMatrix[E]( val iterable:Iterable[Iterable[E]] ) {
-    def deepFind( predicate:Predicate[E] ):Option[E] = {
+    def matrixFind( predicate:Predicate[E] ):Option[E] = {
       iterable.foreach( _.foreach( e => if ( predicate.test( e ) ) return Some( e ) ) )
       Option.empty
     }
@@ -184,18 +185,12 @@ package object util {
 
     def amount:Int = resources.values.sum
 
-    def display:String = resources.map( d => d._1.s + "[" + d._2 + "]" ).mkString( ", " )
-
     def has( requiredResources:ResourceCards ):Boolean = {
       requiredResources.foreach( data => if ( resources.get( data._1 ).isEmpty || resources( data._1 ) < data._2 ) return false )
       true
     }
 
     def sort:Seq[(Resource, Int)] = Resources.get.zip( Resources.get.map( resources ) )
-  }
-
-  object Util {
-
   }
 
 }

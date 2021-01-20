@@ -27,17 +27,18 @@ object Cards {
   type ResourceCards = Map[Resource, Int]
 
   object ResourceCards {
-    val empty:ResourceCards = Map.empty
+    def ofResource( r:Resource, amount:Int = 1 ):ResourceCards = Map( r -> amount )
 
-    def of( r:Resource, amount:Int = 1 ):ResourceCards = Map( r -> amount )
+    def of( wood:Int = 0, clay:Int = 0, sheep:Int = 0, wheat:Int = 0, ore:Int = 0 ):ResourceCards =
+      Map( Wood -> wood, Clay -> clay, Sheep -> sheep, Wheat -> wheat, Ore -> ore )
   }
 
   def getResourceCards( amount:Int = resourceCardAmount ):ResourceCards = {
     Resources.get.map( r => r -> amount ).toMap
   }
 
-  def getDevStack:List[DevelopmentCard] = {
-    Random.shuffle( devCards.red( List.empty, ( l:List[DevelopmentCard], d:DevelopmentCard ) => {
+  def getDevStack( random:Random = Random ):List[DevelopmentCard] = {
+    random.shuffle( devCards.red( List.empty, ( l:List[DevelopmentCard], d:DevelopmentCard ) => {
       l ++ ( 1 to d.amount ).map( _ => d ).toList
     } ) )
   }

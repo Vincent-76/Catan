@@ -22,8 +22,8 @@ abstract class RobberCommand( ) extends Command {
         players = game.players.updated( stealPlayerID, game.players( stealPlayerID ).removeResourceCard( r ).get )
           .updated( game.onTurn, game.player.addResourceCard( r ) )
       ), Some( ResourceChangeInfo(
-        playerAdd = Map( game.onTurn -> ResourceCards.of( r ) ),
-        playerSub = Map( stealPlayerID -> ResourceCards.of( r ) )
+        playerAdd = Map( game.onTurn -> ResourceCards.ofResource( r ) ),
+        playerSub = Map( stealPlayerID -> ResourceCards.ofResource( r ) )
       ) ) )
       case None => Success( game.copy(
         state = nextState,

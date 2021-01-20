@@ -31,8 +31,8 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
       state = state.nextState,
       players = newData._1.updated( game.onTurn, game.player.addResourceCard( r, amount ) )
     ), Some( ResourceChangeInfo(
-      playerAdd = Map( game.onTurn -> ResourceCards.of( r, amount ) ),
-      playerSub = newData._2.map( d => (d._1, ResourceCards.of( r, d._2 )) )
+      playerAdd = Map( game.onTurn -> ResourceCards.ofResource( r, amount ) ),
+      playerSub = newData._2.map( d => (d._1, ResourceCards.ofResource( r, d._2 )) )
     ) ) )
   }
 

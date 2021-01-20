@@ -5,6 +5,7 @@ import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.model.{ Info, State, StructurePlacement }
+import de.htwg.se.settlers.ui.testui.TestUI
 import de.htwg.se.settlers.ui.tui.TUI
 
 /**
@@ -12,6 +13,7 @@ import de.htwg.se.settlers.ui.tui.TUI
  */
 object UI {
   def get( s:String, controller:Controller ):UI = s.toLowerCase() match {
+    case "test" => new TestUI( controller )
     case "gui" => ???
     case _ => new TUI( controller )
   }

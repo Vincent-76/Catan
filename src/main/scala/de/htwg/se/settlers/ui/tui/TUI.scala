@@ -4,7 +4,7 @@ import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state._
-import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.{ PlacementPointNotEmpty, _ }
 import de.htwg.se.settlers.ui.UI
 import de.htwg.se.settlers.ui.tui.TUI.InvalidFormat
 import de.htwg.se.settlers.ui.tui.command.{ ExitCommand, HelpCommand, RedoCommand, UndoCommand }
@@ -66,6 +66,8 @@ object TUI {
     scala.io.StdIn.readLine()
   }
 
+  def highlight( o:Any = "" ):String = Console.YELLOW + o + reset
+
   def confirmed( actionInfo:String = "Type [Y] for yes or [N] for no" ):Boolean = {
     while ( true ) {
       action( actionInfo )
@@ -92,7 +94,7 @@ object TUI {
 
   def parseResources( resourcesString:String ):ResourceCards = {
     val parts = resourcesString.split( "\\s*,\\s*" ).toList
-    parts.red( ResourceCards.empty, ( cards:ResourceCards, part:String ) => {
+    parts.red( ResourceCards.of(), ( cards:ResourceCards, part:String ) => {
       val res = parseResource( part )
       if ( res.isDefined )
         cards.updated( res.get._1, res.get._2 )
@@ -196,8 +198,42 @@ class TUI( val controller:Controller ) extends UI {
   override def onError( t:Throwable ):Unit = {
     TUI.outln()
     TUI.error( t match {
-      case NotEnoughPlayers => "Minimum " + Game.minPlayers + " players required!"
-      case InvalidPlacementPoint => "Invalid place!"
+      case WrongState => "Unable in this state!"
+      case InsufficientResources => "Insufficient resources for this action!"
+      case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
+      case InsufficientStructures( structure ) =>
+        "Insufficient structures of " + TUI.highlight( structure.s ) + " for this action!"
+      case NonExistentPlacementPoint( id ) => "Placement point " + TUI.highlight( id ) + " does not exists!"
+      case PlacementPointNotEmpty( id ) => "Placement point " + TUI.highlight( id ) + " is not empty!"
+      case NoAdjacentStructure => "Player has no adjacent structure!"
+      case TooCloseToBuilding( id ) => "Placement point " + TUI.highlight( id ) + " is too close to another building!"
+      case NoConnectedStructures( id ) => "No connected structures on placement point " + TUI.highlight( id ) + "!"
+      case SettlementRequired( id ) =>
+        "You need a settlement on placement point " + TUI.highlight( id ) + " to build a city!"
+      case InvalidPlacementPoint( id ) => "Invalid placement point " + TUI.highlight( id ) + "!"
+      case NotEnoughPlayers => "Minimum " + TUI.highlight( Game.minPlayers ) + " players required!"
+      case InvalidPlayerColor( color ) => "Invalid player color: " + TUI.highlight( "[" + color + "]" ) + "!"
+      case RobberOnlyOnWater => "Robber can only be places on land!"
+      case NoPlacementPoints( structure ) =>
+        "No available placement points for structure " + TUI.highlight( structure.s ) + "!"
+      case InvalidResourceAmount( amount ) => "Invalid resource amount: " + TUI.highlight( amount ) + "!"
+      case InvalidTradeResources( give, get ) =>
+        "Invalid trade resources: " + TUI.highlight( give.s ) + " <-> " + TUI.highlight( get.s ) + "!"
+      case InvalidDevCard( devCard ) => "Invalid dev card: " + TUI.highlight( "[" + devCard + "]" ) + "!"
+      case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + TUI.highlight( devCard.t ) + "!"
+      case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
+      case DevCardDrawnInTurn( devCard ) =>
+        "You've drawn this development card (" + TUI.highlight( devCard.t ) + ") in this turn, you can use it in your next turn."
+      case InsufficientBankResources( r:Resource ) => "Bank has insufficient resources of " + TUI.highlight( r.s ) + "!"
+      case InconsistentData => "Internal problem, please try again."
+      case DevStackIsEmpty => "Development card stack is empty!"
+      case PlayerNameAlreadyExists( name ) => "Player with name: " + TUI.highlight( "[" + name + "]" ) + " already exists!"
+      case PlayerColorIsAlreadyInUse( playerColor ) =>
+        "Player color " + playerColor.c.t + playerColor.name + TUI.reset + " is already in use!"
+      case InvalidPlayerID( id ) => "Invalid player id: " + TUI.highlight( "[" + id + "]" ) + "!"
+      case InvalidPlayer( playerID ) => "Invalid player with id: " + TUI.highlight( playerID ) + "!"
+      case NothingToUndo => "Nothing to undo!"
+      case NothingToRedo => "Nothing to redo!"
       case e:ControllerError => e
       case t:Throwable => t + ": " + t.getMessage
     } )

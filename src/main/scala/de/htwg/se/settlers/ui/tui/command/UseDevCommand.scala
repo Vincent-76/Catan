@@ -14,7 +14,7 @@ case object UseDevCommand
     case Some( devCardString ) =>
       val devCard = Cards.usableDevCardOf( devCardString )
       if ( devCard.isEmpty )
-        state.onError( InvalidDevCard )
+        state.onError( InvalidDevCard( devCardString ) )
       else
         state.useDevCard( devCard.get )
     case None => state.onError( InvalidFormat( commandInput.input ) )

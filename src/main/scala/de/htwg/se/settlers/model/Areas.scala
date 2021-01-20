@@ -7,7 +7,7 @@ import scala.util.Random
  */
 
 object Area {
-  def getAvailableAreas:(List[WaterArea], List[WaterArea], List[Option[Resource]], List[Number]) = {
+  def getAvailableAreas( r:Random = Random ):(List[WaterArea], List[WaterArea], List[Option[Resource]], List[Number]) = {
     val portAreas = List(
       WaterArea( Some( Port( Option.empty ) ) ),
       WaterArea( Some( Port( Option.empty ) ) ),
@@ -30,7 +30,7 @@ object Area {
       WaterArea( Option.empty ),
       WaterArea( Option.empty )
     )
-    val landAreas = Random.shuffle( List(
+    val landAreas = List(
       Option.empty,
       Some( Wood ),
       Some( Wood ),
@@ -50,28 +50,28 @@ object Area {
       Some( Ore ),
       Some( Ore ),
       Some( Ore ),
-    ) )
+    )
     val numbers = List(
-      Six,
-      Three,
-      Eight,
       Two,
+      Three,
+      Three,
+      Four,
       Four,
       Five,
-      Ten,
       Five,
-      Nine,
       Six,
+      Six,
+      Eight,
+      Eight,
       Nine,
+      Nine,
+      Ten,
       Ten,
       Eleven,
-      Three,
+      Eleven,
       Twelve,
-      Eight,
-      Four,
-      Eleven
     )
-    (Random.shuffle( portAreas ), waterAreas, Random.shuffle( landAreas ), numbers)
+    (r.shuffle( portAreas ), waterAreas, r.shuffle( landAreas ), r.shuffle( numbers ))
   }
 }
 
