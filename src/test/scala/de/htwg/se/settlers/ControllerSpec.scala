@@ -19,7 +19,7 @@ class ControllerSpec extends WordSpec with Matchers {
         controller.game.state shouldBe an[InitState]
       }
     }
-    "running" should {
+    /*"running" should {
       "set InitPlayerState" in {
         controller.game.state.initPlayers()
         controller.undoAction()
@@ -106,7 +106,7 @@ class ControllerSpec extends WordSpec with Matchers {
     }
     "commands" should {
 
-    }
+    }*/
   }
 
   private def undoRedo( controller:Controller ):Unit = {

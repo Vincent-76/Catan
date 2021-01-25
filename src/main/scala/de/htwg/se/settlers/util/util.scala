@@ -55,7 +55,7 @@ package object util {
   implicit class RichIterable[A, B[A] <: Iterable[A]]( iterable:B[A] ) {
     def withType[T <: A :ClassTag]( implicit ct:ClassTag[T] ):B[T] = {
       val n = iterable.filter {
-        case e => ct.runtimeClass.isAssignableFrom( e.getClass )
+        case e if ct.runtimeClass.isAssignableFrom( e.getClass ) => true
         case _ => false
       }
       n.asInstanceOf[B[T]]
