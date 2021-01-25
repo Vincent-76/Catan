@@ -1,5 +1,7 @@
 package de.htwg.se.settlers.model.commands
+
 import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.state.NextPlayerState
 import de.htwg.se.settlers.model.{ Command, Game, Info, State, Turn }
 
 import scala.util.{ Success, Try }
@@ -14,7 +16,7 @@ case class EndTurnCommand( state:State ) extends Command {
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
     turn = Some( game.turn )
     Success( game.copy(
-      state = controller.ui.getNextPlayerState,
+      state = NextPlayerState( controller ),
       turn = Turn( game.nextTurn() ),
       round = game.round + 1
     ), Option.empty )

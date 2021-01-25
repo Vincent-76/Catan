@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.ui.tui.command
 
-import de.htwg.se.settlers.model.State
+import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, TUI }
 
 /**
@@ -9,12 +9,13 @@ import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, TUI }
 case object ExitCommand
   extends CommandAction( "exit", List.empty, "Exit the game." ) {
 
-  override def action( commandInput:CommandInput, state:State ):Unit = {
-    TUI.clear()
+  override def action( commandInput:CommandInput, controller:Controller ):Unit = {
+    /*TUI.clear()
     TUI.outln( Console.YELLOW + "Do you want to exit?" )
     if ( TUI.confirmed() ) {
       TUI.outln( "Bye..." )
       state.exit()
-    } else state.show()
+    } else state.show()*/
+    controller.exit()
   }
 }

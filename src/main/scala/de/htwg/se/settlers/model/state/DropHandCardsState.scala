@@ -9,7 +9,7 @@ import de.htwg.se.settlers.model.commands.DropHandCardsCommand
 /**
  * @author Vincent76;
  */
-abstract class DropHandCardsState( val pID:PlayerID, val dropped:List[PlayerID], controller:Controller ) extends State( controller ) {
+case class DropHandCardsState( controller:Controller, pID:PlayerID, dropped:List[PlayerID] = List.empty ) extends State( controller ) {
 
   override def dropResourceCardsToRobber( cards:ResourceCards ):Unit = controller.action(
     DropHandCardsCommand( this, cards )

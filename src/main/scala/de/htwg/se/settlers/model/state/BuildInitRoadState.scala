@@ -7,7 +7,7 @@ import de.htwg.se.settlers.model.commands.BuildInitRoadCommand
 /**
  * @author Vincent76;
  */
-abstract class BuildInitRoadState( val settlementVID:Int, controller:Controller ) extends State( controller ) {
+case class BuildInitRoadState( controller:Controller, settlementVID:Int ) extends State( controller ) {
 
   override def buildInitRoad( eID:Int ):Unit = controller.action(
     BuildInitRoadCommand( eID, this )

@@ -34,7 +34,7 @@ package object util {
     def tab:String = tab()
 
     def tab( tabs:Int = 1 ):String = {
-      ( 1 to tabs ).red( s, ( s:String, _ ) => s.replace( "\n", "\n\t" ) )
+      ( 1 to tabs ).red( s, ( s:String, _:Int ) => s.replace( "\n", "\n\t" ) )
     }
 
     def toLength( length:Int ):String = if ( s.length > length ) s.substring( 0, length ) else s.space( length - s.length )
@@ -66,7 +66,7 @@ package object util {
     def redByKey[E]( e:E, action:AppendListElementByKeyAction[E] ):E = appendListElementByKey( e, iterable.size - 1, action )
 
     def removeAt( i:Int ):B[A] = {
-      iterable.splitAt( i ).use( d => ( d._1 ++ d._2.tail ).asInstanceOf[B[A]] )
+      iterable.splitAt( i ).use( d => d._1 ++ d._2.tail ).asInstanceOf[B[A]]
     }
   }
 
@@ -85,7 +85,7 @@ package object util {
   }
 
   implicit class RichStringIterable[T <: String]( iterable:Iterable[T] ) {
-    def sumLength:Int = iterable.red( 0, ( v:Int, s:T ) => v + s.length )
+    def sumLength:Int = iterable.red( 0, ( i:Int, s:String ) => i + s.length )
   }
 
   implicit class RichSequence[A]( seq:Seq[A] ) {
@@ -97,10 +97,17 @@ package object util {
       case -1 => seq
       case i:Int => seq.removeAt( i )
     }
+
+    def sortBySeq( sortSeq:Seq[A] ):Seq[A] = {
+      val sorted = sortSeq.flatMap( e => seq.filter( _ == e ) )
+      sorted ++ seq.filter( !sorted.contains( _ ) )
+    }
   }
 
   implicit class RichMap[A, B]( map:Map[A, B] ) {
     def red[E]( e:E, action:AppendMapElementAction[E, A, B] ):E = appendMapElement( e, map.iterator, action )
+
+    def sortBySeq( sortSeq:Seq[A] ):Seq[(A, B)] = sortSeq.zip( sortSeq.map( map ) )
   }
 
   private def appendListElement[E, A]( e:E, iterator:Iterator[A], action:AppendListElementAction[E, A] ):E = {
@@ -190,7 +197,12 @@ package object util {
       true
     }
 
-    def sort:Seq[(Resource, Int)] = Resources.get.zip( Resources.get.map( resources ) )
+    def sort:Seq[(Resource, Int)] = resources.sortBySeq( Resources.get )
+
+    override def toString:String = toString( "" )
+
+    def toString( prefix:String ):String =
+      resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.title ).mkString( ", " )
   }
 
 }

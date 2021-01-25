@@ -3,7 +3,7 @@ package de.htwg.se.settlers.model.commands
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.model.state.RobberPlaceState
+import de.htwg.se.settlers.model.state.{ RobberPlaceState, RobberStealState }
 
 import scala.util.{ Failure, Success, Try }
 
@@ -30,8 +30,8 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
           gameField = newGameField
         ), Option.empty )
         case List( stealPlayerID ) => steal( game, stealPlayerID, state.nextState, Some( newGameField ) )
-        case _ => Success( game.copy(
-          state = controller.ui.getRobberStealState( state.nextState ),
+        case adjacentPlayers => Success( game.copy(
+          state = RobberStealState( adjacentPlayers, controller, state.nextState ),
           gameField = newGameField
         ), Option.empty )
       }

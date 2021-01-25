@@ -44,14 +44,14 @@ object Cards {
   }
 
   def usableDevCardOf( s:String ):Option[DevelopmentCard] =
-    devCards.filter( _.usable ).find( _.t.toLowerCase == s.toLowerCase )
+    devCards.filter( _.usable ).find( _.title.toLowerCase == s.toLowerCase )
 
 }
 
 abstract class Card
 
 
-abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val t:String, val desc:String ) extends Card
+abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val title:String, val desc:String ) extends Card
 
 case object KnightCard extends DevelopmentCard( 14, true, "Knight",
   "Move the robber.\nSteal 1 resource from the owner of a settlement or city adjacent to the robber's new hex." )
@@ -69,7 +69,7 @@ case object MonopolyCard extends DevelopmentCard( 2, true, "Monopoly",
   "When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type." )
 
 
-abstract class BonusCard( val bonus:Int, val required:Int, val t:String, desc:String ) extends Card
+abstract class BonusCard( val bonus:Int, val required:Int, val title:String, desc:String ) extends Card
 
 case object LargestArmyCard extends BonusCard( 2, 3, "Largest Army",
   "2 Victory Points!\nThe first player to play 3 knight cards gets this card. Another player who plays more knight cards takes this card." ) {

@@ -4,11 +4,11 @@ package de.htwg.se.settlers.model
  * @author Vincent76;
  */
 
-sealed abstract class FieldType( val c:Color, val s:String )
+sealed abstract class FieldType( val title:String )
 
-case object Water extends FieldType( ColorBlue, " " )
+case object Water extends FieldType( "" )
 
-case object Desert extends FieldType( ColorBlack, "D" )
+case object Desert extends FieldType( "D" )
 
 
 object Resources {
@@ -20,17 +20,17 @@ object Resources {
     Ore
   )
 
-  def of( s:String ):Option[Resource] = get.find( _.s.toLowerCase == s.toLowerCase )
+  def of( s:String ):Option[Resource] = get.find( _.title.toLowerCase == s.toLowerCase )
 }
 
-sealed abstract class Resource( override val c:Color, override val s:String ) extends FieldType( c, s )
+sealed abstract class Resource( override val title:String ) extends FieldType( title )
 
-case object Wood extends Resource( ColorGreen, "Wood" )
+case object Wood extends Resource( "Wood" )
 
-case object Clay extends Resource( ColorMagenta, "Clay" )
+case object Clay extends Resource( "Clay" )
 
-case object Sheep extends Resource( ColorWhite, "Sheep" )
+case object Sheep extends Resource( "Sheep" )
 
-case object Wheat extends Resource( ColorYellow, "Wheat" )
+case object Wheat extends Resource( "Wheat" )
 
-case object Ore extends Resource( ColorCyan, "Ore" )
+case object Ore extends Resource( "Ore" )

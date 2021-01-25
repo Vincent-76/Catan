@@ -1,0 +1,18 @@
+package de.htwg.se.settlers.ui.gui.guistate
+
+import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.{ Player, Road }
+import de.htwg.se.settlers.ui.gui.{ DisplayState, FieldInputDisplayState, GUIState }
+
+/**
+ * @author Vincent76;
+ */
+case class DevRoadBuildingGUIState( controller:Controller ) extends GUIState {
+
+  override def getDisplayState:DisplayState =
+    new FieldInputDisplayState( Road.getBuildablePoints( controller.game, controller.onTurn ) ) {
+      override def action( id:Int ):Unit = controller.game.state.devBuildRoad( id )
+    }
+
+  override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
+}

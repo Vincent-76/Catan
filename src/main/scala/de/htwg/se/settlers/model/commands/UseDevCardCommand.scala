@@ -2,6 +2,7 @@ package de.htwg.se.settlers.model.commands
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.state.{ DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState }
 import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Success, Try }
@@ -14,7 +15,7 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
     if ( game.turn.usedDevCard )
       return Failure( AlreadyUsedDevCardInTurn )
-    else if( !game.player.devCards.contains( devCard ) )
+    else if ( !game.player.devCards.contains( devCard ) )
       return Failure( InsufficientDevCards( devCard ) )
     else if ( game.player.devCards.count( _ == devCard ) <= game.turn.drawnDevCards.count( _ == devCard ) )
       return Failure( DevCardDrawnInTurn( devCard ) )
@@ -22,15 +23,15 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
     if ( newPlayer.isFailure )
       return newPlayer.rethrow
     val nextState = devCard match {
-      case KnightCard => controller.ui.getRobberPlaceState( state )
-      case YearOfPlentyCard => controller.ui.getYearOfPlentyState( state )
+      case KnightCard => RobberPlaceState( controller, state )
+      case YearOfPlentyCard => YearOfPlentyState( controller, state )
       case RoadBuildingCard =>
         if ( !game.player.hasStructure( Road ) )
           return Failure( InsufficientStructures( Road ) )
-        if ( game.getBuildableIDsForPlayer( game.onTurn, Road ).isEmpty )
+        if ( Road.getBuildablePoints( game, game.onTurn ).isEmpty )
           return Failure( NoPlacementPoints( Road ) )
-        controller.ui.getDevRoadBuildingState( state )
-      case MonopolyCard => controller.ui.getMonopolyState( state )
+        DevRoadBuildingState( controller, state )
+      case MonopolyCard => MonopolyState( controller, state )
       case _ => state
     }
     val newBonusCards = if ( devCard == KnightCard ) {
@@ -54,7 +55,8 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
       players = game.players.updated( game.onTurn, game.player.copy(
         devCards = game.player.devCards :+ devCard,
         usedDevCards = game.player.usedDevCards.removed( devCard ).toVector
-      ) )
+      ) ),
+      turn = game.turn.copy( usedDevCard = false )
     )
     if ( devCard == KnightCard ) {
       val largestArmy = game.bonusCards( LargestArmyCard )

@@ -1,7 +1,7 @@
 package de.htwg.se.settlers.model.commands
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.{ BuildInitRoadState, NextPlayerState }
+import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState, NextPlayerState }
 import de.htwg.se.settlers.model.{ Command, Game, Info, InvalidPlacementPoint, Road, Turn }
 import de.htwg.se.settlers.util._
 
@@ -19,12 +19,12 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
       case Success( game ) =>
         val (nTurn, nState) = game.settlementAmount( game.onTurn ) match {
           case 1 => game.settlementAmount( game.nextTurn() ) match {
-            case 0 => (game.nextTurn(), controller.ui.getBuildInitSettlementState)
-            case _ => (game.onTurn, controller.ui.getBuildInitSettlementState)
+            case 0 => (game.nextTurn(), BuildInitSettlementState( controller ))
+            case _ => (game.onTurn, BuildInitSettlementState( controller ))
           }
           case _ => game.settlementAmount( game.previousTurn() ) match {
-            case 1 => (game.previousTurn(), controller.ui.getBuildInitSettlementState)
-            case _ => (game.onTurn, controller.ui.getNextPlayerState)
+            case 1 => (game.previousTurn(), BuildInitSettlementState( controller ))
+            case _ => (game.onTurn, NextPlayerState( controller ))
           }
         }
         Success( game.copy(

@@ -2,17 +2,15 @@ package de.htwg.se.settlers.ui.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Road
-import de.htwg.se.settlers.model.state.BuildInitRoadState
 import de.htwg.se.settlers.ui.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
-class BuildInitRoadTUIState( vID:Int, controller:Controller
-                           ) extends BuildInitRoadState( vID, controller ) with TUIState {
+case class BuildInitRoadTUIState( vID:Int, controller:Controller ) extends TUIState {
 
   override def getGameDisplay:Option[String] = {
-    Some( GameDisplay( controller, Road, controller.game.gameField.edges.map( _._2.id ).toList /*.getBuildableRoadSpotsForSettlement( vID )*/ ).buildGameField )
+    Some( GameDisplay( controller, controller.game.getBuildableRoadSpotsForSettlement( vID ) ).buildGameField )
   }
 
   override def getActionInfo:String = {
@@ -22,5 +20,6 @@ class BuildInitRoadTUIState( vID:Int, controller:Controller
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
-  override def action( commandInput:CommandInput ):Unit = buildInitRoad( commandInput.command.get.toInt )
+  override def action( commandInput:CommandInput ):Unit =
+    controller.game.state.buildInitRoad( commandInput.command.get.toInt )
 }

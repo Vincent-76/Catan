@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.ui.tui.command
 
-import de.htwg.se.settlers.model.State
+import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, TUI }
 
 /**
@@ -9,9 +9,9 @@ import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, TUI }
 case object PlayerTradeCommand
   extends CommandAction( "ptrade", List( "giveResources", "getResources" ), "Trade resources with other players." ) {
 
-  override def action( commandInput:CommandInput, state:State ):Unit = {
+  override def action( commandInput:CommandInput, controller:Controller ):Unit = {
     val parts = commandInput.input.split( "\\s+", 2 )( 1 ).split( "\\s*-\\s*" )
-    state.setPlayerTradeState( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) )
+    controller.game.state.setPlayerTradeState( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) )
   }
 
   override protected def getInputPattern:String = {

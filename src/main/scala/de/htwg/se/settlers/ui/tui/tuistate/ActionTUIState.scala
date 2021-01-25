@@ -1,15 +1,14 @@
 package de.htwg.se.settlers.ui.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.ActionState
-import de.htwg.se.settlers.ui.tui.command.{ BankTradeCommand, BuildCommand, BuyDevCommand, PlayerTradeCommand, UseDevCommand }
-import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, GameDisplay, TUI, TUIState }
+import de.htwg.se.settlers.ui.tui.command._
+import de.htwg.se.settlers.ui.tui._
 import de.htwg.se.settlers.util._
 
 /**
  * @author Vincent76;
  */
-class ActionTUIState( controller: Controller) extends ActionState( controller ) with TUIState {
+case class ActionTUIState( controller: Controller ) extends TUIState {
 
   private val availableCommands:List[CommandAction] = List(
     BuildCommand,
@@ -36,8 +35,8 @@ class ActionTUIState( controller: Controller) extends ActionState( controller ) 
   }
 
   override def action( commandInput:CommandInput ):Unit = availableCommands.find( c => c.command =^ commandInput.command.get ) match {
-    case Some( c ) => c.action( commandInput, this )
-    case _ if commandInput.input =^ "end" => endTurn()
+    case Some( c ) => c.action( commandInput, controller )
+    case _ if commandInput.input =^ "end" => controller.game.state.endTurn()
     case _ =>
   }
 }

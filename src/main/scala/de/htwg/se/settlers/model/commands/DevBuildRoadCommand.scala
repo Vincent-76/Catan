@@ -2,7 +2,7 @@ package de.htwg.se.settlers.model.commands
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.state.DevRoadBuildingState
-import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.{ Command, _ }
 
 import scala.util.{ Failure, Success, Try }
 
@@ -17,10 +17,10 @@ case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Co
       case Success( newGame ) =>
         val (nextState, info) = if ( !game.player.hasStructure( Road ) )
           (state.nextState, InsufficientStructuresInfo( game.onTurn, Road ))
-        else if ( game.getBuildableIDsForPlayer( game.onTurn, Road ).isEmpty )
+        else if ( Road.getBuildablePoints( game, game.onTurn ).isEmpty )
           (state.nextState, NoPlacementPointsInfo( game.onTurn, Road ))
         else if ( state.roads == 0 )
-          (controller.ui.getDevRoadBuildingState( state.nextState, state.roads + 1 ), BuiltInfo( Road, eID ))
+          (DevRoadBuildingState( controller, state.nextState, state.roads + 1 ), BuiltInfo( Road, eID ))
         else
           (state.nextState, BuiltInfo( Road, eID ))
         Success( newGame.setState( nextState ), Some( info ) )

@@ -2,7 +2,8 @@ package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Row, Vertex }
+import de.htwg.se.settlers.model.GameField.{ Edge, Hex, PlacementPoint, Row, Vertex }
+import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.util._
 
@@ -20,6 +21,7 @@ object Game {
   val defaultBankTradeFactor:Int = 4
   val unspecifiedPortFactor:Int = 3
   val specifiedPortFactor:Int = 2
+  val maxPlayerNameLength:Int = 10
 
 
   class PlayerID private[Game]( val id:Int )
@@ -45,7 +47,7 @@ case class Game( state:State,
                  turn:Turn = Turn( new PlayerID( -1 ) ),
                  bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, Option.empty) ).toMap,
                  winner:Option[PlayerID] = Option.empty,
-                 round:Int = 0,
+                 round:Int = 1,
                  seed:Int = Random.nextInt( Int.MaxValue / 1000 )
                ) {
 
@@ -213,55 +215,10 @@ case class Game( state:State,
     }
   }
 
-  def getBuildableIDsForPlayer( playerID:PlayerID, placement:Placement, any:Boolean = false ):List[Int] = placement match {
-    case Road => gameField.edges.values.red( (List.empty, List.empty), ( d:(List[Int], List[Int]), edge:Edge ) => {
-      if ( !d._2.contains( edge.id ) && edge.road.isDefined && edge.road.get.owner == playerID ) {
-        val nd = gameField.adjacentEdges( edge ).filter( e => !d._2.contains( e.id ) ).red( d, ( d:(List[Int], List[Int]), e:Edge ) => {
-          if ( e.road.isEmpty )
-            (d._1 :+ e.id, d._2 :+ e.id)
-          else if ( e.road.get.owner != playerID )
-            (d._1, d._2 :+ e.id)
-          else d
-        } )
-        (nd._1, nd._2 :+ edge.id)
-      } else d
-    } )._1
-    case Settlement if any => getAnySettlementSpots
-    case Settlement =>
-      gameField.edges.values.red( (List.empty, List.empty), ( d:(List[Int], List[Int]), e:Edge ) => {
-        if ( e.road.isDefined && e.road.get.owner == playerID )
-          gameField.adjacentVertices( e ).filter( v => !d._2.contains( v.id ) ).red( d, ( d:(List[Int], List[Int]), v:Vertex ) => {
-            if ( v.building.isEmpty && noBuildingInRange( v ) )
-              (d._1 :+ v.id, d._2 :+ v.id)
-            else
-              (d._1, d._2 :+ v.id)
-          } )
-        else d
-      } )._1
-    case City => gameField.vertices.values.red( List.empty, ( l:List[Int], v:Vertex ) => v.building match {
-      case Some( b:Settlement ) if b.owner == playerID => l :+ v.id
-      case _ => l
-    } )
-    case Robber => gameField.hexagons.red( List.empty, ( l:List[Int], row:Row[Hex] ) => row.red( l, ( l:List[Int], hex:Option[Hex] ) => {
-      if ( hex.isDefined && hex.get != gameField.robber && hex.get.area.isInstanceOf[LandArea] )
-        l :+ hex.get.id
-      else l
-    } ) )
-    case _ => List.empty
-  }
-
-  def getAnySettlementSpots:List[Int] = {
-    gameField.vertices.values.red( List.empty, ( l:List[Int], v:Vertex ) => {
-      if ( v.building.isEmpty && noBuildingInRange( v ) )
-        l :+ v.id
-      else l
-    } )
-  }
-
-  def getBuildableRoadSpotsForSettlement( vID:Int ):List[Int] = {
+  def getBuildableRoadSpotsForSettlement( vID:Int ):List[Edge] = {
     val vertex = gameField.findVertex( vID )
     if ( vertex.isDefined && vertex.get.building.isDefined )
-      gameField.adjacentEdges( vertex.get ).filter( _.road.isEmpty ).map( _.id )
+      gameField.adjacentEdges( vertex.get ).filter( _.road.isEmpty )
     else List.empty
   }
 

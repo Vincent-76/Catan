@@ -8,13 +8,13 @@ import de.htwg.se.settlers.model.{ DevelopmentCard, Resource, State, StructurePl
 /**
  * @author Vincent76;
  */
-abstract class ActionState( controller:Controller ) extends State( controller ) {
+case class ActionState( controller:Controller ) extends State( controller ) {
 
   override def setBuildState( structure:StructurePlacement ):Unit = controller.action(
     SetBuildStateCommand( structure, this )
   )
 
-  override def bankTrade( give:(Resource, Int), get:(Resource, Int) ):Unit = controller.action(
+  override def bankTrade( give:ResourceCards, get:ResourceCards ):Unit = controller.action(
     BankTradeCommand( give, get )
   )
 

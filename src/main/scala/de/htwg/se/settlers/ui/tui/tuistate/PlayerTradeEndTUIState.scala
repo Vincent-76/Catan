@@ -4,17 +4,12 @@ import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.InvalidPlayerID
-import de.htwg.se.settlers.model.state.PlayerTradeEndState
 import de.htwg.se.settlers.ui.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
-class PlayerTradeEndTUIState( give:ResourceCards,
-                              get:ResourceCards,
-                              decisions:Map[PlayerID, Boolean],
-                              controller:Controller
-                            ) extends PlayerTradeEndState( give, get, decisions, controller ) with TUIState {
+case class PlayerTradeEndTUIState( give:ResourceCards, get:ResourceCards, decisions:Map[PlayerID, Boolean], controller:Controller ) extends TUIState {
 
   override def getGameDisplay:Option[String] = {
     val gameDisplay = GameDisplay( controller )
@@ -22,6 +17,8 @@ class PlayerTradeEndTUIState( give:ResourceCards,
   }
 
   override def getActionInfo:String = {
+    TUI.outln( "Give: " + give.toString )
+    TUI.outln( "Get: " + get.toString )
     if ( decisions.exists( _._2 ) ) {
       val nameLength = decisions.map( d => controller.game.player( d._1 ).idName.length ).max
       decisions.foreach( data => {
@@ -41,9 +38,9 @@ class PlayerTradeEndTUIState( give:ResourceCards,
 
   override def action( commandInput:CommandInput ):Unit = if ( decisions.exists( _._2 ) ) {
     controller.game.getPlayerID( commandInput.input.toInt ) match {
-      case Some( pID ) => playerTrade( pID )
-      case None => onError( InvalidPlayerID( commandInput.input.toInt ) )
+      case Some( pID ) => controller.game.state.playerTrade( pID )
+      case None => controller.error( InvalidPlayerID( commandInput.input.toInt ) )
     }
-  } else abortPlayerTrade()
+  } else controller.game.state.abortPlayerTrade()
 
 }

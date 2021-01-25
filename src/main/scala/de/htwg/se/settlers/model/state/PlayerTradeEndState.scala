@@ -9,10 +9,10 @@ import de.htwg.se.settlers.model.commands.{ AbortPlayerTradeCommand, PlayerTrade
 /**
  * @author Vincent76;
  */
-abstract class PlayerTradeEndState( val give:ResourceCards,
-                                    val get:ResourceCards,
-                                    val decisions:Map[PlayerID, Boolean],
-                                    controller:Controller ) extends State( controller ) {
+case class PlayerTradeEndState( controller:Controller,
+                                give:ResourceCards,
+                                get:ResourceCards,
+                                decisions:Map[PlayerID, Boolean] ) extends State( controller ) {
 
   override def playerTrade( tradePlayerID:PlayerID ):Unit = controller.action(
     PlayerTradeCommand( tradePlayerID, this )

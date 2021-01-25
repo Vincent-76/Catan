@@ -1,16 +1,12 @@
 package de.htwg.se.settlers.ui.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.State
-import de.htwg.se.settlers.model.state.YearOfPlentyState
 import de.htwg.se.settlers.ui.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
-class YearOfPlentyTUIState( nextState:State,
-                            controller:Controller
-                          ) extends YearOfPlentyState( nextState, controller) with TUIState {
+case class YearOfPlentyTUIState( controller:Controller ) extends TUIState {
 
   override def getGameDisplay:Option[String] = {
     val gameDisplay = GameDisplay( controller )
@@ -24,5 +20,6 @@ class YearOfPlentyTUIState( nextState:State,
 
   override def inputPattern:Option[String] = Some( "((^|,)" + TUI.resourcePattern + ")+" )
 
-  override def action( commandInput:CommandInput ):Unit = yearOfPlentyAction( TUI.parseResources( commandInput.input ) )
+  override def action( commandInput:CommandInput ):Unit =
+    controller.game.state.yearOfPlentyAction( TUI.parseResources( commandInput.input ) )
 }

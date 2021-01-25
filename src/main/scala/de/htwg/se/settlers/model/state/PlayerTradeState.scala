@@ -9,11 +9,11 @@ import de.htwg.se.settlers.model.commands.PlayerTradeDecisionCommand
 /**
  * @author Vincent76;
  */
-abstract class PlayerTradeState( val pID:PlayerID,
-                                 val give:ResourceCards,
-                                 val get:ResourceCards,
-                                 val decisions:Map[PlayerID, Boolean],
-                                 controller:Controller ) extends State( controller ) {
+case class PlayerTradeState( controller:Controller,
+                             pID:PlayerID,
+                             give:ResourceCards,
+                             get:ResourceCards,
+                             decisions:Map[PlayerID, Boolean] ) extends State( controller ) {
 
   override def playerTradeDecision( decision:Boolean ):Unit = controller.action(
     PlayerTradeDecisionCommand( decision, this )

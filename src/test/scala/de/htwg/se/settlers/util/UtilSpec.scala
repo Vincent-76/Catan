@@ -107,7 +107,7 @@ class UtilSpec extends WordSpec with Matchers {
         tr.throwable should be( t )
       }
       "rethrow" in {
-        tr.rethrow[String] shouldBe a [Try[String]]
+        tr.rethrow[String].isInstanceOf[Try[String]] shouldBe true
       }
       "failureOption" in {
         tr.failureOption.isDefined should be( true )

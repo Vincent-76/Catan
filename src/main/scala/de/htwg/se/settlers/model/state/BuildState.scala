@@ -7,7 +7,7 @@ import de.htwg.se.settlers.model.commands.BuildCommand
 /**
  * @author Vincent76;
  */
-abstract class BuildState( val structure:StructurePlacement, controller:Controller ) extends State( controller ) {
+case class BuildState( controller:Controller, structure:StructurePlacement ) extends State( controller ) {
 
   override def build( id:Int ):Unit = controller.action(
     BuildCommand( id, this )

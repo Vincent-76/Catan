@@ -1,6 +1,7 @@
 package de.htwg.se.settlers.ui.tui.command
 
-import de.htwg.se.settlers.model.{ Cards, InvalidDevCard, State }
+import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.{ Cards, InvalidDevCard }
 import de.htwg.se.settlers.ui.tui.TUI.InvalidFormat
 import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, TUI }
 
@@ -10,17 +11,17 @@ import de.htwg.se.settlers.ui.tui.{ CommandAction, CommandInput, TUI }
 case object UseDevCommand
   extends CommandAction( "usedevcard", List( "devcard" ), "Use one of your development cards." ) {
 
-  override def action( commandInput:CommandInput, state:State ):Unit = commandInput.args.headOption match {
+  override def action( commandInput:CommandInput, controller:Controller ):Unit = commandInput.args.headOption match {
     case Some( devCardString ) =>
       val devCard = Cards.usableDevCardOf( devCardString )
       if ( devCard.isEmpty )
-        state.onError( InvalidDevCard( devCardString ) )
+        controller.error( InvalidDevCard( devCardString ) )
       else
-        state.useDevCard( devCard.get )
-    case None => state.onError( InvalidFormat( commandInput.input ) )
+        controller.game.state.useDevCard( devCard.get )
+    case None => controller.error( InvalidFormat( commandInput.input ) )
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) + " (" +
-    Cards.devCards.filter( _.usable ).map( d => TUI.regexIgnoreCase( d.t ) ).mkString( "|" ) + ")"
+    Cards.devCards.filter( _.usable ).map( d => TUI.regexIgnoreCase( d.title ) ).mkString( "|" ) + ")"
 
 }

@@ -3,7 +3,7 @@ package de.htwg.se.settlers.model.commands
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.GameField.{ Hex, Vertex }
-import de.htwg.se.settlers.model.state.BuildInitSettlementState
+import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState }
 import de.htwg.se.settlers.model.{ Command, Game, GotResourcesInfo, Info, Resource, Settlement }
 import de.htwg.se.settlers.util._
 
@@ -21,11 +21,11 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
           val resources = adjacentResources( game.gameField.findVertex( vID ).get )
           Success(
             game.drawResourceCards( game.onTurn, resources )
-              .setState( controller.ui.getBuildInitRoadState( vID ) ),
+              .setState( BuildInitRoadState( controller, vID ) ),
             Some( GotResourcesInfo( game.onTurn, resources ) )
           )
         }
-        else Success( game.setState( controller.ui.getBuildInitRoadState( vID ) ), Option.empty )
+        else Success( game.setState( BuildInitRoadState( controller, vID ) ), Option.empty )
       case f => f.rethrow
     }
   }

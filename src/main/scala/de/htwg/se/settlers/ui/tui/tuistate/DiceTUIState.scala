@@ -1,15 +1,13 @@
 package de.htwg.se.settlers.ui.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.DiceState
 import de.htwg.se.settlers.ui.tui.command.UseDevCommand
 import de.htwg.se.settlers.ui.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
-class DiceTUIState( dices:(Int, Int),
-                    controller:Controller ) extends DiceState( dices, controller ) with TUIState {
+case class DiceTUIState( controller:Controller ) extends TUIState {
 
   override def getGameDisplay:Option[String] = {
     val gameDisplay = GameDisplay( controller )
@@ -26,8 +24,8 @@ class DiceTUIState( dices:(Int, Int),
     Some( "(^$|" + UseDevCommand.inputPattern + ")" )
 
   override def action( commandInput:CommandInput ):Unit = commandInput.input.toLowerCase match {
-    case "" => rollTheDices()
-    case _ => UseDevCommand.action( commandInput, this )
+    case "" => controller.game.state.rollTheDices()
+    case _ => UseDevCommand.action( commandInput, controller )
   }
 
 }

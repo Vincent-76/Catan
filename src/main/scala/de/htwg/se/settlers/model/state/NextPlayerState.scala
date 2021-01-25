@@ -7,7 +7,7 @@ import de.htwg.se.settlers.model.commands.StartTurnCommand
 /**
  * @author Vincent76;
  */
-abstract class NextPlayerState( controller:Controller ) extends State( controller ) {
+case class NextPlayerState( controller:Controller ) extends State( controller ) {
 
   override def startTurn( ):Unit = controller.action(
     StartTurnCommand( this )

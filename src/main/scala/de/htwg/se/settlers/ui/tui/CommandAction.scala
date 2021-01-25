@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.ui.tui
 
-import de.htwg.se.settlers.model.State
+import de.htwg.se.settlers.controller.Controller
 
 /**
  * @author Vincent76;
@@ -9,7 +9,7 @@ abstract class CommandAction( val command:String, val parameter:List[String] = L
 
   val inputPattern:String = getInputPattern
 
-  def action( commandInput:CommandInput, state:State ):Unit
+  def action( commandInput:CommandInput, controller:Controller ):Unit
 
   def getSyntax:String = "[" + command + parameter.map( p => " <" + p + ">" ).mkString + "]"
 

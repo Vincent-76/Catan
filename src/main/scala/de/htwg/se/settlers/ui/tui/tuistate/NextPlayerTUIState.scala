@@ -1,13 +1,12 @@
 package de.htwg.se.settlers.ui.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.NextPlayerState
 import de.htwg.se.settlers.ui.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
-class NextPlayerTUIState( controller:Controller ) extends NextPlayerState( controller ) with TUIState {
+case class NextPlayerTUIState( controller:Controller ) extends TUIState {
 
   override def getGameDisplay:Option[String] = {
     val gameDisplay = GameDisplay( controller )
@@ -19,5 +18,6 @@ class NextPlayerTUIState( controller:Controller ) extends NextPlayerState( contr
     "Press Enter to proceed"
   }
 
-  override def action( commandInput:CommandInput ):Unit = startTurn()
+  override def action( commandInput:CommandInput ):Unit =
+    controller.game.state.startTurn()
 }

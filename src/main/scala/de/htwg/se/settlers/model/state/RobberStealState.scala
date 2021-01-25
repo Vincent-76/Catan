@@ -8,7 +8,9 @@ import de.htwg.se.settlers.model.commands.RobberStealCommand
 /**
  * @author Vincent76;
  */
-abstract class RobberStealState( val nextState:State, controller:Controller ) extends State( controller ) {
+case class RobberStealState( adjacentPlayers:List[PlayerID],
+                             controller:Controller,
+                             nextState:State ) extends State( controller ) {
 
   override def robberStealFromPlayer( stealPlayerID:PlayerID ):Unit = controller.action(
     RobberStealCommand( stealPlayerID, this )

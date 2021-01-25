@@ -2,9 +2,9 @@ package de.htwg.se.settlers
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Player.{ Blue, Green, Red, Yellow }
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.ui.testui.TestUI
 import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
 
@@ -13,14 +13,8 @@ import org.scalatest.{ Matchers, WordSpec }
  */
 class ControllerSpec extends WordSpec with Matchers {
   "Controller" when {
-    val controller = new Controller( "test", true )
+    val controller = new Controller( true )
     "new" should {
-      "running" in {
-        controller.running should be( true )
-      }
-      "have ui as TUI" in {
-        controller.ui shouldBe a[TestUI]
-      }
       "have game" in {
         controller.game.state shouldBe an[InitState]
       }
@@ -35,11 +29,11 @@ class ControllerSpec extends WordSpec with Matchers {
       "add players" in {
         controller.game.state.addPlayer( Green, "A" )
         controller.game.state.addPlayer( Green, "B" )
-        controller.game.state.addPlayer( Cyan, "B" )
+        controller.game.state.addPlayer( Blue, "B" )
         controller.game.state.setInitBeginnerState()
-        controller.game.state.addPlayer( Cyan, "C" )
+        controller.game.state.addPlayer( Blue, "C" )
         controller.game.state.addPlayer( Red, "C" )
-        controller.game.state.addPlayer( Magenta, "D" )
+        controller.game.state.addPlayer( Yellow, "D" )
         controller.undoAction()
         controller.game.players should have size 3
       }
@@ -108,13 +102,16 @@ class ControllerSpec extends WordSpec with Matchers {
         controller.undoAction()
         controller.game = controller.game.updatePlayer( controller.game.players.head._2.copy( victoryPoints = Game.requiredVictoryPoints ) )
         controller.redoAction()
-        controller.exit()
-        controller.running should be( false )
       }
     }
     "commands" should {
 
     }
+  }
+
+  private def undoRedo( controller:Controller ):Unit = {
+    controller.undoAction()
+    controller.redoAction()
   }
 
   private def getPlayer( controller:Controller, id:Int ):Player =

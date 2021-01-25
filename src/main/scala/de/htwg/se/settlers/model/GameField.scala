@@ -152,7 +152,9 @@ object GameField {
     GameField( hexagons, edges, createVertices( hexagons, edges ), robber )
   }
 
-  case class Hex private[GameField]( id:Int, r:Int, c:Int, area:Area ) {
+  sealed trait PlacementPoint
+
+  case class Hex private[GameField]( id:Int, r:Int, c:Int, area:Area ) extends PlacementPoint {
     private def copy( ):Unit = {}
   }
 
@@ -160,17 +162,11 @@ object GameField {
     private def apply( id:Int, r:Int, c:Int, area:Area ):Hex = new Hex( id, r, c, area )
   }
 
-  sealed abstract class PlacementPoint {
-    def getStructure:Option[Structure]
-  }
-
   case class Edge private[GameField]( id:Int, h1:Hex, h2:Hex, port:Option[Port] = Option.empty, road:Option[Road] = Option.empty )
     extends PlacementPoint {
     def hexes:List[Hex] = List( h1, h2 )
 
     private def copy( ):Unit = {}
-
-    override def getStructure:Option[Structure] = road
 
     def setRoad( road:Option[Road] ):Edge = new Edge( id, h1, h2, port, road )
   }
@@ -184,8 +180,6 @@ object GameField {
     def hexes:List[Hex] = List( h1, h2, h3 )
 
     private def copy( ):Unit = {}
-
-    override def getStructure:Option[Structure] = building
 
     def setBuilding( building:Option[Building] ):Vertex = new Vertex( id, h1, h2, h3, port, building )
   }

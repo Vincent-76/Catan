@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.controller
 
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.{ Command, Game, GameEndInfo, Info, NothingToRedo, NothingToUndo, Player }
-import de.htwg.se.settlers.ui.UI
+import de.htwg.se.settlers.model.state.InitState
+import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.util.Observable
 
 import scala.util.{ Failure, Success }
 
@@ -10,14 +11,11 @@ import scala.util.{ Failure, Success }
  * @author Vincent76;
  */
 
-class Controller( uiString:String, test:Boolean = false ) {
+class Controller( test:Boolean = false ) extends Observable {
   var running:Boolean = true
-  val ui:UI = UI.get( uiString, this )
-  var game:Game = Game( ui.getInitState, test )
+  var game:Game = Game( InitState( this ), test )
   private var undoStack:List[Command] = Nil
   private var redoStack:List[Command] = Nil
-
-  ui.start()
 
   def onTurn:PlayerID = game.turn.playerID
 
@@ -25,50 +23,57 @@ class Controller( uiString:String, test:Boolean = false ) {
 
   def player( pID:PlayerID = onTurn ):Player = game.players( pID )
 
+  def hasUndo:Boolean = undoStack.nonEmpty
+
+  def hasRedo:Boolean = redoStack.nonEmpty
+
   private def checkWinner( newGame:Game ):Option[PlayerID] =
     newGame.players.values.find( p => p.getVictoryPoints( newGame ) >= Game.requiredVictoryPoints ) match {
       case Some( p ) => Some( p.id )
       case None => Option.empty
     }
 
-  private def actionDone( newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
+  private def actionDone( newGame:Game, command:Command, newRedoStack:List[Command], i:Option[Info] ):Unit = {
     game = newGame
     undoStack = command :: undoStack
     redoStack = newRedoStack
     checkWinner( game ) match {
       case None =>
-        //if ( info.isEmpty || !ui.onInfoWait( info.get ) )
-        if ( info.isDefined ) ui.onInfo( info.get )
-        game.state.show()
+        update()
+        if ( i.isDefined ) info( i.get )
       case Some( pID ) =>
         running = false
         game = game.copy( winner = Some( pID ) )
-        ui.onInfo( GameEndInfo( pID ) )
+        update()
+        info( GameEndInfo( pID ) )
     }
   }
 
   def action( command:Command ):Unit = {
     command.doStep( this, this.game ) match {
       case Success( (game, info) ) => actionDone( game, command, Nil, info )
-      case Failure( t ) => this.game.state.onError( t )
+      case Failure( t ) => error( t )
     }
   }
 
   def undoAction( ):Unit = undoStack match {
-    case Nil => ui.onError( NothingToUndo )
+    case Nil => error( NothingToUndo )
     case head :: stack =>
       this.game = head.undoStep( this.game )
       undoStack = stack
       redoStack = head :: redoStack
-      this.game.state.show()
+      update()
   }
 
   def redoAction( ):Unit = redoStack match {
-    case Nil => ui.onError( NothingToRedo )
+    case Nil => error( NothingToRedo )
     case head :: stack =>
       val (game, info) = head.doStep( this, this.game ).get
       actionDone( game, head, stack, info )
   }
 
-  def exit( ):Unit = running = false
+  def exit( ):Unit = {
+    running = false
+    update()
+  }
 }

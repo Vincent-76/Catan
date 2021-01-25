@@ -3,17 +3,13 @@ package de.htwg.se.settlers.ui.tui.tuistate
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Resources
-import de.htwg.se.settlers.model.state.DropHandCardsState
 import de.htwg.se.settlers.ui.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 import de.htwg.se.settlers.util._
 
 /**
  * @author Vincent76;
  */
-class DropHandCardsTUIState( pID:PlayerID,
-                             dropped:List[PlayerID],
-                             controller:Controller
-                           ) extends DropHandCardsState( pID, dropped, controller ) with TUIState {
+case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends TUIState {
 
   override def getGameDisplay:Option[String] = Some( GameDisplay( controller ).buildGameField )
 
@@ -21,14 +17,15 @@ class DropHandCardsTUIState( pID:PlayerID,
     TUI.outln( TUI.displayName( controller.game.player( pID ) ) + ", you have to drop " +
       ( controller.game.player( pID ).resources.amount / 2 ) + " cards!" )
     TUI.outln( "Resources:" )
-    val resourceNameLength = Resources.get.map( _.s.length ).max
+    val resourceNameLength = Resources.get.map( _.title.length ).max
     TUI.outln( controller.game.player( pID ).resources.sort.map( d =>
-      "  " + d._1.s.toLength( resourceNameLength ) + " " + d._2 ).mkString( "\n" )
+      "  " + d._1.title.toLength( resourceNameLength ) + " " + d._2 ).mkString( "\n" )
     )
     "Type [<Resource> <amount>, ...] to drop"
   }
 
   override def inputPattern:Option[String] = Some( "((^|,)" + TUI.resourcePattern + ")+" )
 
-  override def action( commandInput:CommandInput ):Unit = dropResourceCardsToRobber( TUI.parseResources( commandInput.input ) )
+  override def action( commandInput:CommandInput ):Unit =
+    controller.game.state.dropResourceCardsToRobber( TUI.parseResources( commandInput.input ) )
 }

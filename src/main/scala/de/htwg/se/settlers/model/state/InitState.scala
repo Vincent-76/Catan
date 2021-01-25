@@ -6,9 +6,9 @@ import de.htwg.se.settlers.model.commands.ChangeStateCommand
 /**
  * @author Vincent76;
  */
-abstract class InitState( controller:Controller ) extends State( controller ) {
+case class InitState( controller:Controller ) extends State( controller ) {
 
   override def initPlayers():Unit = controller.action(
-    ChangeStateCommand( this, controller.ui.getInitPlayerState )
+    ChangeStateCommand( this, InitPlayerState( controller ) )
   )
 }

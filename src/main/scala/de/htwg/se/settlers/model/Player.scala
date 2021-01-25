@@ -2,6 +2,7 @@ package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Random, Success, Try }
@@ -10,11 +11,23 @@ import scala.util.{ Failure, Random, Success, Try }
  * @author Vincent76;
  */
 object Player {
+
+  sealed abstract class PlayerColor( val name:String )
+
+
+  case object Green extends PlayerColor( "Green" )
+
+  case object Blue extends PlayerColor( "Blue" )
+
+  case object Yellow extends PlayerColor( "Yellow" )
+
+  case object Red extends PlayerColor( "Red" )
+
   val colors:List[PlayerColor] = List(
     Green,
-    Red,
-    Magenta,
-    Cyan
+    Blue,
+    Yellow,
+    Red
   )
 
   def colorOf( cString:String ):Option[PlayerColor] = {

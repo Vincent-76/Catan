@@ -1,21 +1,19 @@
 package de.htwg.se.settlers.ui.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.InitPlayerState
 import de.htwg.se.settlers.model.{ InvalidPlayerColor, Player }
 import de.htwg.se.settlers.ui.tui.{ CommandInput, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
-class InitPlayerTUIState( controller:Controller
-                        ) extends InitPlayerState( controller ) with TUIState {
+case class InitPlayerTUIState( controller:Controller ) extends TUIState {
 
   override def getActionInfo:String = {
     TUI.outln( "Players:" )
     controller.game.players.values.foreach( p => TUI.outln( TUI.displayName( p ) ) )
     TUI.outln( "Available colors: " +
-      Player.availableColors( controller.game.players.values ).map( c => c.c.t + c.name ).mkString( TUI.reset + ", " ) )
+      Player.availableColors( controller.game.players.values ).map( c => TUI.colorOf( c ) + c.name ).mkString( TUI.reset + ", " ) )
     "Type [<name> <color>] to add a player, or [next] to continue"
   }
 
@@ -24,11 +22,11 @@ class InitPlayerTUIState( controller:Controller
 
   override def action( commandInput:CommandInput ):Unit = {
     if ( commandInput.input.matches( TUI.regexIgnoreCase( "next" ) ) )
-      setInitBeginnerState()
+      controller.game.state.setInitBeginnerState()
     else Player.colorOf( commandInput.args.head ) match {
-      case None => onError( InvalidPlayerColor( commandInput.args.head ) )
+      case None => controller.error( InvalidPlayerColor( commandInput.args.head ) )
       case Some( playerColor ) =>
-        addPlayer( playerColor, commandInput.command.get )
+        controller.game.state.addPlayer( playerColor, commandInput.command.get )
     }
   }
 }

@@ -2,7 +2,7 @@ package de.htwg.se.settlers.ui.tui
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Vertex }
+import de.htwg.se.settlers.model.GameField.{ Edge, Hex, PlacementPoint, Vertex }
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
 
@@ -17,20 +17,24 @@ object GameDisplay {
   val port:String = "=" // "\u2b40"
   val generalPort:String = "?"
 
+  def colorOf( fieldType:FieldType, background:Boolean = true ):String = fieldType match {
+    case Water => if ( background ) Console.BLUE_B else Console.BLUE
+    case Desert => if ( background ) Console.BLACK_B else Console.BLACK
+    case Wood => if ( background ) Console.GREEN_B else Console.GREEN
+    case Clay => if ( background ) Console.MAGENTA_B else Console.MAGENTA
+    case Sheep => if ( background ) Console.WHITE_B else Console.WHITE
+    case Wheat => if ( background ) Console.YELLOW_B else Console.YELLOW
+    case Ore => if ( background ) Console.CYAN_B else Console.CYAN
+  }
+
   val legend:Vector[(String, String)] = Vector(
-    (Water.c.b + " ", "Water"),
-    (Desert.c.b + " ", "Desert"),
-    (Wood.c.b + TUI.textOnColor + " ", "Forest/Wood"),
-    (Clay.c.b + " ", "Hills/Clay"),
-    (Sheep.c.b + " ", "Pasture/Sheep"),
-    (Wheat.c.b + " ", "Field/Wheat"),
-    (Ore.c.b + " ", "Mountains/Ore"),
-    (Desert.s, "Desert"),
-    (Wood.s, "Wood"),
-    (Clay.s, "Clay"),
-    (Sheep.s, "Sheep"),
-    (Wheat.s, "Wheat"),
-    (Ore.s, "Ore"),
+    (colorOf( Water ) + " ", "Water"),
+    (colorOf( Desert ) + " ", "Desert"),
+    (colorOf( Wood ) + " ", "Forest/Wood"),
+    (colorOf( Clay ) + " ", "Hills/Clay"),
+    (colorOf( Sheep ) + " ", "Pasture/Sheep"),
+    (colorOf( Wheat ) + " ", "Field/Wheat"),
+    (colorOf( Ore ) + " ", "Mountains/Ore"),
     (emptyVertex, "Empty Vertex"),
     (settlement, "Settlement"),
     (city, "City"),
@@ -39,26 +43,22 @@ object GameDisplay {
     (generalPort, "3:1 exchange port"),
   )
 
-  def apply( controller:Controller, placement:Placement, playerID:PlayerID, any:Boolean = false ):GameDisplay = {
-    new GameDisplay( controller.game, Some( placement, controller.game.getBuildableIDsForPlayer( playerID, placement, any ) ) )
-  }
-
-  def apply( controller:Controller, placement:Placement, buildableIDs:List[Int] ):GameDisplay = {
-    new GameDisplay( controller.game, Some( placement, buildableIDs ) )
+  def apply( controller:Controller, buildableIDs:List[PlacementPoint] ):GameDisplay = {
+    new GameDisplay( controller.game, Some( buildableIDs ) )
   }
 
   def apply( controller:Controller ) = new GameDisplay( controller.game )
 }
 
-class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.empty ) {
+class GameDisplay( game:Game, placement:Option[List[PlacementPoint]] = Option.empty ) {
 
   type Field = Array[Array[String]]
 
   type PortOffsets = ((Int, Int), (Int, Int))
 
-  private def isShowingID( e:Edge ):Boolean = placement.isDefined && placement.get._1 == Road && placement.get._2.contains( e.id )
+  private def isShowingID( e:Edge ):Boolean = placement.isDefined && placement.get.contains( e )
 
-  private def isShowingID( v:Vertex ):Boolean = placement.isDefined && placement.get._1.isInstanceOf[VertexPlacement] && placement.get._2.contains( v.id )
+  private def isShowingID( v:Vertex ):Boolean = placement.isDefined && placement.get.contains( v )
 
 
   def buildGameField:String = {
@@ -85,7 +85,7 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
   implicit class RichField( val f:Field ) {
     def update( i:Int, j:Int, s:String ):Field = f.updated( i, f( i ).updated( j, s ) )
 
-    def fillEmptyArea( h:Hex, i:Int, j:Int ):Field = f.update( i, j, h.area.f.c.b + " " )
+    def fillEmptyArea( h:Hex, i:Int, j:Int ):Field = f.update( i, j, GameDisplay.colorOf( h.area.f ) + " " )
 
     def showOnFields( string:String, i:Int, j:Int, c:String = "" ):Field = {
       val start = j - ( math.ceil( string.length / 2d ) - 1 ).toInt
@@ -101,14 +101,14 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
       if ( edge.isEmpty )
         return f.update( i, j, dir.symbol )
       if ( h1.area.f == Water && hex2.get.area.f == Water )
-        return f.update( i, j, Water.c.b + " " )
+        return f.update( i, j, GameDisplay.colorOf( Water ) + " " )
       val f1 = if ( edge.get.road.isEmpty )
         if ( isShowingID( edge.get ) )
           f.showID( edge.get.id, i, j )
         else
           f.update( i, j, dir.symbol )
       else
-        f.update( i, j, game.players( edge.get.road.get.owner ).color.c.t + dir.symbol )
+        f.update( i, j, TUI.colorOf( game.players( edge.get.road.get.owner ).color ) + dir.symbol )
       if ( edge.get.port.isEmpty )
         return f1
       val c = if ( hex2.get.area.isInstanceOf[WaterArea] ) 1 else -1
@@ -130,8 +130,8 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
           case NorthWest => ((0, -2), (-1, 0))
           case West => ((-1, -2), (1, -2))
         }
-      f1.update( i + o1._1 * c, j + o1._2 * c, Water.c.b + TUI.textOnColor + GameDisplay.port )
-        .update( i + o2._1 * c, j + o2._2 * c, Water.c.b + TUI.textOnColor + GameDisplay.port )
+      f1.update( i + o1._1 * c, j + o1._2 * c, GameDisplay.colorOf( Water ) + TUI.textOnColor + GameDisplay.port )
+        .update( i + o2._1 * c, j + o2._2 * c, GameDisplay.colorOf( Water ) + TUI.textOnColor + GameDisplay.port )
     }
 
     def addVertex( h1:Hex, hex2:Option[Hex], hex3:Option[Hex], i:Int, j:Int ):Field = {
@@ -150,18 +150,18 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
           return f.update( i, j, GameDisplay.emptyVertex )
       val player = game.players( vertex.get.building.get.owner )
       if ( isShowingID( vertex.get ) )
-        return f.showID( vertex.get.id, i, j, player.color.c.t )
+        return f.showID( vertex.get.id, i, j, TUI.colorOf( player.color ) )
       vertex.get.building.get match {
-        case _:Settlement => f.update( i, j, player.color.c.t + GameDisplay.settlement )
-        case _:City => f.update( i, j, player.color.c.t + GameDisplay.city )
-        case _ => f.update( i, j, player.color.c.t + "?" )
+        case _:Settlement => f.update( i, j, TUI.colorOf( player.color ) + GameDisplay.settlement )
+        case _:City => f.update( i, j, TUI.colorOf( player.color ) + GameDisplay.city )
+        case _ => f.update( i, j, TUI.colorOf( player.color ) + "?" )
       }
     }
   }
 
   private def getLegend:Vector[(String, String)] = {
     val legend = game.resourceStack.red( GameDisplay.legend :+ ("", ""), ( l:Vector[(String, String)], r:Resource, amount:Int ) => {
-      l :+ (r.s + " Stack", amount.toString)
+      l :+ (r.title + " Stack", amount.toString)
     } ) :+ ("Dev Stack", game.developmentCards.size.toString)
     val titleLength = legend.map( _._1.length ).max
     legend.map( d => (d._1.toLength( titleLength ), d._2) )
@@ -190,28 +190,28 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
       .fillEmptyArea( h, i + 5, j + 3 )
       .fillEmptyArea( h, i + 5, j + 4 )
       .fillEmptyArea( h, i + 5, j + 5 )
-      .update( i + 2, j + 4, h.area.f.c.b + ( if ( h == game.gameField.robber )
+      .update( i + 2, j + 4, GameDisplay.colorOf( h.area.f ) + ( if ( h == game.gameField.robber )
         ( h.area.f match {
           case Desert => TUI.text
           case _ => TUI.textOnColor
         } ) + GameDisplay.robber
       else " " ) )
     val f1 = h.area match {
-      case DesertArea => ( if ( placement.isDefined && placement.get._1 == Robber && h != game.gameField.robber )
+      case DesertArea => ( if ( placement.isDefined && placement.get.contains( h ) )
         base.showID( h.id, i + 3, j + 4 )
       else
-        base ).showOnFields( DesertArea.f.s, i + 4, j + 4, TUI.text )
+        base ).showOnFields( DesertArea.f.title, i + 4, j + 4, TUI.text )
       case a:WaterArea => if ( a.port.isDefined )
         if ( a.port.get.specific.isDefined )
-          base.showOnFields( a.port.get.specific.get.s, i + 3, j + 4, TUI.textOnColor + a.port.get.specific.get.c.b )
+          base.showOnFields( a.port.get.specific.get.title, i + 3, j + 4, TUI.textOnColor + GameDisplay.colorOf( a.port.get.specific.get ) )
         else
           base.update( i + 3, j + 4, TUI.text + "?" )
       else base
       case a:ResourceArea =>
-        ( if ( placement.isDefined && placement.get._1 == Robber && h != game.gameField.robber )
+        ( if ( placement.isDefined && placement.get.contains( h ) )
           base.showID( h.id, i + 2, j + 4 )
-        else base ).showOnFields( a.number.value.toString, i + 3, j + 4, h.area.f.c.b + TUI.textOnColor )
-          .showOnFields( h.area.f.s, i + 4, j + 4, h.area.f.c.b + TUI.textOnColor )
+        else base ).showOnFields( a.number.value.toString, i + 3, j + 4, GameDisplay.colorOf( h.area.f ) + TUI.textOnColor )
+          .showOnFields( h.area.f.title, i + 4, j + 4, GameDisplay.colorOf( h.area.f ) + TUI.textOnColor )
     }
     val f2 = f1.addEdge( h, game.gameField.adjacentHex( h, 5 ), i + 3, j, West )
       .addEdge( h, game.gameField.adjacentHex( h, 4 ), i + 1, j + 2, NorthWest )
@@ -244,19 +244,19 @@ class GameDisplay( game:Game, placement:Option[(Placement, List[Int])] = Option.
         " Resources[" + p.resources.amount.toLength( 2 ) + "]" +
         " Points[" + p.getDisplayVictoryPoints( game ).toLength( 2 ) + "]" +
         " DevCards[" + p.devCards.size.toLength( 2 ) + "]" +
-        " UsedDevCards[" + p.usedDevCards.map( _.t ).mkString( "|" ) + "] " +
+        " UsedDevCards[" + p.usedDevCards.map( _.title ).mkString( "|" ) + "] " +
         p.getBonusCards( game ).mkString( " " )
     } ).mkString( "\n" )
     ( if ( turnPlayer.isDefined ) {
       val p = game.players( turnPlayer.get )
-      val resourceNameLength = Resources.get.map( _.s.length ).max
+      val resourceNameLength = Resources.get.map( _.title.length ).max
       s + "\n\n" + TUI.displayName( p ) +
         "\nVictory Points: " + p.getVictoryPoints( game ) +
-        "\nResources:\n" +
-        p.resources.sort.map( d => "  " + d._1.s.toLength( resourceNameLength ) + "  " + d._2 ).mkString( "\n" ) +
-        "\nDevelopment Cards: [" + p.devCards.map( _.t ).mkString( "|" ) + "]" +
-        "\nUsed Dev Cards:    [" + p.usedDevCards.map( _.t ).mkString( "|" ) + "]" +
-        p.getBonusCards( game ).map( c => "\n" + c.t ).mkString
+        "\nResources:" + p.resources.amount + "\n" +
+        p.resources.sort.map( d => "  " + d._1.title.toLength( resourceNameLength ) + "  " + d._2 ).mkString( "\n" ) +
+        "\nDevelopment Cards: [" + p.devCards.map( _.title ).mkString( "|" ) + "]" +
+        "\nUsed Dev Cards:    [" + p.usedDevCards.map( _.title ).mkString( "|" ) + "]" +
+        p.getBonusCards( game ).map( c => "\n" + c.title ).mkString
     } else s ) + "\n\n"
   }
 }
