@@ -28,7 +28,6 @@ class ControllerSpec extends WordSpec with Matchers {
         controller.game.state shouldBe an[InitState]
         controller.hasUndo shouldBe false
         controller.hasRedo shouldBe false
-        undoRedo( controller )
       }
     }
     "running" should {
