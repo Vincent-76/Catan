@@ -15,7 +15,7 @@ import scala.util.Success
  */
 class ControllerSpec extends WordSpec with Matchers {
   "Controller" when {
-    val controller = new Controller( test = true )
+    val controller = new Controller( test = true, debug = true )
     "new" should {
       "have game" in {
         val observer = new Observer {

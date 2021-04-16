@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.controller
 
-import de.htwg.se.settlers.Catan
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.model._
@@ -12,7 +11,7 @@ import scala.util.{Failure, Success}
  * @author Vincent76;
  */
 
-class Controller( test:Boolean = false ) extends Observable {
+class Controller( test:Boolean = false, debug:Boolean = false ) extends Observable {
   var running:Boolean = true
   var game:Game = Game( InitState( this ), test )
   private var undoStack:List[Command] = Nil
@@ -35,7 +34,7 @@ class Controller( test:Boolean = false ) extends Observable {
     }
 
   private def actionDone(newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
-    if( Catan.debug )
+    if( debug )
       println( "Done   | " + command )
     game = newGame
     undoStack = command :: undoStack
@@ -55,7 +54,7 @@ class Controller( test:Boolean = false ) extends Observable {
     command.doStep( this, this.game ) match {
       case Success( (game, info) ) => actionDone( game, command, Nil, info )
       case Failure( t ) =>
-        if( Catan.debug )
+        if( debug )
           println( "Error  | " + command )
         error( t )
     }
@@ -65,7 +64,7 @@ class Controller( test:Boolean = false ) extends Observable {
     case Nil => error( NothingToUndo )
     case head :: stack =>
       this.game = head.undoStep( this.game )
-      if( Catan.debug )
+      if( debug )
         println( "Undone | " + head )
       undoStack = stack
       redoStack = head :: redoStack
