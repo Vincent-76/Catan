@@ -14,4 +14,6 @@ case class DropHandCardsState( controller:Controller, pID:PlayerID, dropped:List
   override def dropResourceCardsToRobber( cards:ResourceCards ):Unit = controller.action(
     DropHandCardsCommand( this, cards )
   )
+
+  override def toString:String = getClass.getSimpleName + ": pID[" + pID + "], dropped[" + dropped.mkString( ", " ) + "]"
 }

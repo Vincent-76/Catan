@@ -13,4 +13,6 @@ case class RobberPlaceState( controller:Controller,
   override def placeRobber( hID:Int ):Unit = controller.action(
     PlaceRobberCommand( hID, controller.game.gameField.robber, this )
   )
+
+  override def toString:String = getClass.getSimpleName + ": nextState[" + nextState + "]"
 }

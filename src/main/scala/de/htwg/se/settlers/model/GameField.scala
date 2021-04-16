@@ -156,6 +156,10 @@ object GameField {
 
   case class Hex private[GameField]( id:Int, r:Int, c:Int, area:Area ) extends PlacementPoint {
     private def copy( ):Unit = {}
+
+    def isWater:Boolean = area.f == Water
+
+    def isLand:Boolean = area.isInstanceOf[LandArea]
   }
 
   object Hex {

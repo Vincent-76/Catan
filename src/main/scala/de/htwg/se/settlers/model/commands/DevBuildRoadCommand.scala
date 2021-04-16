@@ -32,4 +32,6 @@ case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Co
       gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( Option.empty ) ),
       players = game.updatePlayers( game.player.addStructure( Road ) )
     )
+
+  override def toString:String = getClass.getSimpleName + ": eID[" + eID + "], " + state
 }

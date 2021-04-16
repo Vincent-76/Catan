@@ -4,6 +4,7 @@ import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.{ RobberPlaceState, RobberStealState }
+import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Success, Try }
 
@@ -20,8 +21,8 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
       Failure( InconsistentData )
     else if ( hex.get == actualRobber )
       Failure( PlacementPointNotEmpty( hID ) )
-    else if ( !hex.get.area.isInstanceOf[LandArea] )
-      Failure( RobberOnlyOnWater )
+    else if ( !hex.get.isLand )
+      Failure( RobberOnlyOnLand )
     else {
       val newGameField = game.gameField.copy( robber = hex.get )
       game.gameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match {
@@ -55,4 +56,6 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
     }
   }
 
+  override def toString:String = getClass.getSimpleName + ": hID[" + hID + "], actualRobber[" + actualRobber.id +
+    "], robbedResources[" + robbedResource.useOrElse( r => r, "-" ) + "], " + state
 }

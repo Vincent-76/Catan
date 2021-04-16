@@ -32,4 +32,6 @@ case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState
     case None => game
     case Some( available ) => game.dropResourceCards( game.onTurn, available ).get
   } ).setState( state )
+
+  override def toString:String = getClass.getSimpleName + ": resources[" + resources + "], " + state
 }

@@ -81,7 +81,7 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
   }
 
 
-  guiApp.onUpdate()
+  guiApp.onUpdate( None )
 
 
   def update( state:Option[GUIState] = Option.empty ):Unit = Platform.runLater {

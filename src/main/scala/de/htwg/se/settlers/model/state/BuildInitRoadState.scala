@@ -13,4 +13,5 @@ case class BuildInitRoadState( controller:Controller, settlementVID:Int ) extend
     BuildInitRoadCommand( eID, this )
   )
 
+  override def toString:String = getClass.getSimpleName + ": SettlementVID[" + settlementVID + "]"
 }

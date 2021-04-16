@@ -28,4 +28,6 @@ case class DropHandCardsCommand( state:DropHandCardsState, cards:ResourceCards )
   }
 
   override def undoStep( game:Game ):Game = game.drawResourceCards( state.pID, cards ).setState( state )
+
+  override def toString:String = getClass.getSimpleName + ": " + state + ", cards[" + cards + "]"
 }

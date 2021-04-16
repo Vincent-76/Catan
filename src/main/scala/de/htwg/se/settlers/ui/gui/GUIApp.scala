@@ -93,14 +93,17 @@ class GUIApp( val controller:Controller ) extends Observer {
   }
 
 
-  override def onUpdate( ):Unit = {
+  override def onUpdate( info:Option[Info] ):Unit = {
     gui.update( getGUIState( controller.game.state ) )
+    if( info.isDefined )
+      onInfo( info.get )
   }
 
   override def onInfo( info:Info ):Unit = info match {
     case info:DiceInfo =>
       gui.showInfoDialog( info.dices._1 + " + " + info.dices._2 + " = " + ( info.dices._1 + info.dices._2 ) )
     case GatherInfo( dices, playerResources ) =>
+      gui.showInfo( playerResources.map( d => controller.player( d._1 ).name.toLength( Game.maxPlayerNameLength ) + "  " + d._2.toString( "+" ) ).mkString( "\n" ) )
       gui.showInfoDialog( dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ), Some(
         playerResources.toList.sortBy( _._1.id ).map( d => {
           controller.player( d._1 ).name.toLength( Game.maxPlayerNameLength ) + "  " + d._2.toString( "+" )

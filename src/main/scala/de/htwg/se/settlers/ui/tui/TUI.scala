@@ -124,7 +124,7 @@ class TUI( val controller:Controller ) extends Observer {
   var actionInfo:Option[String] = Option.empty
 
   controller.add( this )
-  onUpdate()
+  onUpdate( None )
 
   def onInput( input:String ):Unit = {
     val commandInput = CommandInput( input )
@@ -144,16 +144,20 @@ class TUI( val controller:Controller ) extends Observer {
     }
   }
 
-  override def onUpdate( ):Unit = {
+  override def onUpdate( info:Option[Info] ):Unit = {
     val tuiState = findTUIState( controller.game.state )
     TUI.clear()
     val gameDisplay = tuiState.getGameDisplay
     if ( gameDisplay.isDefined )
       TUI.out( gameDisplay.get )
     //TUI.outln()
-    val actionInfo = tuiState.getActionInfo
+    actionInfo = Some( tuiState.getActionInfo )
+    if( info.isDefined ) {
+      TUI.outln()
+      onInfo( info.get )
+    }
     TUI.outln()
-    TUI.action( actionInfo )
+    TUI.action( actionInfo.get )
   }
 
   def findGlobalCommand( commandInput:CommandInput ):Option[CommandAction] = {
@@ -212,7 +216,6 @@ class TUI( val controller:Controller ) extends Observer {
         TUI.out( TUI.displayName( p ) + " won with " + p.getVictoryPoints( controller.game ) + " victory points!" )
       case _ => return
     }
-    TUI.outln()
   }
 
   override def onError( t:Throwable ):Unit = {
@@ -233,7 +236,7 @@ class TUI( val controller:Controller ) extends Observer {
       case InvalidPlacementPoint( id ) => "Invalid placement point " + TUI.errorHighlight( id ) + "!"
       case NotEnoughPlayers => "Minimum " + TUI.errorHighlight( Game.minPlayers ) + " players required!"
       case InvalidPlayerColor( color ) => "Invalid player color: [" + TUI.errorHighlight( color ) + "]!"
-      case RobberOnlyOnWater => "Robber can only be places on land!"
+      case RobberOnlyOnLand => "Robber can only be placed on land!"
       case NoPlacementPoints( structure ) =>
         "No available placement points for structure " + TUI.errorHighlight( structure.title ) + "!"
       case InvalidResourceAmount( amount ) => "Invalid resource amount: " + TUI.errorHighlight( amount ) + "!"

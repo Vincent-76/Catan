@@ -16,4 +16,5 @@ case class DiceState( controller:Controller ) extends State( controller ) {
     RollDicesCommand( this )
   )
 
+  override def toString:String = getClass.getSimpleName
 }

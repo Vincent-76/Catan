@@ -1,5 +1,6 @@
 package de.htwg.se.settlers.ui.gui
 
+import de.htwg.se.settlers.Catan
 import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.ui.gui.GameFieldPane.Coords
@@ -7,7 +8,7 @@ import de.htwg.se.settlers.util._
 import scalafx.geometry.VPos
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{ Font, FontWeight, TextAlignment }
+import scalafx.scene.text.{Font, FontWeight, TextAlignment}
 
 /**
  * @author Vincent76;
@@ -62,6 +63,11 @@ class GameFieldCanvas extends Canvas {
           case _ =>
         }
       case _ =>
+    }
+    if( Catan.debug ) {
+      graphicsContext2D.fill = Color.White
+      graphicsContext2D.font = Font.font( Font.default.getFamily, GameFieldPane.mult( 12, hSize ) )
+      graphicsContext2D.fillText( h.id.toString, center._1, ( center._2 - hSize / 2 ) )
     }
   }
 

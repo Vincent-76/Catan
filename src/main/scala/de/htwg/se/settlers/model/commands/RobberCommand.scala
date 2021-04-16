@@ -3,6 +3,7 @@ package de.htwg.se.settlers.model.commands
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.{ Command, Game, GameField, Info, Resource, ResourceChangeInfo, State }
+import de.htwg.se.settlers.util._
 
 import scala.util.{ Success, Try }
 
@@ -31,4 +32,6 @@ abstract class RobberCommand( ) extends Command {
       ), Option.empty )
     }
   }
+
+  override def toString:String = getClass.getSimpleName + ": robbedResource[" + robbedResource.useOrElse( r => r, "-" ) + "]"
 }

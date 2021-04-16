@@ -51,7 +51,9 @@ object Cards {
 abstract class Card
 
 
-abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val title:String, val desc:String ) extends Card
+abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val title:String, val desc:String ) extends Card {
+  override def toString:String = title
+}
 
 case object KnightCard extends DevelopmentCard( 14, true, "Knight",
   "Move the robber.\nSteal 1 resource from the owner of a settlement or city adjacent to the robber's new hex." )

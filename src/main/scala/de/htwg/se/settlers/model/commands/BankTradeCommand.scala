@@ -51,5 +51,5 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
     case None => game
   }
 
-
+  override def toString:String = getClass.getSimpleName + ": Give: " + give + " | Get: " + get + " | GiveResources: " + giveResources.useOrElse( r => r, "-" )
 }

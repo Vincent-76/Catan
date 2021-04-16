@@ -100,7 +100,7 @@ class GameDisplay( game:Game, placement:Option[List[PlacementPoint]] = Option.em
       val edge = game.gameField.findEdge( h1, hex2.get )
       if ( edge.isEmpty )
         return f.update( i, j, dir.symbol )
-      if ( h1.area.f == Water && hex2.get.area.f == Water )
+      if ( h1.isWater && hex2.get.isWater )
         return f.update( i, j, GameDisplay.colorOf( Water ) + " " )
       val f1 = if ( edge.get.road.isEmpty )
         if ( isShowingID( edge.get ) )

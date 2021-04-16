@@ -24,4 +24,6 @@ case class BuyDevCardCommand( state:State ) extends Command {
       developmentCards = devCard +: newGame.developmentCards
     )
   }
+
+  override def toString:String = getClass.getSimpleName + ": " + state
 }

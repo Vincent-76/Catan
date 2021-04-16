@@ -149,6 +149,10 @@ package object util {
     }
   }
 
+  implicit class RichOption[T]( val option:Option[T] ) {
+    def useOrElse[R]( operation:Function[T, R], default:R ):R = if( option.isDefined ) operation.apply( option.get ) else default
+  }
+
   implicit class RichTry[T]( t:Try[T] ) {
     def throwable:Throwable = t match {
       case Failure( e ) => e

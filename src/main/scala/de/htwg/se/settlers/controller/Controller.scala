@@ -1,11 +1,12 @@
 package de.htwg.se.settlers.controller
 
+import de.htwg.se.settlers.Catan
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util.Observable
 
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 /**
  * @author Vincent76;
@@ -33,26 +34,30 @@ class Controller( test:Boolean = false ) extends Observable {
       case None => Option.empty
     }
 
-  private def actionDone( newGame:Game, command:Command, newRedoStack:List[Command], i:Option[Info] ):Unit = {
+  private def actionDone(newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
+    if( Catan.debug )
+      println( "Done   | " + command )
     game = newGame
     undoStack = command :: undoStack
     redoStack = newRedoStack
     checkWinner( game ) match {
       case None =>
-        update()
-        if ( i.isDefined ) info( i.get )
+        update( info )
+        //if ( info.isDefined ) info( info.get )
       case Some( pID ) =>
-        running = false
         game = game.copy( winner = Some( pID ) )
-        update()
-        info( GameEndInfo( pID ) )
+        exit()
+        //info( GameEndInfo( pID ) )
     }
   }
 
   def action( command:Command ):Unit = {
     command.doStep( this, this.game ) match {
       case Success( (game, info) ) => actionDone( game, command, Nil, info )
-      case Failure( t ) => error( t )
+      case Failure( t ) =>
+        if( Catan.debug )
+          println( "Error  | " + command )
+        error( t )
     }
   }
 
@@ -60,6 +65,8 @@ class Controller( test:Boolean = false ) extends Observable {
     case Nil => error( NothingToUndo )
     case head :: stack =>
       this.game = head.undoStep( this.game )
+      if( Catan.debug )
+        println( "Undone | " + head )
       undoStack = stack
       redoStack = head :: redoStack
       update()

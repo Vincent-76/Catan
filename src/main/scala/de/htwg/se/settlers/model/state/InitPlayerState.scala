@@ -17,4 +17,6 @@ case class InitPlayerState( controller:Controller ) extends State( controller ) 
   override def setInitBeginnerState( ):Unit = if ( controller.game.players.size >= Game.minPlayers )
     controller.action( ChangeStateCommand( this, InitBeginnerState( controller ) ) )
   else controller.error( NotEnoughPlayers )
+
+  override def toString:String = getClass.getSimpleName
 }

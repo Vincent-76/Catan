@@ -50,4 +50,6 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
       }
     } )
   }
+
+  override def toString:String = getClass.getSimpleName + ": vID[" + vID + "], " + state
 }

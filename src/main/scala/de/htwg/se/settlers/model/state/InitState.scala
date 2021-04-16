@@ -11,4 +11,6 @@ case class InitState( controller:Controller ) extends State( controller ) {
   override def initPlayers():Unit = controller.action(
     ChangeStateCommand( this, InitPlayerState( controller ) )
   )
+
+  override def toString:String = getClass.getSimpleName
 }

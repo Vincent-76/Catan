@@ -35,4 +35,6 @@ case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPla
     state = state,
     players = game.players.init
   )
+
+  override def toString:String = getClass.getSimpleName + ": Name[" + name + "], Color[" + playerColor.name + "]"
 }

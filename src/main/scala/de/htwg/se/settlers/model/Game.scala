@@ -24,7 +24,10 @@ object Game {
   val maxPlayerNameLength:Int = 10
 
 
-  class PlayerID private[Game]( val id:Int )
+  class PlayerID private[Game]( val id:Int ) {
+
+    override def toString:String = id.toString;
+  }
 
   def apply( state:InitState, test:Boolean ):Game = {
     if ( test )
@@ -140,11 +143,11 @@ case class Game( state:State,
 
   def dropResourceCards( pID:PlayerID, cards:ResourceCards ):Try[Game] = {
     players( pID ).removeResourceCards( cards ) match {
-      case Failure( e ) => Failure( e )
       case Success( nPlayer ) => Success( copy(
         players = players.updated( pID, nPlayer ),
         resourceStack = resourceStack.add( cards )
       ) )
+      case f => f.rethrow
     }
   }
 
@@ -197,8 +200,8 @@ case class Game( state:State,
     false
   }
 
-  def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
-    playerHasAdjacentVertex( pID, gameField.adjacentVertices( edge ) )
+  def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = ( playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
+    playerHasAdjacentVertex( pID, gameField.adjacentVertices( edge ) ) ) && ( edge.h1.isLand || edge.h2.isLand )
 
   def roadLength( pID:PlayerID, e:Edge, count:Int = 0 ):Int = {
     if ( e.road.isEmpty || e.road.get.owner != pID )

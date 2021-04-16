@@ -23,7 +23,9 @@ object Resources {
   def of( s:String ):Option[Resource] = get.find( _.title.toLowerCase == s.toLowerCase )
 }
 
-sealed abstract class Resource( override val title:String ) extends FieldType( title )
+sealed abstract class Resource( override val title:String ) extends FieldType( title ) {
+  override def toString:String = title
+}
 
 case object Wood extends Resource( "Wood" )
 

@@ -30,4 +30,5 @@ case class ActionState( controller:Controller ) extends State( controller ) {
 
   override def endTurn( ):Unit = controller.action( EndTurnCommand( this ) )
 
+  override def toString:String = getClass.getSimpleName
 }

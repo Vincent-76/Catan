@@ -28,4 +28,6 @@ case class SetBuildStateCommand( structure:StructurePlacement, state:State ) ext
   override def undoStep( game:Game ):Game = {
     game.drawResourceCards( game.onTurn, structure.resources ).setState( state )
   }
+
+  override def toString:String = getClass.getSimpleName + ": structure[" + structure.title + "], " + state
 }

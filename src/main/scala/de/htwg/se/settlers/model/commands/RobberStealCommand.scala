@@ -4,6 +4,7 @@ import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.RobberStealState
+import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Try }
 
@@ -27,4 +28,5 @@ case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) 
     case None => game.setState( state )
   }
 
+  override def toString:String = getClass.getSimpleName + ": robbedResource[" + robbedResource.useOrElse( r => r, "-" ) +  "], stealPlayerID[" + stealPlayerID + "], " + state
 }

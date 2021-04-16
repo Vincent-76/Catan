@@ -12,4 +12,6 @@ case class DevRoadBuildingState( controller:Controller, nextState:State, roads:I
   override def devBuildRoad( eID:Int ):Unit = controller.action(
     DevBuildRoadCommand( eID, this )
   )
+
+  override def toString:String = getClass.getSimpleName + ": NextState[" + nextState + "], Roads[" + roads + "]"
 }

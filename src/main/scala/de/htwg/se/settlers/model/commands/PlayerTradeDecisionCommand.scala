@@ -20,4 +20,6 @@ case class PlayerTradeDecisionCommand( decision:Boolean, state:PlayerTradeState 
   }
 
   override def undoStep( game:Game ):Game = game.setState( state )
+
+  override def toString:String = getClass.getSimpleName + ": Decision[" + decision + "], " + state
 }

@@ -12,4 +12,6 @@ case class BuildState( controller:Controller, structure:StructurePlacement ) ext
   override def build( id:Int ):Unit = controller.action(
     BuildCommand( id, this )
   )
+
+  override def toString:String = getClass.getSimpleName + ": StructurePlacement[" + structure.title + "]"
 }

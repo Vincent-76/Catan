@@ -1,9 +1,12 @@
 package de.htwg.se.settlers.ui.gui
 
+import de.htwg.se.settlers.Catan
 import de.htwg.se.settlers.model.GameField.Hex
-import de.htwg.se.settlers.model.{ City, Game, Settlement }
+import de.htwg.se.settlers.model.{City, Game, Settlement}
+import scalafx.geometry.VPos
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
+import scalafx.scene.text.{Font, TextAlignment}
 
 /**
  * @author Vincent76;
@@ -17,6 +20,9 @@ object OverlayPane {
 }
 
 class OverlayPane extends Canvas {
+
+  graphicsContext2D.textAlign = TextAlignment.Center
+  graphicsContext2D.textBaseline = VPos.Center
 
   def update( game:Game, coords:Map[Hex, (Double, Double)], hSize:Double ):Unit = {
     graphicsContext2D.clearRect( 0, 0, width.value, height.value )
@@ -32,20 +38,30 @@ class OverlayPane extends Canvas {
   }
 
   private def updateEdges( game:Game, coords:Map[Hex, (Double, Double)], hSize:Double ):Unit = {
-    game.gameField.edges.values.filter( _.road.isDefined ).foreach( e => {
-      game.gameField.adjacentVertices( e ) match {
-        case List( vertex1, vertex2 ) =>
-          val r = getRoadCoordinates(
-            GUIApp.middleOf( coords( vertex1.h1 ), coords( vertex1.h2 ), coords( vertex1.h3 ) ),
-            GUIApp.middleOf( coords( vertex2.h1 ), coords( vertex2.h2 ), coords( vertex2.h3 ) )
-          )
-          graphicsContext2D.stroke = Color.Black
-          graphicsContext2D.lineWidth = GameFieldPane.mult( 7, hSize )
-          graphicsContext2D.strokeLine( r._1._1, r._1._2, r._2._1, r._2._2 )
-          graphicsContext2D.stroke = GUIApp.colorOf( game.player( e.road.get.owner ).color )
-          graphicsContext2D.lineWidth = GameFieldPane.mult( 5, hSize )
-          graphicsContext2D.strokeLine( r._1._1, r._1._2, r._2._1, r._2._2 )
-        case _ =>
+    game.gameField.edges.values.foreach( e => {
+      if( Catan.debug || e.road.isDefined ) {
+        game.gameField.adjacentVertices( e ) match {
+          case List( vertex1, vertex2 ) =>
+            val r = getRoadCoordinates(
+              GUIApp.middleOf( coords( vertex1.h1 ), coords( vertex1.h2 ), coords( vertex1.h3 ) ),
+              GUIApp.middleOf( coords( vertex2.h1 ), coords( vertex2.h2 ), coords( vertex2.h3 ) )
+            )
+            if( e.road.isDefined ) {
+              graphicsContext2D.stroke = Color.Black
+              graphicsContext2D.lineWidth = GameFieldPane.mult( 7, hSize )
+              graphicsContext2D.strokeLine( r._1._1, r._1._2, r._2._1, r._2._2 )
+              graphicsContext2D.stroke = GUIApp.colorOf( game.player( e.road.get.owner ).color )
+              graphicsContext2D.lineWidth = GameFieldPane.mult( 5, hSize )
+              graphicsContext2D.strokeLine( r._1._1, r._1._2, r._2._1, r._2._2 )
+            }
+            if( Catan.debug ) {
+              graphicsContext2D.fill = Color.White
+              graphicsContext2D.font = Font.font( Font.default.getFamily, GameFieldPane.mult( 10, hSize ) )
+              val c = GUIApp.middleOf( r._1, r._2 )
+              graphicsContext2D.fillText( e.id.toString, c._1, c._2 )
+            }
+          case _ =>
+        }
       }
     } )
   }
@@ -62,15 +78,24 @@ class OverlayPane extends Canvas {
   private def updateVertices( game:Game, coords:Map[Hex, (Double, Double)], hSize:Double ):Unit = {
     graphicsContext2D.stroke = Color.Black
     graphicsContext2D.lineWidth = 1
-    game.gameField.vertices.values.filter( _.building.isDefined ).foreach( v => {
-      graphicsContext2D.fill = GUIApp.colorOf( game.player( v.building.get.owner ).color )
-      val p = GUIApp.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) )
-      val points = v.building.get match {
-        case _:Settlement => getSettlementCoordinates( hSize, p )
-        case _:City => getCityCoordinates( hSize, p )
+    game.gameField.vertices.values.foreach( v => {
+      if( Catan.debug || v.building.isDefined ) {
+        val p = GUIApp.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) )
+        if( v.building.isDefined ) {
+          graphicsContext2D.fill = GUIApp.colorOf( game.player( v.building.get.owner ).color )
+          val points = v.building.get match {
+            case _:Settlement => getSettlementCoordinates( hSize, p )
+            case _:City => getCityCoordinates( hSize, p )
+          }
+          graphicsContext2D.fillPolygon( points )
+          graphicsContext2D.strokePolygon( points )
+        }
+        if( Catan.debug ) {
+          graphicsContext2D.fill = Color.White
+          graphicsContext2D.font = Font.font( Font.default.getFamily, GameFieldPane.mult( 10, hSize ) )
+          graphicsContext2D.fillText( v.id.toString, p._1, p._2 )
+        }
       }
-      graphicsContext2D.fillPolygon( points )
-      graphicsContext2D.strokePolygon( points )
     } )
   }
 

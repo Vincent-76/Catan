@@ -63,9 +63,9 @@ case object Road extends StructurePlacement( "Road", 15, Map( Wood -> 1, Clay ->
     game.gameField.edges.values.red( (List.empty, List.empty), ( d:(List[Edge], List[Int]), edge:Edge ) => {
       if ( !d._2.contains( edge.id ) && edge.road.isDefined && edge.road.get.owner == pID ) {
         val nd = game.gameField.adjacentEdges( edge ).filter( e => !d._2.contains( e.id ) ).red( d, ( d:(List[Edge], List[Int]), e:Edge ) => {
-          if ( e.road.isEmpty )
+          if( e.road.isEmpty && ( e.h1.isLand || e.h2.isLand ) )
             (d._1 :+ e, d._2 :+ e.id)
-          else if ( e.road.get.owner != pID )
+          else if ( e.road.useOrElse( road => road.owner != pID, true ) )
             (d._1, d._2 :+ e.id)
           else d
         } )

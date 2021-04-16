@@ -12,4 +12,5 @@ case class MonopolyState( controller:Controller,
 
   override def monopolyAction( r:Resource ):Unit = controller.action( MonopolyCommand( r, this ) )
 
+  override def toString:String = getClass.getSimpleName + ": nextState[" + nextState + "]"
 }

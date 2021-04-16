@@ -71,4 +71,6 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
     }
     newGame
   }
+
+  override def toString:String = getClass.getSimpleName + ": devCard[" + devCard + "], " + state
 }

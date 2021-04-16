@@ -3,6 +3,7 @@ package de.htwg.se.settlers.model.commands
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.state.NextPlayerState
 import de.htwg.se.settlers.model.{ Command, Game, Info, State, Turn }
+import de.htwg.se.settlers.util._
 
 import scala.util.{ Success, Try }
 
@@ -28,4 +29,6 @@ case class EndTurnCommand( state:State ) extends Command {
     turn = turn.getOrElse( Turn( game.previousTurn() ) ),
     round = game.round - 1
   )
+
+  override def toString:String = getClass.getSimpleName + ": " + state + ", turn[" + turn.useOrElse( t => t.playerID, "-" ) + "]"
 }

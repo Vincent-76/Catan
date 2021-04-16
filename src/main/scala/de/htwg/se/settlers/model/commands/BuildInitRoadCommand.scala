@@ -53,4 +53,6 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
       players = game.updatePlayers( game.players( nTurn ).addStructure( Road ) )
     )
   }
+
+  override def toString:String = getClass.getSimpleName + ": eID[" + eID + "], " + state
 }

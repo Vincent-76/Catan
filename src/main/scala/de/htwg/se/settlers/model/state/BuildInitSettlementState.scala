@@ -12,4 +12,6 @@ case class BuildInitSettlementState( controller:Controller ) extends State( cont
   override def buildInitSettlement( vID:Int ):Unit = controller.action(
     BuildInitSettlementCommand( vID, this )
   )
+
+  override def toString:String = getClass.getSimpleName
 }

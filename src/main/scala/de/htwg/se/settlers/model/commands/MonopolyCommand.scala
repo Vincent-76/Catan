@@ -46,4 +46,7 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
         players = newPlayers.updated( game.onTurn, game.player.removeResourceCard( r, amount ).get )
       )
   }
+
+  override def toString:String = getClass.getSimpleName + ": Resource[" + r + "], " + state +
+    ", RobbedResources[" + robbedResources.useOrElse( r => r.map( d => d._1 + ": " + d._2 ).mkString( ", " ), "-" ) + "]"
 }

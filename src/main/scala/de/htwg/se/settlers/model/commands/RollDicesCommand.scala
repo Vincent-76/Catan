@@ -20,6 +20,7 @@ case class RollDicesCommand( state:State ) extends Command {
 
   override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
     val dices = game.rollDices()
+    println( "Dices[" + dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) + "]" )
     Numbers.of( dices._1 + dices._2 ) match {
       case Seven => controller.game.checkHandCardsInOrder() match {
         case Some( p ) => Success( game.setState( DropHandCardsState( controller, p.id ) ), Some( DiceInfo( dices ) ) )
@@ -52,7 +53,7 @@ case class RollDicesCommand( state:State ) extends Command {
               (data._1 - pID, data._2)
           }
         )
-        availablePlayerResources = Some( available )
+        availablePlayerResources = if( available.isEmpty ) None else Some( available )
         Success( (game.copy(
           state = ActionState( controller ),
           players = game.updatePlayers( available.map( d => game.player( d._1 ).addResourceCards( d._2 ) ).toList:_* ),
@@ -74,4 +75,8 @@ case class RollDicesCommand( state:State ) extends Command {
       )
     case None => game.setState( state )
   }
+
+  override def toString:String = getClass.getSimpleName + ": availablePlayerResources[" +
+    availablePlayerResources.useOrElse( d => d.map( d => d._1 + "[" + d._2 + "]" ).mkString( ", " ), "-" ) +
+    "], " + state
 }

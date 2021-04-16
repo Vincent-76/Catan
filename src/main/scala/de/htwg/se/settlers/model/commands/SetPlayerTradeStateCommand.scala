@@ -27,4 +27,6 @@ case class SetPlayerTradeStateCommand( give:ResourceCards, get:ResourceCards, st
   }
 
   override def undoStep( game:Game ):Game = game.setState( state )
+
+  override def toString:String = getClass.getSimpleName + ": give[" + give + "], get[" + get + "], " + state
 }

@@ -38,4 +38,6 @@ case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState
       players = game.updatePlayers( newPlayer, tradePlayer )
     )
   }
+
+  override def toString:String = getClass.getSimpleName + ": tradePlayerID[" + tradePlayerID + "], " + state
 }

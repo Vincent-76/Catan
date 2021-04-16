@@ -15,4 +15,7 @@ case class RobberStealState( adjacentPlayers:List[PlayerID],
   override def robberStealFromPlayer( stealPlayerID:PlayerID ):Unit = controller.action(
     RobberStealCommand( stealPlayerID, this )
   )
+
+  override def toString:String = getClass.getSimpleName + ": adjacentPlayers[" + adjacentPlayers.mkString( ", " ) +
+    "], NextState[" + nextState + "]"
 }

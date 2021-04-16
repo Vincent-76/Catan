@@ -41,7 +41,7 @@ case object NotEnoughPlayers extends ControllerError
 
 case class InvalidPlayerColor( color:String ) extends ControllerError
 
-case object RobberOnlyOnWater extends ControllerError
+case object RobberOnlyOnLand extends ControllerError
 
 case class NoPlacementPoints( structure:StructurePlacement ) extends ControllerError
 

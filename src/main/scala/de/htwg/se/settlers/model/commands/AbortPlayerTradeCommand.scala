@@ -17,4 +17,6 @@ case class AbortPlayerTradeCommand( state:PlayerTradeEndState ) extends Command 
   )
 
   override def undoStep( game:Game ):Game = game.setState( state )
+
+  override def toString:String = getClass.getSimpleName + ": " + state
 }

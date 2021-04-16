@@ -7,7 +7,7 @@ import de.htwg.se.settlers.model.Info
  */
 
 trait Observer {
-  def onUpdate():Unit
+  def onUpdate( info:Option[Info] ):Unit
 
   def onInfo( info:Info ):Unit
 
@@ -22,9 +22,9 @@ class Observable {
 
   def remove( o:Observer ):Unit = subscribers = subscribers.removed( o ).toList
 
-  def update():Unit = subscribers.foreach( _.onUpdate() )
+  def update( info:Option[Info] = None ):Unit = subscribers.foreach( _.onUpdate( info ) )
 
-  def info( info:Info ):Unit = subscribers.foreach( _.onInfo( info ) )
+  //def info( info:Info ):Unit = subscribers.foreach( _.onInfo( info ) )
 
   def error( t:Throwable ):Unit = subscribers.foreach( _.onError( t ) )
 }

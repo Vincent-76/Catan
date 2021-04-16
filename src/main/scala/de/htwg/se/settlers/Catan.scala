@@ -10,9 +10,10 @@ import scala.io.StdIn
  * @author Vincent76;
  */
 object Catan {
-  val controller = new Controller( true )
+  val debug = false
+  val controller = new Controller( test = true )
   val tui = new TUI( controller )
-  val gui = new GUIApp( controller )
+  //val gui = new GUIApp( controller )
 
   def main( args:Array[String] ):Unit = {
     var input:String = ""
@@ -20,6 +21,6 @@ object Catan {
       input = StdIn.readLine()
       tui.onInput( input )
     } while( input != "exit" )
-    gui.exit()
+    //gui.exit()
   }
 }

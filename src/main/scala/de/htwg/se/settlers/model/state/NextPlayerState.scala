@@ -2,7 +2,7 @@ package de.htwg.se.settlers.model.state
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.State
-import de.htwg.se.settlers.model.commands.StartTurnCommand
+import de.htwg.se.settlers.model.commands.ChangeStateCommand
 
 /**
  * @author Vincent76;
@@ -10,8 +10,8 @@ import de.htwg.se.settlers.model.commands.StartTurnCommand
 case class NextPlayerState( controller:Controller ) extends State( controller ) {
 
   override def startTurn( ):Unit = controller.action(
-    StartTurnCommand( this )
+    ChangeStateCommand( this, DiceState( controller ) )
   )
 
-
+  override def toString:String = getClass.getSimpleName
 }

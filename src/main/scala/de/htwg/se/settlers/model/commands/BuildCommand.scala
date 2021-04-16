@@ -26,7 +26,7 @@ case class BuildCommand( id:Int, state:BuildState ) extends Command {
       case Road => game.gameField.update( game.gameField.findEdge( id ).get.setRoad( Option.empty ) )
       case Settlement => game.gameField.update( game.gameField.findVertex( id ).get.setBuilding( Option.empty ) )
       case City => game.gameField.update( game.gameField.findVertex( id ).get.setBuilding( Some( Settlement( game.onTurn ) ) ) )
-      case _ => game.gameField
+//    case _ => game.gameField
     }
     game.copy(
       state = state,
@@ -34,4 +34,6 @@ case class BuildCommand( id:Int, state:BuildState ) extends Command {
       players = game.updatePlayers( game.player.addStructure( state.structure ) )
     )
   }
+
+  override def toString:String = getClass.getSimpleName + ": ID[" + id + "], " + state
 }

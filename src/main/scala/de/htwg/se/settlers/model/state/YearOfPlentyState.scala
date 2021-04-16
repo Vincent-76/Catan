@@ -15,4 +15,5 @@ case class YearOfPlentyState( controller:Controller,
     YearOfPlentyCommand( resources, this )
   )
 
+  override def toString:String = getClass.getSimpleName + ": nextState[" + nextState + "]"
 }
