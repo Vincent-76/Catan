@@ -147,13 +147,12 @@ class UtilSpec extends WordSpec with Matchers {
           ResourceCards.of( 8, 4, 3, 7, 1 )
       }
       "subtract" in {
-        ResourceCards.of( wood = 2 ).subtract( Clay, 2 ) shouldBe Failure( InsufficientResources )
         cards.subtract( Wheat, 7 ) shouldBe
           Success( ResourceCards.of( 4, 2, 3, 0, 1 ) )
         cards.subtract( Clay, 3 ) shouldBe Failure( InsufficientResources )
         cards.subtract( ResourceCards.of( 2 ) ) shouldBe
           Success( ResourceCards.of( 2, 2, 3, 7, 1 ) )
-        cards.subtract( ResourceCards.of( 5 ) ) shouldBe Failure( InsufficientResources )
+        ResourceCards.of( wood = 2 ).subtract( ResourceCards.of( clay = 5 ) ) shouldBe Failure( InsufficientResources )
       }
       "amount" in {
         cards.amount shouldBe 17
