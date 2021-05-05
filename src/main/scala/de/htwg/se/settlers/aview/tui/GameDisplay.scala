@@ -9,6 +9,21 @@ import de.htwg.se.settlers.util._
 /**
  * @author Vincent76;
  */
+
+sealed abstract class EdgeDir( val symbol:String )
+
+case object SouthWest extends EdgeDir( "\\" )
+
+case object SouthEast extends EdgeDir( "/" )
+
+case object East extends EdgeDir( "|" )
+
+case object NorthEast extends EdgeDir( "\\" )
+
+case object NorthWest extends EdgeDir( "/" )
+
+case object West extends EdgeDir( "|" )
+
 object GameDisplay {
   val emptyVertex:String = "O"
   val settlement:String = "n" // "\u2302"

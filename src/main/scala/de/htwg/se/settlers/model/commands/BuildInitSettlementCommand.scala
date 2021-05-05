@@ -43,7 +43,7 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
   }
 
   private def adjacentResources( v:Vertex ):ResourceCards = {
-    v.hexes.red( Map.empty:ResourceCards, ( c:ResourceCards, h:Hex ) => {
+    List( v.h1, v.h2, v.h3 ).red( Map.empty:ResourceCards, ( c:ResourceCards, h:Hex ) => {
       h.area.f match {
         case r:Resource => c.add( r )
         case _ => c

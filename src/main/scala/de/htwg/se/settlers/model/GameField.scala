@@ -86,8 +86,8 @@ case class GameField(
 
   def adjacentEdges( e:Edge ):List[Edge] = {
     val enclosedHexes = enclosingHexes( e )
-    if ( enclosedHexes.isEmpty )
-      return List.empty
+    /*if ( enclosedHexes.isEmpty )
+      return List.empty*/
     val res1 = findEdge( e.h1, enclosedHexes.head ).toList ++ findEdge( e.h2, enclosedHexes.head ).toList
     if ( enclosedHexes.size > 1 )
       return findEdge( e.h1, enclosedHexes( 1 ) ).toList ++ findEdge( e.h2, enclosedHexes( 1 ) ).toList ++ res1
@@ -96,8 +96,8 @@ case class GameField(
 
   def adjacentVertices( e:Edge ):List[Vertex] = {
     val enclosedHexes = enclosingHexes( e )
-    if ( enclosedHexes.isEmpty )
-      return List.empty
+    /*if ( enclosedHexes.isEmpty )
+      return List.empty*/
     val res1 = findVertex( e.h1, e.h2, enclosedHexes.head ).toList
     if ( enclosedHexes.size > 1 )
       return findVertex( e.h1, e.h2, enclosedHexes( 1 ) ).toList ++ res1
@@ -128,21 +128,6 @@ case class GameField(
   def update( v:Vertex ):GameField = copy( vertices = vertices.updated( (v.h1, v.h2, v.h3), v ) )
 }
 
-
-sealed abstract class EdgeDir( val symbol:String )
-
-case object SouthWest extends EdgeDir( "\\" )
-
-case object SouthEast extends EdgeDir( "/" )
-
-case object East extends EdgeDir( "|" )
-
-case object NorthEast extends EdgeDir( "\\" )
-
-case object NorthWest extends EdgeDir( "/" )
-
-case object West extends EdgeDir( "|" )
-
 object GameField {
 
   def apply( random:Random = Random ):GameField = {
@@ -155,42 +140,40 @@ object GameField {
   sealed trait PlacementPoint
 
   case class Hex private[GameField]( id:Int, r:Int, c:Int, area:Area ) extends PlacementPoint {
-    private def copy( ):Unit = {}
+    //private def copy( ):Unit = {}
 
     def isWater:Boolean = area.f == Water
 
     def isLand:Boolean = area.isInstanceOf[LandArea]
   }
 
-  object Hex {
+  /*object Hex {
     private def apply( id:Int, r:Int, c:Int, area:Area ):Hex = new Hex( id, r, c, area )
-  }
+  }*/
 
   case class Edge private[GameField]( id:Int, h1:Hex, h2:Hex, port:Option[Port] = Option.empty, road:Option[Road] = Option.empty )
     extends PlacementPoint {
-    def hexes:List[Hex] = List( h1, h2 )
 
-    private def copy( ):Unit = {}
+    //private def copy( ):Unit = {}
 
     def setRoad( road:Option[Road] ):Edge = new Edge( id, h1, h2, port, road )
   }
 
-  object Edge {
+  /*object Edge {
     private def apply( id:Int, h1:Hex, h2:Hex, port:Option[Port], building:Option[Road] ):Edge = new Edge( id, h1, h2, port, building )
-  }
+  }*/
 
   case class Vertex private[GameField]( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port] = Option.empty, building:Option[Building] = Option.empty )
     extends PlacementPoint {
-    def hexes:List[Hex] = List( h1, h2, h3 )
 
-    private def copy( ):Unit = {}
+    //private def copy( ):Unit = {}
 
     def setBuilding( building:Option[Building] ):Vertex = new Vertex( id, h1, h2, h3, port, building )
   }
 
-  object Vertex {
+  /*object Vertex {
     private def apply( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port], building:Option[Building] ):Vertex = new Vertex( id, h1, h2, h3, port, building )
-  }
+  }*/
 
   type Row[E] = Vector[Option[E]]
 

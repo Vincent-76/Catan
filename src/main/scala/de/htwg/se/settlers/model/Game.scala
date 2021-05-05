@@ -24,7 +24,7 @@ object Game {
   val maxPlayerNameLength:Int = 10
 
 
-  class PlayerID private[Game]( val id:Int ) {
+  class PlayerID /*private[Game]*/( val id:Int ) {
 
     override def toString:String = id.toString;
   }
