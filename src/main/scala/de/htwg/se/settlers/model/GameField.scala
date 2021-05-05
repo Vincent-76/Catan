@@ -60,9 +60,7 @@ case class GameField(
     val hex1 = findHex( c1._1, c1._2 )
     val hex2 = findHex( c2._1, c2._2 )
     if ( hex1.isDefined && hex2.isDefined ) {
-      val vertex = findVertex( h, hex1.get, hex2.get )
-      if ( vertex.isDefined )
-        return Some( vertex.get )
+      return findVertex( h, hex1.get, hex2.get )
     }
     Option.empty
   }

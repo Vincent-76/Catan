@@ -22,6 +22,7 @@ object Game {
   val unspecifiedPortFactor:Int = 3
   val specifiedPortFactor:Int = 2
   val maxPlayerNameLength:Int = 10
+  val testSeed:Int = 1
 
 
   class PlayerID /*private[Game]*/( val id:Int ) {
@@ -30,7 +31,7 @@ object Game {
   }
 
   def apply( state:InitState, test:Boolean ):Game = {
-    if ( test ) new Game( state, gameField = GameField( new Random( 1 ) ), seed = 1, developmentCards = Cards.getDevStack( new Random( 1 ) ) ) else Game( state )
+    if ( test ) new Game( state, gameField = GameField( new Random( testSeed ) ), seed = testSeed, developmentCards = Cards.getDevStack( new Random( testSeed ) ) ) else Game( state )
   }
 
 }

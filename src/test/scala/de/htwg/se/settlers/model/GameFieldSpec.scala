@@ -14,6 +14,11 @@ class GameFieldSpec extends WordSpec with Matchers {
   "GameField" when {
     "new" should {
       val gameField = GameField( new Random( 1 ) )
+      "create" in {
+        ( 2 to 10 ).foreach( seed => GameField( new Random( seed ) ).hexagons.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
+          r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
+        } ) should be( 37 ) )
+      }
       "have a size" in {
         gameField.hexagons.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
@@ -88,6 +93,7 @@ class GameFieldSpec extends WordSpec with Matchers {
       val e2 = edge2.get
       "not find edge" in {
         gameField.findEdge( 90 ) shouldBe None
+        gameField.findEdge( h1, Hex( 100, 0, 0, DesertArea ) ) shouldBe None
       }
       "update edge" in {
         val pID = new PlayerID( 0 )
@@ -125,6 +131,7 @@ class GameFieldSpec extends WordSpec with Matchers {
       val v2 = vertex2.get
       "not find vertex" in {
         gameField.findVertex( 54 ) shouldBe None
+        gameField.findVertex( h1, h2, Hex( 100, 0, 0, DesertArea ) ) shouldBe None
       }
       "update vertex" in {
         val pID = new PlayerID( 0 )
