@@ -17,6 +17,7 @@ class UtilSpec extends WordSpec with Matchers {
       }
       "validate" in {
         1.validate( _ == 2, 0 ) shouldBe 0
+        1.validate( _ == 1, 0 ) shouldBe 1
       }
       "use" in {
         Some( "check" ).use( s => if ( s.isDefined ) 1 else 2 ) shouldBe 1
