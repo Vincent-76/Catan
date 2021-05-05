@@ -1,7 +1,7 @@
 package de.htwg.se.settlers.util
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
-import de.htwg.se.settlers.model.{Clay, Ore, Resources, Sheep, Wheat, Wood}
+import de.htwg.se.settlers.model.{Clay, Ore, Resource, Resources, Sheep, Wheat, Wood}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.{Failure, Random, Success, Try}
@@ -93,13 +93,18 @@ class UtilSpec extends WordSpec with Matchers {
         s.removed( 1 ) shouldBe s
       }
       "sortBySeq" in {
-        val resources:ResourceCards = Map( Ore -> 5, Clay -> 2, Wheat -> 4, Sheep -> 3, Wood -> 1 )
-        resources.sortBySeq( Resources.get ) shouldBe Seq( (Wood, 1), (Clay, 2), (Sheep, 3), (Wheat, 4), (Ore, 5) )
+        val seq:Seq[Resource] = Seq( Wheat, Wood, Sheep )
+        val sortSeq:Seq[Resource] = Resources.get
+        seq.sortBySeq( sortSeq ) shouldBe Seq( Wood, Sheep, Wheat )
       }
     }
     "RichMap" should {
       "red" in {
         Map( 1 -> 5, 3 -> 2, 2 -> 7 ).red( 2, ( s:Int, i:Int, v:Int ) => s + i * v ) shouldBe 27
+      }
+      "sortBySeq" in {
+        val resources:ResourceCards = Map( Ore -> 5, Clay -> 2, Wheat -> 4, Sheep -> 3, Wood -> 1 )
+        resources.sortBySeq( Resources.get ) shouldBe Seq( (Wood, 1), (Clay, 2), (Sheep, 3), (Wheat, 4), (Ore, 5) )
       }
     }
     "RichMatrix" should {
