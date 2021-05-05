@@ -1,7 +1,5 @@
 package de.htwg.se.settlers.model
 
-import com.sun.javaws.exceptions.InvalidArgumentException
-
 /**
  * @author Vincent76;
  */
@@ -28,8 +26,7 @@ object Numbers {
   }
 }
 
-sealed abstract class Number( val frequency:Int ) {
-  def value:Int
+sealed abstract class Number( value:Int, val frequency:Int ) {
 
   override def toString:String = {
     if( value < 10 )
@@ -39,46 +36,24 @@ sealed abstract class Number( val frequency:Int ) {
   }
 }
 
-case object Two extends Number( 1 ) {
-  override def value:Int = 2
-}
+case object Two extends Number( 2, 1 )
 
-case object Three extends Number( 2 ) {
-  override def value:Int = 3
-}
+case object Three extends Number( 3, 2 )
 
-case object Four extends Number( 3 ) {
-  override def value:Int = 4
-}
+case object Four extends Number( 4, 3 )
 
-case object Five extends Number( 4 ) {
-  override def value:Int = 5
-}
+case object Five extends Number( 5, 4 )
 
-case object Six extends Number( 5 ) {
-  override def value:Int = 6
-}
+case object Six extends Number( 6, 5 )
 
-case object Seven extends Number( 0 ) {
-  override def value:Int = 7
-}
+case object Seven extends Number( 7, 0 )
 
-case object Eight extends Number( 5 ) {
-  override def value:Int = 8
-}
+case object Eight extends Number( 8, 5 )
 
-case object Nine extends Number( 4 ) {
-  override def value:Int = 9
-}
+case object Nine extends Number( 9, 4 )
 
-case object Ten extends Number( 3 ) {
-  override def value:Int = 10
-}
+case object Ten extends Number( 10, 3 )
 
-case object Eleven extends Number( 2 ) {
-  override def value:Int = 11
-}
+case object Eleven extends Number( 11, 2 )
 
-case object Twelve extends Number( 1 ) {
-  override def value:Int = 12
-}
+case object Twelve extends Number( 12, 1 )
