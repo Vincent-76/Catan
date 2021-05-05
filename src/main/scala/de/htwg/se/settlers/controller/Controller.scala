@@ -33,7 +33,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
       case None => Option.empty
     }
 
-  private def actionDone(newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
+  private def actionDone( newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
     game = newGame
     undoStack = command :: undoStack
     redoStack = newRedoStack
@@ -43,8 +43,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
         //if ( info.isDefined ) info( info.get )
       case Some( pID ) =>
         game = game.copy( winner = Some( pID ) )
-        exit()
-        update( Some( GameEndInfo( pID ) ) )
+        exit( Some( GameEndInfo( pID ) ) )
     }
   }
 
@@ -72,8 +71,8 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
       actionDone( game, head, stack, info )
   }
 
-  def exit( ):Unit = {
+  def exit( info:Option[Info] = None ):Unit = {
     running = false
-    update()
+    update( info )
   }
 }
