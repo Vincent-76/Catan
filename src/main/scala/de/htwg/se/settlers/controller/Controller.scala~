@@ -44,7 +44,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
       case Some( pID ) =>
         game = game.copy( winner = Some( pID ) )
         exit()
-        update( Some( GameEndInfo( pID ) ) )
+        //info( GameEndInfo( pID ) )
     }
   }
 
