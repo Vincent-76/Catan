@@ -34,8 +34,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
     }
 
   private def actionDone(newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
-    if( debug )
-      println( "Done   | " + command )
+    if( debug ) println( "Done   | " + command )
     game = newGame
     undoStack = command :: undoStack
     redoStack = newRedoStack
@@ -54,8 +53,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
     command.doStep( this, this.game ) match {
       case Success( (game, info) ) => actionDone( game, command, Nil, info )
       case Failure( t ) =>
-        if( debug )
-          println( "Error  | " + command )
+        if( debug ) println( "Error  | " + command )
         error( t )
     }
   }
@@ -64,8 +62,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
     case Nil => error( NothingToUndo )
     case head :: stack =>
       this.game = head.undoStep( this.game )
-      if( debug )
-        println( "Undone | " + head )
+      if( debug ) println( "Undone | " + head )
       undoStack = stack
       redoStack = head :: redoStack
       update()

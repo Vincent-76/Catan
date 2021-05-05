@@ -7,7 +7,7 @@ import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.util._
 
-import scala.collection.immutable.{ SortedMap, TreeMap }
+import scala.collection.immutable.{ SortedMap, TreeMap, List }
 import scala.util.{ Failure, Random, Success, Try }
 
 /**
@@ -30,10 +30,7 @@ object Game {
   }
 
   def apply( state:InitState, test:Boolean ):Game = {
-    if ( test )
-      new Game( state, gameField = GameField( new Random( 1 ) ), seed = 1, developmentCards = Cards.getDevStack( new Random( 1 ) ) )
-    else
-      Game( state )
+    if ( test ) new Game( state, gameField = GameField( new Random( 1 ) ), seed = 1, developmentCards = Cards.getDevStack( new Random( 1 ) ) ) else Game( state )
   }
 
 }
@@ -91,7 +88,9 @@ case class Game( state:State,
   }
 
   def addPlayerF( playerColor:PlayerColor, name:String ):Try[Game] = {
-    if ( players.exists( _._2.name =^ name ) )
+    if( players.exists( _._2.color == playerColor ) )
+      Failure( PlayerColorIsAlreadyInUse( playerColor ) )
+    else if ( players.exists( _._2.name =^ name ) )
       Failure( PlayerNameAlreadyExists( name ) )
     else Success( addPlayer( playerColor, name ) )
   }
@@ -115,9 +114,7 @@ case class Game( state:State,
   def getAvailableResourceCards( resources:ResourceCards, stack:ResourceCards = resourceStack ):(ResourceCards, ResourceCards) = {
     resources.red( (resources, stack), ( cards:(ResourceCards, ResourceCards), r:Resource, amount:Int ) => {
       val available = cards._2.getOrElse( r, 0 )
-      if ( available <= 0 )
-        (cards._1.updated( r, 0 ), cards._2)
-      else if ( available >= amount )
+      if ( available >= amount )
         (cards._1, cards._2.updated( r, available - amount ))
       else
         (cards._1.updated( r, available ), cards._2.updated( r, 0 ))
@@ -157,7 +154,7 @@ case class Game( state:State,
     else dropResourceCards( pID, Cards.developmentCardCost ) match {
       case Success( newGame ) =>
         val newPlayer = newGame.players( pID ).addDevCard( developmentCards.head )
-        Success( copy(
+        Success( newGame.copy(
           players = newGame.players.updated( pID, newPlayer ),
           turn = turn.addDrawnDevCard( developmentCards.head ),
           developmentCards = developmentCards.tail
@@ -203,10 +200,10 @@ case class Game( state:State,
   def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = ( playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
     playerHasAdjacentVertex( pID, gameField.adjacentVertices( edge ) ) ) && ( edge.h1.isLand || edge.h2.isLand )
 
-  def roadLength( pID:PlayerID, e:Edge, count:Int = 0 ):Int = {
+  def roadLength( pID:PlayerID, e:Edge, count:Int = 0, previous:Option[Edge] = None ):Int = {
     if ( e.road.isEmpty || e.road.get.owner != pID )
       return count
-    gameField.adjacentEdges( e ).map( e2 => roadLength( pID, e2, count + 1 ) ).max
+    gameField.adjacentEdges( e ).filter( !previous.contains( _ ) ).map(e2 => roadLength( pID, e2, count + 1, Some( e ) ) ).max
   }
 
   def checkHandCardsInOrder( p:Player = player, dropped:List[PlayerID] = List.empty ):Option[Player] = {
@@ -220,15 +217,15 @@ case class Game( state:State,
 
   def getBuildableRoadSpotsForSettlement( vID:Int ):List[Edge] = {
     val vertex = gameField.findVertex( vID )
-    if ( vertex.isDefined && vertex.get.building.isDefined )
-      gameField.adjacentEdges( vertex.get ).filter( _.road.isEmpty )
+    if( vertex.isDefined && vertex.get.building.isDefined )
+      gameField.adjacentEdges( vertex.get ).filter( e => ( e.h1.isLand || e.h2.isLand ) && e.road.isEmpty )
     else List.empty
   }
 
   def getBankTradeFactor( playerID:PlayerID, r:Resource ):Int = {
     gameField.vertices.values.red( Game.defaultBankTradeFactor, ( factor:Int, v:Vertex ) => {
-      if ( v.building.isDefined && v.building.get.owner == playerID && v.port.isDefined )
-        if ( v.port.get.specific.isDefined && v.port.get.specific.get == r )
+      if( v.building.isDefined && v.building.get.owner == playerID && v.port.isDefined )
+        if( v.port.get.specific.isDefined && v.port.get.specific.get == r )
           Game.specifiedPortFactor
         else if ( v.port.get.specific.isEmpty && Game.unspecifiedPortFactor < factor )
           Game.unspecifiedPortFactor
@@ -241,9 +238,9 @@ case class Game( state:State,
     getNextTradePlayerInOrder( decisions, players( pID ) )
 
   def getNextTradePlayerInOrder( decisions:Map[PlayerID, Boolean], p:Player ):Option[PlayerID] = {
-    if ( p == player )
+    if( p == player )
       Option.empty
-    else if ( decisions.contains( p.id ) )
+    else if( decisions.contains( p.id ) )
       getNextTradePlayerInOrder( decisions, nextPlayer( p ) )
     else Some( p.id )
   }

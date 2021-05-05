@@ -104,7 +104,7 @@ case class GameField(
     res1
   }
 
-  def update( e:Edge ):GameField = copy( edges = edges.updated( (e.h1, e.h2), e ) )
+  def update( e:Edge ):GameField = copy( edges = edges.updated( (e.h1, e.h2 ), e ) )
 
 
   def findVertex( vID:Int ):Option[Vertex] = vertices.values.find( _.id == vID )
