@@ -15,7 +15,7 @@ import scala.util.{Failure, Random, Success}
 class GameSpec extends WordSpec with Matchers {
   "Game" when {
     val newGame:Game = Game( InitState( null ), test = true )
-    val randomGame = Game( InitState( null ) )
+    val randomGame = Game( InitState( null ), test = false )
     "random new" should {
       "have state" in {
         randomGame.state shouldBe a [InitState]
