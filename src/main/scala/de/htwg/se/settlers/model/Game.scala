@@ -29,7 +29,7 @@ object Game {
     override def toString:String = id.toString;
   }
 
-  def apply( state:InitState, test:Boolean ):Game = {
+  def apply( state:InitState, test:Boolean = false ):Game = {
     if ( test ) new Game( state, gameField = GameField( new Random( 1 ) ), seed = 1, developmentCards = Cards.getDevStack( new Random( 1 ) ) ) else Game( state )
   }
 

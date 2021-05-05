@@ -7,7 +7,6 @@ import de.htwg.se.settlers.model.state.{ActionState, InitState}
 import de.htwg.se.settlers.util._
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.collection.immutable.{SortedMap, TreeMap}
 import scala.util.{Failure, Random, Success}
 
 /**

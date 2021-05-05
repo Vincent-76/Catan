@@ -1,8 +1,10 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Vertex }
+import de.htwg.se.settlers.model.GameField.{Edge, Hex, Vertex}
 import de.htwg.se.settlers.util._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
+
+import scala.util.Random
 
 /**
  * @author Vincent76;
@@ -10,7 +12,7 @@ import org.scalatest.{ Matchers, WordSpec }
 class GameFieldSpec extends WordSpec with Matchers {
   "GameField" when {
     "new" should {
-      val gameField = GameField()
+      val gameField = GameField( new Random( 1 ) )
       "have a size" in {
         gameField.hexagons.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
@@ -42,9 +44,10 @@ class GameFieldSpec extends WordSpec with Matchers {
         gameField.findHex( 7, 2 ).isDefined should be( false )
         gameField.findHex( 38 ).isDefined should be( false )
       }
-      val neighbours = gameField.adjacentHexes( h )
       "find neighbours" in {
-        neighbours should be( Vector( h1, h2, h3, h4 ) )
+        gameField.adjacentHexes( h ) should be( Vector( h1, h2, h3, h4 ) )
+        gameField.adjacentHex( h, 0 ) shouldBe Some( h1 )
+        gameField.adjacentHex( h, 6 ) shouldBe None
       }
       "have edges" in {
         gameField.edges.size should be( 90 )
