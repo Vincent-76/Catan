@@ -9,6 +9,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
 
 coverageExcludedPackages := "de.htwg.se.settlers.aview.*"
+coverageExcludedPackages := "de.htwg.se.settlers.Catan"
 
 lazy val osName = System.getProperty("os.name") match {
   case n if n.startsWith("Linux") => "linux"
