@@ -133,7 +133,7 @@ class GUIApp( val controller:Controller ) extends Observer {
       val p = controller.player( winner )
       gui.showInfoDialog(
         "Game End",
-        Some( p.name + " won with " + p.getVictoryPoints( controller.game ) + " victory points!" ),
+        Some( p.name + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" ),
         centered = true
       )
     case _ =>

@@ -213,7 +213,7 @@ class TUI( val controller:Controller ) extends Observer {
         TUI.outln( "There aren't any more possible placement points for structure " + structure.title + " to build more." )
       case GameEndInfo( winner ) =>
         val p = controller.player( winner )
-        TUI.out( TUI.displayName( p ) + " won with " + p.getVictoryPoints( controller.game ) + " victory points!" )
+        TUI.out( TUI.displayName( p ) + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" )
       case _ => return
     }
   }

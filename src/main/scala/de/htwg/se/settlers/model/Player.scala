@@ -30,17 +30,11 @@ object Player {
     Red
   )
 
-  def colorOf( cString:String ):Option[PlayerColor] = {
-    colors.find( _.name.toLowerCase == cString.toLowerCase() ).use( c => if ( c.isDefined ) Some( c.get ) else Option.empty )
-  }
+  def colorOf( cString:String ):Option[PlayerColor] = colors.find( _.name.toLowerCase == cString.toLowerCase() )
 
-  def availableColors( players:Iterable[Player] = Vector.empty ):List[PlayerColor] = {
-    players.red( colors, ( c:List[PlayerColor], p:Player ) => {
-      val index = c.indexWhere( _ == p.color )
-      if ( index >= 0 )
-        c.removeAt( index )
-      else
-        c
+  def availableColors( players:Iterable[Player] = Vector.empty ):Seq[PlayerColor] = {
+    players.red( colors, ( c:Seq[PlayerColor], p:Player ) => {
+      c.removed( p.color )
     } )
   }
 }
@@ -67,7 +61,7 @@ case class Player( id:PlayerID,
     case Failure( e ) => Failure( e )
   }
 
-  def addResourceCard( resource:Resource, amount:Int = 1 ):Player = copy( resources = resources.add( resource ) )
+  def addResourceCard( resource:Resource, amount:Int = 1 ):Player = copy( resources = resources.add( resource, amount ) )
 
   def addResourceCards( cards:ResourceCards ):Player = copy( resources = resources.add( cards ) )
 
@@ -78,16 +72,6 @@ case class Player( id:PlayerID,
   def removeDevCard():Player = copy( devCards = devCards.init )
 
   def addVictoryPoint( ):Player = copy( victoryPoints = victoryPoints + 1 )
-
-  def getVictoryPoints( game:Game ):Int = {
-    getDisplayVictoryPoints( game ) + devCards.count( _ == GreatHallCard )
-  }
-
-  def getDisplayVictoryPoints( game:Game ):Int =
-    getBonusCards( game ).red( victoryPoints, ( points:Int, bonusCard:BonusCard ) => points + bonusCard.bonus )
-
-  def getBonusCards( game:Game ):Iterable[BonusCard] =
-    game.bonusCards.filter( d => d._2.isDefined && d._2.get._1 == id ).keys
 
   def hasStructure( structure:StructurePlacement ):Boolean = structures.getOrElse( structure, 0 ) > 0
 
@@ -111,7 +95,7 @@ case class Player( id:PlayerID,
     )
   }
 
-  def randomHandResource( ):Option[Resource] = {
+  def randomHandResource():Option[Resource] = {
     Random.element( resources.red( List.empty, ( l:List[Resource], r:Resource, amount:Int ) => {
       ( 0 until amount ).red( l, ( l:List[Resource], _ ) => {
         l :+ r

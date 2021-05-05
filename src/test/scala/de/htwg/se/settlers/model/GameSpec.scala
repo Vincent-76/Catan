@@ -2,7 +2,7 @@ package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Cards.{ResourceCards, developmentCardCost}
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.Player.{Blue, Green, Red, Yellow}
+import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
 import de.htwg.se.settlers.model.state.{ActionState, InitState}
 import de.htwg.se.settlers.util._
 import org.scalatest.{Matchers, WordSpec}
@@ -124,7 +124,7 @@ class GameSpec extends WordSpec with Matchers {
       "dropResourceCards" in {
         val game2 = game.updatePlayer( game.player().addResourceCard( Wood, 3 ) )
         val result1 = game2.dropResourceCards( pID, Wood )
-        result1 shouldBe a [Success[Game]]
+        result1 shouldBe a [Success[_]]
         result1.get.resourceStack( Wood ) shouldBe game2.resourceStack( Wood ) + 1
         game2.dropResourceCards( pID, Wood, 4 ) shouldBe Failure( InsufficientResources )
         game2.dropResourceCards( pID, ResourceCards.of( wood = 4 ) ) shouldBe Failure( InsufficientResources )
@@ -134,7 +134,7 @@ class GameSpec extends WordSpec with Matchers {
         game.drawDevCard( pID ) shouldBe Failure( InsufficientResources )
         val game1 = game.drawResourceCards( pID, developmentCardCost )
         val game2 = game1.drawDevCard( pID )
-        game2 shouldBe a [Success[Game]]
+        game2 shouldBe a [Success[_]]
         game2.get.player().devCards should have size 1
         game2.get.player().devCards.head shouldBe game.developmentCards.head
         game2.get.player().resources.amount shouldBe 0
@@ -147,7 +147,18 @@ class GameSpec extends WordSpec with Matchers {
         val nGameField = game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) )
         val game2 = game.updateGameField( nGameField )
         game2.gameField shouldBe nGameField
-        game2.gameField.vertices.values.head.building shouldBe a [Some[Settlement]]
+        game2.gameField.vertices.values.head.building shouldNot be( None )
+      }
+      "getPlayerBonusCards" in {
+        game.getPlayerBonusCards( pID ) shouldBe empty
+        val game2 = game.copy( bonusCards = game.bonusCards.updated( LongestRoadCard, Some( pID, 5 ) ) )
+        game2.getPlayerBonusCards( pID ) should contain( LongestRoadCard )
+      }
+      "getPlayerVictoryPoints" in {
+        game.getPlayerDisplayVictoryPoints( pID ) shouldBe 0
+        val p = game.player.copy( victoryPoints = 3 ).addDevCard( GreatHallCard ).addDevCard( GreatHallCard )
+        game.updatePlayer( p ).getPlayerDisplayVictoryPoints( pID ) shouldBe 3
+        game.updatePlayer( p ).getPlayerVictoryPoints( pID ) shouldBe 5
       }
       "settlementAmount" in {
         game.settlementAmount( pID ) shouldBe 0

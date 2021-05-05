@@ -168,6 +168,15 @@ case class Game( state:State,
     copy( gameField = newField )
   }
 
+  def getPlayerBonusCards( pID:PlayerID ):Iterable[BonusCard] =
+    bonusCards.filter( d => d._2.isDefined && d._2.get._1 == pID ).keys
+
+  def getPlayerDisplayVictoryPoints(pID:PlayerID ):Int =
+    getPlayerBonusCards( pID ).red( player( pID ).victoryPoints, ( points:Int, bonusCard:BonusCard ) => points + bonusCard.bonus )
+
+  def getPlayerVictoryPoints(pID:PlayerID ):Int = {
+    getPlayerDisplayVictoryPoints( pID ) + player( pID ).devCards.count( _ == GreatHallCard )
+  }
 
   def settlementAmount( pID:PlayerID ):Int = gameField.vertices.count( d => d._2.building.isDefined && d._2.building.get.owner == pID )
 

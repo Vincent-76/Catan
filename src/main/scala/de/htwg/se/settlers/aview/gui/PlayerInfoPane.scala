@@ -56,7 +56,7 @@ class PlayerInfoPane( game:Game, p:Player ) extends AnchorPane {
                 strokeWidth = 1
                 fill = Color.Transparent
               },
-              new Text( p.getDisplayVictoryPoints( game ).toString )
+              new Text( game.getPlayerDisplayVictoryPoints( p.id ).toString )
             )
           },
           new Label( p.name ) {

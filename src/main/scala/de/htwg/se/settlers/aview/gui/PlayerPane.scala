@@ -40,7 +40,7 @@ class PlayerPane( gui:GUI ) extends VBox {
                 strokeWidth = 1
                 fill = Color.Transparent
               },
-              new Text( player.getVictoryPoints( game ).toString ) {
+              new Text( game.getPlayerVictoryPoints( player.id ).toString ) {
                 style = "-fx-font-size: 14"
               }
             )

@@ -257,21 +257,21 @@ class GameDisplay( game:Game, placement:Option[List[PlacementPoint]] = Option.em
     val s = otherPlayers.map( p => {
       TUI.displayName( p, nameLength ) +
         " Resources[" + p.resources.amount.toLength( 2 ) + "]" +
-        " Points[" + p.getDisplayVictoryPoints( game ).toLength( 2 ) + "]" +
+        " Points[" + game.getPlayerDisplayVictoryPoints( p.id ).toLength( 2 ) + "]" +
         " DevCards[" + p.devCards.size.toLength( 2 ) + "]" +
         " UsedDevCards[" + p.usedDevCards.map( _.title ).mkString( "|" ) + "] " +
-        p.getBonusCards( game ).mkString( " " )
+        game.getPlayerBonusCards( p.id ).mkString( " " )
     } ).mkString( "\n" )
     ( if ( turnPlayer.isDefined ) {
       val p = game.players( turnPlayer.get )
       val resourceNameLength = Resources.get.map( _.title.length ).max
       s + "\n\n" + TUI.displayName( p ) +
-        "\nVictory Points: " + p.getVictoryPoints( game ) +
+        "\nVictory Points: " + game.getPlayerVictoryPoints( p.id ) +
         "\nResources:" + p.resources.amount + "\n" +
         p.resources.sort.map( d => "  " + d._1.title.toLength( resourceNameLength ) + "  " + d._2 ).mkString( "\n" ) +
         "\nDevelopment Cards: [" + p.devCards.map( _.title ).mkString( "|" ) + "]" +
         "\nUsed Dev Cards:    [" + p.usedDevCards.map( _.title ).mkString( "|" ) + "]" +
-        p.getBonusCards( game ).map( c => "\n" + c.title ).mkString
+        game.getPlayerBonusCards( p.id ).map( c => "\n" + c.title ).mkString
     } else s ) + "\n\n"
   }
 }

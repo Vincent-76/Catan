@@ -28,7 +28,7 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
   def hasRedo:Boolean = redoStack.nonEmpty
 
   private def checkWinner( newGame:Game ):Option[PlayerID] =
-    newGame.players.values.find( p => p.getVictoryPoints( newGame ) >= Game.requiredVictoryPoints ) match {
+    newGame.players.values.find( p => newGame.getPlayerVictoryPoints( p.id ) >= Game.requiredVictoryPoints ) match {
       case Some( p ) => Some( p.id )
       case None => Option.empty
     }

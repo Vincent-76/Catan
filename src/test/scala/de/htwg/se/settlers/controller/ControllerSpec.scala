@@ -46,7 +46,7 @@ class ControllerSpec extends WordSpec with Matchers {
         controller.player.id.id shouldBe 1
         controller.player( controller.onTurn ).id.id shouldBe 1
         val oldGame = controller.game
-        val p = controller.player.copy( devCards = ( 0 to Game.requiredVictoryPoints ).map( _ => GreatHallCard ).toVector )
+        val p = controller.player.copy( victoryPoints = Game.requiredVictoryPoints )
         controller.game = controller.game.updatePlayer( p )
         controller.game.state.buildInitSettlement( 21 )
         controller.game.winner shouldBe Some( p.id )
