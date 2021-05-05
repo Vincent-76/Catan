@@ -1,5 +1,7 @@
 package de.htwg.se.settlers.model
 
+import com.sun.javaws.exceptions.InvalidArgumentException
+
 /**
  * @author Vincent76;
  */
@@ -8,19 +10,20 @@ object Numbers {
   val maxFrequency = 5
   val maxSum = 12
 
-  def of( n:Int ):Number = {
+  def of( n:Int ):Option[Number] = {
     n match {
-      case 2 => Two
-      case 3 => Three
-      case 4 => Four
-      case 5 => Five
-      case 6 => Six
-      case 7 => Seven
-      case 8 => Eight
-      case 9 => Nine
-      case 10 => Ten
-      case 11 => Eleven
-      case 12 => Twelve
+      case 2 => Some( Two )
+      case 3 => Some( Three )
+      case 4 => Some( Four )
+      case 5 => Some( Five )
+      case 6 => Some( Six )
+      case 7 => Some( Seven )
+      case 8 => Some( Eight )
+      case 9 => Some( Nine )
+      case 10 => Some( Ten )
+      case 11 => Some( Eleven )
+      case 12 => Some( Twelve )
+      case _ => None
     }
   }
 }

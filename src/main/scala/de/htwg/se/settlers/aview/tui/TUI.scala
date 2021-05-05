@@ -204,7 +204,7 @@ class TUI( val controller:Controller ) extends Observer {
         playerSub.foreach( d => TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + d._2.toString( "-" ) ) )
         playerAdd.foreach( d => TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + d._2.toString( "+" ) ) )
       case BankTradedInfo( _, give, get ) =>
-        TUI.outln( "You traded " + give.toString + " for " + get.toString + "." )
+        TUI.outln( "You traded " + give.toString( "" ) + " for " + get.toString( "" ) + "." )
       case DrawnDevCardInfo( _, devCard ) =>
         TUI.outln( "Drawn: " + devCard.title + "\n" + devCard.desc )
       case InsufficientStructuresInfo( _, structure ) =>

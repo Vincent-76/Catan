@@ -3,13 +3,13 @@ package de.htwg.se.settlers.model.commands
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{ Hex, Row, Vertex }
+import de.htwg.se.settlers.model.GameField.{Hex, Row, Vertex}
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
+import de.htwg.se.settlers.model.state.{ActionState, DropHandCardsState, RobberPlaceState}
 import de.htwg.se.settlers.util._
 
 import scala.collection.immutable.SortedMap
-import scala.util.{ Success, Try }
+import scala.util.{Failure, Success, Try}
 
 /**
  * @author Vincent76;
@@ -22,11 +22,12 @@ case class RollDicesCommand( state:State ) extends Command {
     val dices = game.rollDices()
     println( "Dices[" + dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) + "]" )
     Numbers.of( dices._1 + dices._2 ) match {
-      case Seven => controller.game.checkHandCardsInOrder() match {
+      case None => Failure( Fail )
+      case Some( Seven ) => controller.game.checkHandCardsInOrder() match {
         case Some( p ) => Success( game.setState( DropHandCardsState( controller, p.id ) ), Some( DiceInfo( dices ) ) )
         case None => Success( game.setState( RobberPlaceState( controller, ActionState( controller ) ) ), Some( DiceInfo( dices ) ) )
       }
-      case n:Number =>
+      case Some( n:Number ) =>
         val playerResources = game.gameField.hexagons.red( Map.empty[PlayerID, ResourceCards], ( resources:Map[PlayerID, ResourceCards], row:Row[Hex] ) => {
           row.red( resources, ( resources:Map[PlayerID, ResourceCards], hex:Option[Hex] ) => {
             if ( hex.isDefined && hex.get != game.gameField.robber ) hex.get.area match {

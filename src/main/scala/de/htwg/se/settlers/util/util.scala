@@ -203,8 +203,6 @@ package object util {
 
     def sort:Seq[(Resource, Int)] = resources.sortBySeq( Resources.get )
 
-    override def toString:String = toString( "" )
-
     def toString( prefix:String ):String =
       resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.title ).mkString( ", " )
   }
