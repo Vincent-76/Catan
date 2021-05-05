@@ -157,8 +157,9 @@ class GameSpec extends WordSpec with Matchers {
       "getPlayerVictoryPoints" in {
         game.getPlayerDisplayVictoryPoints( pID ) shouldBe 0
         val p = game.player.copy( victoryPoints = 3 ).addDevCard( GreatHallCard ).addDevCard( GreatHallCard )
-        game.updatePlayer( p ).getPlayerDisplayVictoryPoints( pID ) shouldBe 3
-        game.updatePlayer( p ).getPlayerVictoryPoints( pID ) shouldBe 5
+        val nGame = game.copy( bonusCards = game.bonusCards.updated( LongestRoadCard, Some( pID, 5 ) ) ).updatePlayer( p )
+        nGame.getPlayerDisplayVictoryPoints( pID ) shouldBe 5
+        nGame.getPlayerVictoryPoints( pID ) shouldBe 7
       }
       "settlementAmount" in {
         game.settlementAmount( pID ) shouldBe 0
