@@ -21,7 +21,7 @@ case class RollDicesCommand( state:State ) extends Command {
     val dices = game.rollDices()
     println( "Dices[" + dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) + "]" )
     Numbers.of( dices._1 + dices._2 ) match {
-      case None => Failure( Fail )
+      //case None => Failure( Fail )
       case Some( Seven ) => game.checkHandCardsInOrder() match {
         case Some( p ) => Success( game.setState( DropHandCardsState( p.id ) ), Some( DiceInfo( dices ) ) )
         case None => Success( game.setState( RobberPlaceState( ActionState() ) ), Some( DiceInfo( dices ) ) )

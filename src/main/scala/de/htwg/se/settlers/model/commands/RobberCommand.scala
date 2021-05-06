@@ -11,9 +11,9 @@ import scala.util.{ Success, Try }
  */
 abstract class RobberCommand( ) extends Command {
 
-  var robbedResource:Option[Resource] = Option.empty
+  var robbedResource:Option[Resource] = None
 
-  protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[GameField] = Option.empty ):Try[(Game, Option[Info])] = {
+  protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[GameField] = None ):Try[(Game, Option[Info])] = {
     robbedResource = game.players( stealPlayerID ).randomHandResource()
     robbedResource match {
       case Some( r ) => Success( game.copy(
@@ -28,7 +28,7 @@ abstract class RobberCommand( ) extends Command {
       case None => Success( game.copy(
         state = nextState,
         gameField = gameField.getOrElse( game.gameField )
-      ), Option.empty )
+      ), None )
     }
   }
 

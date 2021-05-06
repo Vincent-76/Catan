@@ -24,16 +24,16 @@ case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberC
     else {
       actualRobber = Some( game.gameField.robber )
       val newGameField = game.gameField.copy( robber = hex.get )
-      game.gameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match {
+      newGameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match {
         case Nil => Success( game.copy(
           state = state.nextState,
           gameField = newGameField
-        ), Option.empty )
+        ), None )
         case List( stealPlayerID ) => steal( game, stealPlayerID, state.nextState, Some( newGameField ) )
         case adjacentPlayers => Success( game.copy(
           state = RobberStealState( adjacentPlayers, state.nextState ),
           gameField = newGameField
-        ), Option.empty )
+        ), None )
       }
     }
   }

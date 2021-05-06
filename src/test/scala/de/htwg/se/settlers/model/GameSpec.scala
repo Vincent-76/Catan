@@ -2,6 +2,7 @@ package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Cards.{ResourceCards, developmentCardCost}
 import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.GameField.Edge
 import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
 import de.htwg.se.settlers.model.state.{ActionState, InitState}
 import de.htwg.se.settlers.util._
@@ -213,12 +214,12 @@ class GameSpec extends WordSpec with Matchers {
         game3.roadBuildable( edge3.get, pID ) shouldBe false
       }
       "roadLength" in {
-        val edge = game.gameField.edges.values.head
-        game.roadLength( pID, edge ) shouldBe 0
-        val edge2 = edge.setRoad( Some( Road( pID ) ) )
-        val edge3 = game.gameField.adjacentEdges( edge2 ).head.setRoad( Some( Road( pID ) ) )
-        val game2 = game.updateGameField( game.gameField.update( edge2 ).update( edge3 ) )
-        game2.roadLength( pID, edge2, 0, List.empty ) shouldBe 2
+        val edges = game.gameField.adjacentEdges( game.gameField.findHex( 19 ).get )
+        game.getRoadLength( pID, edges.head ) shouldBe 0
+        val game2 = game.updateGameField( edges.red( game.gameField,
+          ( gf:GameField, e:Edge ) => gf.update( e.setRoad( Some( Road( pID ) ) ) ) )
+        )
+        game2.getRoadLength( pID, game2.gameField.findEdge( edges.head.id ).get ) shouldBe 6
       }
       "checkHandCardsInOrder" in {
         val game2 = game.drawResourceCards( pID, Wood, Game.maxHandCards + 1 )

@@ -690,6 +690,188 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.player( pID2 ).resources shouldBe ResourceCards.of( wood = 3 )
       }
     }
-
+    "PlaceRobberCommand" should {
+      val nextState = ActionState()
+      val state = RobberPlaceState( nextState )
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val game = newGame.copy(
+        state = state,
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ),
+          pID1 -> Player( pID1, Blue, "B" ).addResourceCard( Wood ),
+          pID2 -> Player( pID2, Yellow, "C" ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "fail because of non existent placement point" in {
+        PlaceRobberCommand( -1, state ).doStep( game ) shouldBe
+          Failure( NonExistentPlacementPoint( -1 ) )
+      }
+      "fail because of placement point is not empty" in {
+        PlaceRobberCommand( game.gameField.robber.id, state ).doStep( game ) shouldBe
+          Failure( PlacementPointNotEmpty( game.gameField.robber.id ) )
+      }
+      "fail because of robber is placed in water" in {
+        PlaceRobberCommand( 1, state ).doStep( game ) shouldBe
+          Failure( RobberOnlyOnLand )
+      }
+      "success without stealing" in {
+        val command = PlaceRobberCommand( 19, state )
+        val undoRes1 = command.undoStep( game )
+        undoRes1.state shouldBe state
+        undoRes1.gameField shouldBe game.gameField
+        val res = command.doStep( game )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe nextState
+        res.get._1.gameField.robber.id shouldBe 19
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.gameField.robber.id shouldBe game.gameField.robber.id
+      }
+      "success with stealing from one with resource" in {
+        val hex = game.gameField.findHex( 19 )
+        val vertex = game.gameField.adjacentVertices( hex.get ).head
+        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID1 ) ) ) ) )
+        val command = PlaceRobberCommand( 19, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[ResourceChangeInfo]]
+        res.get._1.state shouldBe nextState
+        res.get._1.player.resources shouldBe ResourceCards.of( wood = 1 )
+        res.get._1.player( pID1 ).resources shouldBe ResourceCards.of()
+        res.get._1.gameField.robber.id shouldBe 19
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.gameField.robber.id shouldBe game.gameField.robber.id
+        undoRes.player.resources shouldBe ResourceCards.of()
+        undoRes.player( pID1 ).resources shouldBe ResourceCards.of( wood = 1 )
+      }
+      "success with stealing from multiple" in {
+        val hex = game.gameField.findHex( 19 )
+        val vertices = game.gameField.adjacentVertices( hex.get )
+        val vertex1 = vertices.head
+        val vertex2 = vertices( 1 )
+        val game2 = game.updateGameField( game.gameField.update( vertex1.setBuilding( Some( Settlement( pID1 ) ) ) )
+          .update( vertex2.setBuilding( Some( Settlement( pID2 ) ) ) ) )
+        val command = PlaceRobberCommand( 19, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe RobberStealState( List( pID1, pID2 ), nextState )
+        res.get._1.gameField.robber.id shouldBe 19
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.gameField.robber.id shouldBe game.gameField.robber.id
+      }
+    }
+    "RobberStealCommand" should {
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val nextState = ActionState()
+      val state = RobberStealState( List( pID1, pID2 ), nextState )
+      val game = newGame.copy(
+        state = state,
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ),
+          pID1 -> Player( pID1, Blue, "B" ),
+          pID2 -> Player( pID2, Yellow, "C" ).addResourceCard( Wood ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "fail because of steal player has no adjacent structure" in {
+        RobberStealCommand( pID1, state ).doStep( game ) shouldBe
+          Failure( NoAdjacentStructure )
+      }
+      "success without stealing" in {
+        val vertex = game.gameField.adjacentVertices( game.gameField.robber ).head
+        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID1 ) ) ) ) )
+        val command = RobberStealCommand( pID1, state )
+        val undoRes1 = command.undoStep( game2 )
+        undoRes1.state shouldBe state
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._1.state shouldBe nextState
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "success with stealing" in {
+        val vertex = game.gameField.adjacentVertices( game.gameField.robber ).head
+        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID2 ) ) ) ) )
+        val command = RobberStealCommand( pID2, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._1.state shouldBe nextState
+        res.get._1.player.resources shouldBe ResourceCards.of( wood = 1 )
+        res.get._1.player( pID1 ).resources shouldBe ResourceCards.of()
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.player.resources shouldBe ResourceCards.of()
+        undoRes.player( pID2 ).resources shouldBe ResourceCards.of( wood = 1 )
+      }
+    }
+    "RollDicesCommand" should {
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val state = ActionState()
+      val game = newGame.copy(
+        state = state,
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ),
+          pID1 -> Player( pID1, Blue, "B" ),
+          pID2 -> Player( pID2, Yellow, "C" ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "success with seven with no card drop" in {
+        val game2 = game.copy( round = 9 )
+        val command = RollDicesCommand( state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[DiceInfo]]
+        res.get._1.state shouldBe a [RobberPlaceState]
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "success with seven with card drop" in {
+        val game2 = game.copy( round = 9 ).updatePlayer( game.player.addResourceCard( Wood, Game.maxHandCards + 1 ) )
+        val command = RollDicesCommand( state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[DiceInfo]]
+        res.get._1.state shouldBe DropHandCardsState( pID )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "success with gather" in {
+        val hex = game.gameField.findHex( 25 ).get
+        val vertices = game.gameField.adjacentVertices( hex )
+        val game2 = game.copy(
+          round = 1,
+          resourceStack = game.resourceStack.updated( Clay, 1 ),
+          gameField = game.gameField.update( vertices.head.setBuilding( Some( Settlement( pID ) ) ) )
+            .update( vertices( 1 ).setBuilding( Some( City( pID1 ) ) ) )
+        )
+        val command = RollDicesCommand( state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[GatherInfo]]
+        res.get._1.state shouldBe ActionState()
+        res.get._1.player( pID ).resources shouldBe ResourceCards.of()
+        res.get._1.player( pID1 ).resources shouldBe ResourceCards.of( clay = 1 )
+        res.get._1.player( pID2 ).resources shouldBe ResourceCards.of()
+        res.get._1.resourceStack shouldBe game2.resourceStack.updated( Clay, 0 )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.player( pID ).resources shouldBe ResourceCards.of()
+        undoRes.player( pID1 ).resources shouldBe ResourceCards.of()
+        undoRes.player( pID2 ).resources shouldBe ResourceCards.of()
+        undoRes.resourceStack shouldBe game2.resourceStack
+      }
+    }
   }
 }

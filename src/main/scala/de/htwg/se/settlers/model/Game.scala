@@ -210,13 +210,19 @@ case class Game( state:State = InitState(),
   def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = ( playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
     playerHasAdjacentVertex( pID, gameField.adjacentVertices( edge ) ) ) && ( edge.h1.isLand || edge.h2.isLand )
 
-  def roadLength( pID:PlayerID, e:Edge, count:Int = 0, previous:List[Edge] = List.empty ):Int = {
-    if ( e.road.isEmpty || e.road.get.owner != pID )
-      return count
-    val lengths = gameField.adjacentEdges( e ).filter( !previous.contains( _ ) ).map( e2 => roadLength( pID, e2, count + 1, previous :+ e ) )
+  private def roadLength( pID:PlayerID, e:Edge, count:Int = 1, previous:List[Edge] = List.empty ):Int = {
+    val lengths = gameField.adjacentEdges( e )
+      .filter( e => e.road.isDefined && e.road.get.owner == pID && !previous.contains( e ) )
+      .map( e2 => roadLength( pID, e2, count + 1, previous :+ e ) )
     if( lengths.isEmpty )
       count
     else lengths.max
+  }
+
+  def getRoadLength( pID:PlayerID, e:Edge ):Int = {
+    if( e.road.isEmpty || e.road.get.owner != pID )
+      0
+    else roadLength( pID, e )
   }
 
   def checkHandCardsInOrder( p:Player = player, dropped:List[PlayerID] = List.empty ):Option[Player] = {
