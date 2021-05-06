@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
@@ -14,7 +13,7 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
 
   var giveResources:Option[ResourceCards] = Option.empty
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     val (amount, factors) = give.red( (0, Map.empty[Resource, Int]), ( data:(Int, Map[Resource, Int]), r:Resource, i:Int ) => {
       val factor = game.getBankTradeFactor( game.onTurn, r )
       (data._1 + i / factor, data._2.updated( r, factor ))
@@ -51,5 +50,5 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
     case None => game
   }
 
-  override def toString:String = getClass.getSimpleName + ": Give: " + give + " | Get: " + get + " | GiveResources: " + giveResources.useOrElse( r => r, "-" )
+  //override def toString:String = getClass.getSimpleName + ": Give: " + give + " | Get: " + get + " | GiveResources: " + giveResources.useOrElse( r => r, "-" )
 }

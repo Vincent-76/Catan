@@ -19,5 +19,5 @@ case class RobberPlaceTUIState( controller:Controller ) extends TUIState {
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):Unit =
-    controller.game.state.placeRobber( commandInput.input.toInt )
+    controller.placeRobber( commandInput.input.toInt )
 }

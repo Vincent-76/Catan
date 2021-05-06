@@ -1,29 +1,28 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.{ RobberPlaceState, RobberStealState }
-import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Success, Try }
 
 /**
  * @author Vincent76;
  */
-case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState ) extends RobberCommand {
+case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberCommand {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  private var actualRobber:Option[Hex] = None
+
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     val hex = game.gameField.findHex( hID )
     if ( hex.isEmpty )
       Failure( NonExistentPlacementPoint( hID ) )
-    else if ( actualRobber != game.gameField.robber )
-      Failure( InconsistentData )
-    else if ( hex.get == actualRobber )
+    else if ( hex.get == game.gameField.robber )
       Failure( PlacementPointNotEmpty( hID ) )
     else if ( !hex.get.isLand )
       Failure( RobberOnlyOnLand )
     else {
+      actualRobber = Some( game.gameField.robber )
       val newGameField = game.gameField.copy( robber = hex.get )
       game.gameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match {
         case Nil => Success( game.copy(
@@ -32,7 +31,7 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
         ), Option.empty )
         case List( stealPlayerID ) => steal( game, stealPlayerID, state.nextState, Some( newGameField ) )
         case adjacentPlayers => Success( game.copy(
-          state = RobberStealState( adjacentPlayers, controller, state.nextState ),
+          state = RobberStealState( adjacentPlayers, state.nextState ),
           gameField = newGameField
         ), Option.empty )
       }
@@ -41,7 +40,7 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
 
   override def undoStep( game:Game ):Game = {
     val h = game.gameField.findHex( hID ).get
-    val newGameField = game.gameField.copy( robber = actualRobber )
+    val newGameField = if( actualRobber.isDefined ) game.gameField.copy( robber = actualRobber.get ) else game.gameField
     game.gameField.adjacentPlayers( h ).filter( _ != game.onTurn ) match {
       case List( stealPlayerID ) if robbedResource.isDefined => game.copy(
         state = state,
@@ -56,6 +55,6 @@ case class PlaceRobberCommand( hID:Int, actualRobber:Hex, state:RobberPlaceState
     }
   }
 
-  override def toString:String = getClass.getSimpleName + ": hID[" + hID + "], actualRobber[" + actualRobber.id +
-    "], robbedResources[" + robbedResource.useOrElse( r => r, "-" ) + "], " + state
+  /*override def toString:String = getClass.getSimpleName + ": hID[" + hID + "], actualRobber[" + actualRobber.useOrElse( _.id, -1 ) +
+    "], robbedResources[" + robbedResource.useOrElse( r => r, "-" ) + "], " + state*/
 }

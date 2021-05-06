@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.{ ActionState, PlayerTradeEndState }
 import de.htwg.se.settlers.model.{ Command, _ }
@@ -12,7 +11,7 @@ import scala.util.{ Failure, Success, Try }
  */
 case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState ) extends Command {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if ( !state.decisions.getOrElse( tradePlayerID, false ) )
       Failure( InvalidPlayer( tradePlayerID ) )
     else game.player.trade( state.get, state.give ) match {
@@ -20,7 +19,7 @@ case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState
       case Success( newPlayer ) => game.player( tradePlayerID ).trade( state.give, state.get ) match {
         case Failure( _ ) => Failure( TradePlayerInsufficientResources )
         case Success( tradePlayer ) => Success( game.copy(
-          state = ActionState( controller ),
+          state = ActionState(),
           players = game.updatePlayers( newPlayer, tradePlayer )
         ), Some( ResourceChangeInfo(
           playerAdd = Map( newPlayer.id -> state.get, tradePlayer.id -> state.give ),
@@ -39,5 +38,5 @@ case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState
     )
   }
 
-  override def toString:String = getClass.getSimpleName + ": tradePlayerID[" + tradePlayerID + "], " + state
+  //override def toString:String = getClass.getSimpleName + ": tradePlayerID[" + tradePlayerID + "], " + state
 }

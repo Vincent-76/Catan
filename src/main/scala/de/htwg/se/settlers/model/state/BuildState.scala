@@ -1,17 +1,16 @@
 package de.htwg.se.settlers.model.state
 
-import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.{ State, StructurePlacement }
+import de.htwg.se.settlers.model.{Command, State, StructurePlacement}
 import de.htwg.se.settlers.model.commands.BuildCommand
 
 /**
  * @author Vincent76;
  */
-case class BuildState( controller:Controller, structure:StructurePlacement ) extends State( controller ) {
+case class BuildState( structure:StructurePlacement ) extends State {
 
-  override def build( id:Int ):Unit = controller.action(
+  override def build( id:Int ):Option[Command] = Some(
     BuildCommand( id, this )
   )
 
-  override def toString:String = getClass.getSimpleName + ": StructurePlacement[" + structure.title + "]"
+  //override def toString:String = getClass.getSimpleName + ": StructurePlacement[" + structure.title + "]"
 }

@@ -1,5 +1,5 @@
 package de.htwg.se.settlers.model.commands
-import de.htwg.se.settlers.controller.Controller
+
 import de.htwg.se.settlers.model.{ Cards, Command, DrawnDevCardInfo, Game, Info, State }
 
 import scala.util.{ Failure, Success, Try }
@@ -9,7 +9,7 @@ import scala.util.{ Failure, Success, Try }
  */
 case class BuyDevCardCommand( state:State ) extends Command {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = game.drawDevCard( game.onTurn ) match {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = game.drawDevCard( game.onTurn ) match {
     case Failure( t ) => Failure( t )
     case Success( newGame ) => Success( newGame, Some( DrawnDevCardInfo( newGame.onTurn, newGame.turn.getLastDrawnDevCard.get ) ) )
   }
@@ -25,5 +25,5 @@ case class BuyDevCardCommand( state:State ) extends Command {
     )
   }
 
-  override def toString:String = getClass.getSimpleName + ": " + state
+  //override def toString:String = getClass.getSimpleName + ": " + state
 }

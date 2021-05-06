@@ -12,7 +12,7 @@ case object BankTradeCommand
 
   override def action( commandInput:CommandInput, controller:Controller ):Unit = {
     val parts = commandInput.input.split( "\\s+", 2 )( 1 ).split( "\\s*-\\s*" )
-    controller.game.state.bankTrade( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) )
+    controller.bankTrade( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) )
   }
 
   override protected def getInputPattern:String = {

@@ -19,7 +19,7 @@ case class InitGUIState( controller:Controller ) extends GUIState {
       children = List(
         new Text( "Welcome to the Settlers of Catan" ),
         new Button( "Add Players" ) {
-          onAction = _ => controller.game.state.initPlayers()
+          onAction = _ => controller.initPlayers()
         }
       )
     }

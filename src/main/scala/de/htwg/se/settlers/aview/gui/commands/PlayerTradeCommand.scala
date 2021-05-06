@@ -9,5 +9,5 @@ import de.htwg.se.settlers.aview.gui.GUI
 case object PlayerTradeCommand extends TradeCommand( "Player Trade" ) {
 
   override def onTrade( gui:GUI, give:ResourceCards, get:ResourceCards ):Unit =
-    gui.controller.game.state.setPlayerTradeState( give, get )
+    gui.controller.setPlayerTradeState( give, get )
 }

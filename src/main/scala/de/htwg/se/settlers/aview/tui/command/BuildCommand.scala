@@ -12,7 +12,7 @@ case object BuildCommand
 
   override def action( commandInput:CommandInput, controller:Controller ):Unit = {
     val placement = StructurePlacement.of( commandInput.args( 0 ) )
-    controller.game.state.setBuildState( placement.get )
+    controller.setBuildState( placement.get )
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) +

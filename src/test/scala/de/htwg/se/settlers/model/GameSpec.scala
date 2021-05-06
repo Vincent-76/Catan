@@ -14,8 +14,8 @@ import scala.util.{Failure, Random, Success}
  */
 class GameSpec extends WordSpec with Matchers {
   "Game" when {
-    val newGame:Game = Game( InitState( null ), test = true )
-    val randomGame = Game( InitState( null ), test = false )
+    val newGame:Game = Game( InitState(), test = true )
+    val randomGame = Game( InitState(), test = false )
     "random new" should {
       "have state" in {
         randomGame.state shouldBe a [InitState]
@@ -97,7 +97,7 @@ class GameSpec extends WordSpec with Matchers {
         players( player2ID.get ).name shouldBe "CC"
       }
       "setState" in {
-        game.setState( ActionState( null ) ).state shouldBe a [ActionState]
+        game.setState( ActionState() ).state shouldBe a [ActionState]
       }
       "rollDice" in {
         game.rollDice( new Random() ) should ( be >= 1 and be <= 6 )

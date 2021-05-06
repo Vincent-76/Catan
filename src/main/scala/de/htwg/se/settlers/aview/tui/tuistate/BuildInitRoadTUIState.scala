@@ -21,5 +21,5 @@ case class BuildInitRoadTUIState( vID:Int, controller:Controller ) extends TUISt
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):Unit =
-    controller.game.state.buildInitRoad( commandInput.command.get.toInt )
+    controller.buildInitRoad( commandInput.command.get.toInt )
 }

@@ -34,7 +34,7 @@ case class MonopolyGUIState( controller:Controller ) extends GUIState {
           children = new Label( r.title )
           onMouseEntered = _ => effect = new Glow( 0.7 )
           onMouseExited = _ => effect = null
-          onMouseClicked = _ => controller.game.state.monopolyAction( r )
+          onMouseClicked = _ => controller.monopolyAction( r )
         } )
       }
     }

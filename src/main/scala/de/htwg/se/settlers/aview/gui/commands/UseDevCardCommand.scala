@@ -25,7 +25,7 @@ case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" )
           spacing = 10
           alignment = Pos.Center
           children = d.map( d => new Button( d.title ) {
-            onAction = _ => gui.controller.game.state.useDevCard( d )
+            onAction = _ => gui.controller.useDevCard( d )
           } )
         }
       } )

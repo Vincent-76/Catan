@@ -22,11 +22,11 @@ case class InitPlayerTUIState( controller:Controller ) extends TUIState {
 
   override def action( commandInput:CommandInput ):Unit = {
     if ( commandInput.input.matches( TUI.regexIgnoreCase( "next" ) ) )
-      controller.game.state.setInitBeginnerState()
+      controller.setInitBeginnerState()
     else Player.colorOf( commandInput.args.head ) match {
       case None => controller.error( InvalidPlayerColor( commandInput.args.head ) )
       case Some( playerColor ) =>
-        controller.game.state.addPlayer( playerColor, commandInput.command.get )
+        controller.addPlayer( playerColor, commandInput.command.get )
     }
   }
 }

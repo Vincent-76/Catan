@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.{ DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState }
 import de.htwg.se.settlers.util._
@@ -12,7 +11,7 @@ import scala.util.{ Failure, Success, Try }
  */
 case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Command {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if ( game.turn.usedDevCard )
       return Failure( AlreadyUsedDevCardInTurn )
     else if ( !game.player.devCards.contains( devCard ) )
@@ -23,15 +22,15 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
     if ( newPlayer.isFailure )
       return newPlayer.rethrow
     val nextState = devCard match {
-      case KnightCard => RobberPlaceState( controller, state )
-      case YearOfPlentyCard => YearOfPlentyState( controller, state )
+      case KnightCard => RobberPlaceState( state )
+      case YearOfPlentyCard => YearOfPlentyState( state )
       case RoadBuildingCard =>
         if ( !game.player.hasStructure( Road ) )
           return Failure( InsufficientStructures( Road ) )
         if ( Road.getBuildablePoints( game, game.onTurn ).isEmpty )
           return Failure( NoPlacementPoints( Road ) )
-        DevRoadBuildingState( controller, state )
-      case MonopolyCard => MonopolyState( controller, state )
+        DevRoadBuildingState( state )
+      case MonopolyCard => MonopolyState( state )
       case _ => state
     }
     val newBonusCards = if ( devCard == KnightCard ) {
@@ -72,5 +71,5 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
     newGame
   }
 
-  override def toString:String = getClass.getSimpleName + ": devCard[" + devCard + "], " + state
+  //override def toString:String = getClass.getSimpleName + ": devCard[" + devCard + "], " + state
 }

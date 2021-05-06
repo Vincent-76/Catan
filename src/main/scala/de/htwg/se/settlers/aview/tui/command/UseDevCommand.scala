@@ -17,7 +17,7 @@ case object UseDevCommand
       if ( devCard.isEmpty )
         controller.error( InvalidDevCard( devCardString ) )
       else
-        controller.game.state.useDevCard( devCard.get )
+        controller.useDevCard( devCard.get )
     case None => controller.error( InvalidFormat( commandInput.input ) )
   }
 

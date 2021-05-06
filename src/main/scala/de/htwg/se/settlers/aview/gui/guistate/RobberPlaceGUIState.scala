@@ -10,7 +10,7 @@ import de.htwg.se.settlers.aview.gui.{ DisplayState, FieldInputDisplayState, GUI
 case class RobberPlaceGUIState( controller:Controller ) extends GUIState {
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( Robber.getBuildablePoints( controller.game, controller.onTurn ) ) {
-      override def action( id:Int ):Unit = controller.game.state.placeRobber( id )
+      override def action( id:Int ):Unit = controller.placeRobber( id )
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )

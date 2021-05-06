@@ -41,7 +41,7 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
             style = "-fx-font-size: 16"
           } )
         else Nil ) :+ new Button( "Roll the dices" ) {
-          onAction = _ => state.diceOutBeginner()
+          onAction = _ => controller.diceOutBeginner()
         }
       } )
     }
@@ -52,7 +52,7 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
         style = "-fx-font-size: 16"
       },
       new Button( "Continue" ) {
-        onAction = _ => controller.game.state.setBeginner()
+        onAction = _ => controller.setBeginner()
       }
     )
   }

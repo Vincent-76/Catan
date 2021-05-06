@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState, NextPlayerState }
 import de.htwg.se.settlers.model.{ Command, Game, Info, InvalidPlacementPoint, Road, Turn }
 import de.htwg.se.settlers.util._
@@ -12,25 +11,25 @@ import scala.util.{ Failure, Success, Try }
  */
 case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Command {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if ( !game.gameField.adjacentEdges( game.gameField.findVertex( state.settlementVID ).get ).exists( _.id == eID ) )
       Failure( InvalidPlacementPoint( eID ) )
     else Road.build( game, game.onTurn, eID ) match {
       case Success( game ) =>
         val (nTurn, nState) = game.settlementAmount( game.onTurn ) match {
           case 1 => game.settlementAmount( game.nextTurn() ) match {
-            case 0 => (game.nextTurn(), BuildInitSettlementState( controller ))
-            case _ => (game.onTurn, BuildInitSettlementState( controller ))
+            case 0 => (game.nextTurn(), BuildInitSettlementState())
+            case _ => (game.onTurn, BuildInitSettlementState())
           }
           case _ => game.settlementAmount( game.previousTurn() ) match {
-            case 1 => (game.previousTurn(), BuildInitSettlementState( controller ))
-            case _ => (game.onTurn, NextPlayerState( controller ))
+            case 1 => (game.previousTurn(), BuildInitSettlementState())
+            case _ => (game.onTurn, NextPlayerState())
           }
         }
         Success( game.copy(
           state = nState,
           turn = Turn( nTurn )
-        ), Option.empty )
+        ), None )
       case f => f.rethrow
     }
   }
@@ -54,5 +53,5 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
     )
   }
 
-  override def toString:String = getClass.getSimpleName + ": eID[" + eID + "], " + state
+  //override def toString:String = getClass.getSimpleName + ": eID[" + eID + "], " + state
 }

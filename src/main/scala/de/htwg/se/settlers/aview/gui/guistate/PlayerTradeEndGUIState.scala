@@ -33,14 +33,14 @@ case class PlayerTradeEndGUIState( state:PlayerTradeEndState, controller:Control
               fill = GUIApp.colorOf( controller.player( d._1 ).color )
             },
             new Button( "Trade" ) {
-              onAction = _ => controller.game.state.playerTrade( d._1 )
+              onAction = _ => controller.playerTrade( d._1 )
             }
           )
         } )
       }
       bottom = new Button( "Abort" ) {
         alignmentInParent = Pos.Center
-        onAction = _ => controller.game.state.abortPlayerTrade()
+        onAction = _ => controller.abortPlayerTrade()
       }
     }
   } )

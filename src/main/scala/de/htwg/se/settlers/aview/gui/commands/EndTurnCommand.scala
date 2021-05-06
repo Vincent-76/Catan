@@ -7,5 +7,5 @@ import de.htwg.se.settlers.aview.gui.GUI
  */
 case object EndTurnCommand extends SimpleGUICommand( "End Turn" ) {
 
-  override protected def action( gui:GUI ):Unit = gui.controller.game.state.endTurn()
+  override protected def action( gui:GUI ):Unit = gui.controller.endTurn()
 }

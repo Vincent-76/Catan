@@ -38,9 +38,9 @@ case class PlayerTradeEndTUIState( give:ResourceCards, get:ResourceCards, decisi
 
   override def action( commandInput:CommandInput ):Unit = if ( decisions.exists( _._2 ) ) {
     controller.game.getPlayerID( commandInput.input.toInt ) match {
-      case Some( pID ) => controller.game.state.playerTrade( pID )
+      case Some( pID ) => controller.playerTrade( pID )
       case None => controller.error( InvalidPlayerID( commandInput.input.toInt ) )
     }
-  } else controller.game.state.abortPlayerTrade()
+  } else controller.abortPlayerTrade()
 
 }

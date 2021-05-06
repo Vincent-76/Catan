@@ -18,5 +18,5 @@ case class BuildTUIState( structure:StructurePlacement, controller:Controller ) 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):Unit =
-    controller.game.state.build( commandInput.input.toInt )
+    controller.build( commandInput.input.toInt )
 }

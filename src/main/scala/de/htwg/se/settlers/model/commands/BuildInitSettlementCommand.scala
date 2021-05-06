@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.GameField.{ Hex, Vertex }
 import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState }
@@ -14,18 +13,18 @@ import scala.util.{ Success, Try }
  */
 case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState ) extends Command {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     Settlement.build( game, game.onTurn, vID, anywhere = true ) match {
       case Success( game ) =>
         if ( game.settlementAmount( game.onTurn ) == 2 ) {
           val resources = adjacentResources( game.gameField.findVertex( vID ).get )
           Success(
             game.drawResourceCards( game.onTurn, resources )
-              .setState( BuildInitRoadState( controller, vID ) ),
+              .setState( BuildInitRoadState( vID ) ),
             Some( GotResourcesInfo( game.onTurn, resources ) )
           )
         }
-        else Success( game.setState( BuildInitRoadState( controller, vID ) ), Option.empty )
+        else Success( game.setState( BuildInitRoadState( vID ) ), Option.empty )
       case f => f.rethrow
     }
   }
@@ -51,5 +50,5 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
     } )
   }
 
-  override def toString:String = getClass.getSimpleName + ": vID[" + vID + "], " + state
+  //override def toString:String = getClass.getSimpleName + ": vID[" + vID + "], " + state
 }

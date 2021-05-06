@@ -1,16 +1,16 @@
 package de.htwg.se.settlers.model.state
-import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.State
+
+import de.htwg.se.settlers.model.{Command, State}
 import de.htwg.se.settlers.model.commands.ChangeStateCommand
 
 /**
  * @author Vincent76;
  */
-case class InitState( controller:Controller ) extends State( controller ) {
+case class InitState() extends State {
 
-  override def initPlayers():Unit = controller.action(
-    ChangeStateCommand( this, InitPlayerState( controller ) )
+  override def initPlayers():Option[Command] = Some(
+    ChangeStateCommand( this, InitPlayerState() )
   )
 
-  override def toString:String = getClass.getSimpleName
+  //override def toString:String = getClass.getSimpleName
 }

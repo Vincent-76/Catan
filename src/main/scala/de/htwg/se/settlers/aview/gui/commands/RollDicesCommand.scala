@@ -6,5 +6,5 @@ import de.htwg.se.settlers.aview.gui.GUI
  * @author Vincent76;
  */
 case object RollDicesCommand extends SimpleGUICommand( "Roll the Dices" ) {
-  override def action( gui:GUI ):Unit = gui.controller.game.state.rollTheDices()
+  override def action( gui:GUI ):Unit = gui.controller.rollTheDices()
 }

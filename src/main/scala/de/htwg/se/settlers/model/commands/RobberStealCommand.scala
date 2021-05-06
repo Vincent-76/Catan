@@ -1,10 +1,8 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.RobberStealState
-import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Try }
 
@@ -13,7 +11,7 @@ import scala.util.{ Failure, Try }
  */
 case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) extends RobberCommand {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if ( !game.playerHasAdjacentVertex( stealPlayerID, game.gameField.adjacentVertices( game.gameField.robber ) ) )
       Failure( NoAdjacentStructure )
     else steal( game, stealPlayerID, state.nextState )
@@ -28,5 +26,5 @@ case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) 
     case None => game.setState( state )
   }
 
-  override def toString:String = getClass.getSimpleName + ": robbedResource[" + robbedResource.useOrElse( r => r, "-" ) +  "], stealPlayerID[" + stealPlayerID + "], " + state
+  //override def toString:String = getClass.getSimpleName + ": robbedResource[" + robbedResource.useOrElse( r => r, "-" ) +  "], stealPlayerID[" + stealPlayerID + "], " + state
 }

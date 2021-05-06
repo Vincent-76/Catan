@@ -1,9 +1,7 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.state.NextPlayerState
 import de.htwg.se.settlers.model.{ Command, Game, Info, State, Turn }
-import de.htwg.se.settlers.util._
 
 import scala.util.{ Success, Try }
 
@@ -14,10 +12,10 @@ case class EndTurnCommand( state:State ) extends Command {
 
   var turn:Option[Turn] = Option.empty
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     turn = Some( game.turn )
     Success( game.copy(
-      state = NextPlayerState( controller ),
+      state = NextPlayerState(),
       turn = Turn( game.nextTurn() ),
       round = game.round + 1
     ), Option.empty )
@@ -30,5 +28,5 @@ case class EndTurnCommand( state:State ) extends Command {
     round = game.round - 1
   )
 
-  override def toString:String = getClass.getSimpleName + ": " + state + ", turn[" + turn.useOrElse( t => t.playerID, "-" ) + "]"
+  //override def toString:String = getClass.getSimpleName + ": " + state + ", turn[" + turn.useOrElse( t => t.playerID, "-" ) + "]"
 }

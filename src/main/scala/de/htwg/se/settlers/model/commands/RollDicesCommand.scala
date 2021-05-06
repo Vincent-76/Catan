@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.GameField.{Hex, Row, Vertex}
@@ -18,14 +17,14 @@ case class RollDicesCommand( state:State ) extends Command {
 
   private var availablePlayerResources:Option[Map[PlayerID, ResourceCards]] = Option.empty
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     val dices = game.rollDices()
     println( "Dices[" + dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) + "]" )
     Numbers.of( dices._1 + dices._2 ) match {
       case None => Failure( Fail )
-      case Some( Seven ) => controller.game.checkHandCardsInOrder() match {
-        case Some( p ) => Success( game.setState( DropHandCardsState( controller, p.id ) ), Some( DiceInfo( dices ) ) )
-        case None => Success( game.setState( RobberPlaceState( controller, ActionState( controller ) ) ), Some( DiceInfo( dices ) ) )
+      case Some( Seven ) => game.checkHandCardsInOrder() match {
+        case Some( p ) => Success( game.setState( DropHandCardsState( p.id ) ), Some( DiceInfo( dices ) ) )
+        case None => Success( game.setState( RobberPlaceState( ActionState() ) ), Some( DiceInfo( dices ) ) )
       }
       case Some( n:Number ) =>
         val playerResources = game.gameField.hexagons.red( Map.empty[PlayerID, ResourceCards], ( resources:Map[PlayerID, ResourceCards], row:Row[Hex] ) => {
@@ -56,7 +55,7 @@ case class RollDicesCommand( state:State ) extends Command {
         )
         availablePlayerResources = if( available.isEmpty ) None else Some( available )
         Success( (game.copy(
-          state = ActionState( controller ),
+          state = ActionState(),
           players = game.updatePlayers( available.map( d => game.player( d._1 ).addResourceCards( d._2 ) ).toList:_* ),
           resourceStack = newStack,
         ), Some( GatherInfo( dices, playerResources ) )) )
@@ -77,7 +76,7 @@ case class RollDicesCommand( state:State ) extends Command {
     case None => game.setState( state )
   }
 
-  override def toString:String = getClass.getSimpleName + ": availablePlayerResources[" +
+  /*override def toString:String = getClass.getSimpleName + ": availablePlayerResources[" +
     availablePlayerResources.useOrElse( d => d.map( d => d._1 + "[" + d._2 + "]" ).mkString( ", " ), "-" ) +
-    "], " + state
+    "], " + state*/
 }

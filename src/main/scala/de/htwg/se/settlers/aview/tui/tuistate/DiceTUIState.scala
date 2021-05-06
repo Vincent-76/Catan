@@ -24,7 +24,7 @@ case class DiceTUIState( controller:Controller ) extends TUIState {
     Some( "(^$|" + UseDevCommand.inputPattern + ")" )
 
   override def action( commandInput:CommandInput ):Unit = commandInput.input.toLowerCase match {
-    case "" => controller.game.state.rollTheDices()
+    case "" => controller.rollTheDices()
     case _ => UseDevCommand.action( commandInput, controller )
   }
 

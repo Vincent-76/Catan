@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.state.YearOfPlentyState
 import de.htwg.se.settlers.model._
@@ -15,7 +14,7 @@ case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState
 
   var drawnResources:Option[ResourceCards] = Option.empty
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if ( resources.amount != 2 )
       Failure( InvalidResourceAmount( resources.amount ) )
     else {
@@ -33,5 +32,5 @@ case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState
     case Some( available ) => game.dropResourceCards( game.onTurn, available ).get
   } ).setState( state )
 
-  override def toString:String = getClass.getSimpleName + ": resources[" + resources + "], " + state
+  //override def toString:String = getClass.getSimpleName + ": resources[" + resources + "], " + state
 }

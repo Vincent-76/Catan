@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.MonopolyState
@@ -17,7 +16,7 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
 
   var robbedResources:Option[Map[PlayerID, Int]] = Option.empty
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     val newData = game.players.red( (game.players, Map.empty[PlayerID, Int]),
       ( data:(SortedMap[PlayerID, Player], Map[PlayerID, Int]), pID:PlayerID, p:Player ) => {
         if ( pID != game.onTurn ) {
@@ -47,6 +46,6 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
       )
   }
 
-  override def toString:String = getClass.getSimpleName + ": Resource[" + r + "], " + state +
-    ", RobbedResources[" + robbedResources.useOrElse( r => r.map( d => d._1 + ": " + d._2 ).mkString( ", " ), "-" ) + "]"
+  /*override def toString:String = getClass.getSimpleName + ": Resource[" + r + "], " + state +
+    ", RobbedResources[" + robbedResources.useOrElse( r => r.map( d => d._1 + ": " + d._2 ).mkString( ", " ), "-" ) + "]"*/
 }

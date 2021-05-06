@@ -1,34 +1,33 @@
 package de.htwg.se.settlers.model.state
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
-import de.htwg.se.settlers.model.commands.{ BankTradeCommand, BuyDevCardCommand, SetBuildStateCommand, SetPlayerTradeStateCommand, EndTurnCommand, UseDevCardCommand }
-import de.htwg.se.settlers.model.{ DevelopmentCard, Resource, State, StructurePlacement }
+import de.htwg.se.settlers.model.commands.{BankTradeCommand, BuyDevCardCommand, EndTurnCommand, SetBuildStateCommand, SetPlayerTradeStateCommand, UseDevCardCommand}
+import de.htwg.se.settlers.model.{Command, DevelopmentCard, Resource, State, StructurePlacement}
 
 /**
  * @author Vincent76;
  */
-case class ActionState( controller:Controller ) extends State( controller ) {
+case class ActionState() extends State {
 
-  override def setBuildState( structure:StructurePlacement ):Unit = controller.action(
+  override def setBuildState( structure:StructurePlacement ):Option[Command] = Some(
     SetBuildStateCommand( structure, this )
   )
 
-  override def bankTrade( give:ResourceCards, get:ResourceCards ):Unit = controller.action(
+  override def bankTrade( give:ResourceCards, get:ResourceCards ):Option[Command] = Some(
     BankTradeCommand( give, get )
   )
 
-  override def setPlayerTradeState( give:ResourceCards, get:ResourceCards ):Unit = controller.action(
+  override def setPlayerTradeState( give:ResourceCards, get:ResourceCards ):Option[Command] = Some(
     SetPlayerTradeStateCommand( give, get, this )
   )
 
-  override def buyDevCard( ):Unit = controller.action( BuyDevCardCommand( this ) )
+  override def buyDevCard( ):Option[Command] = Some( BuyDevCardCommand( this ) )
 
-  override def useDevCard( devCard:DevelopmentCard ):Unit = controller.action(
+  override def useDevCard( devCard:DevelopmentCard ):Option[Command] = Some(
     UseDevCardCommand( devCard, this )
   )
 
-  override def endTurn( ):Unit = controller.action( EndTurnCommand( this ) )
+  override def endTurn( ):Option[Command] = Some( EndTurnCommand( this ) )
 
-  override def toString:String = getClass.getSimpleName
+  //override def toString:String = getClass.getSimpleName
 }

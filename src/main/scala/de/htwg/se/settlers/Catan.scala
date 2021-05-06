@@ -11,7 +11,7 @@ import scala.io.StdIn
  */
 object Catan {
   val debug = false
-  val controller = new Controller( test = true, debug = debug )
+  val controller = new Controller( test = true/*, debug = debug*/ )
   val tui = new TUI( controller )
   val gui = new GUIApp( controller )
 

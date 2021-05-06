@@ -19,5 +19,5 @@ case class NextPlayerTUIState( controller:Controller ) extends TUIState {
   }
 
   override def action( commandInput:CommandInput ):Unit =
-    controller.game.state.startTurn()
+    controller.startTurn()
 }

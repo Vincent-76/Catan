@@ -10,6 +10,6 @@ case object BuyDevCommand extends
   CommandAction( "buydevcard", List.empty, "Buy a development card." ) {
 
   override def action( commandInput:CommandInput, controller:Controller ):Unit =
-    controller.game.state.buyDevCard()
+    controller.buyDevCard()
 
 }

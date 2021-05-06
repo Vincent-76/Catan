@@ -12,7 +12,7 @@ case class BuildInitRoadGUIState( state:BuildInitRoadState, controller:Controlle
 
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( controller.game.getBuildableRoadSpotsForSettlement( state.settlementVID ) ) {
-      override def action( id:Int ):Unit = controller.game.state.buildInitRoad( id )
+      override def action( id:Int ):Unit = controller.buildInitRoad( id )
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, false )

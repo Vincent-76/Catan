@@ -21,5 +21,5 @@ case class YearOfPlentyTUIState( controller:Controller ) extends TUIState {
   override def inputPattern:Option[String] = Some( "((^|,)" + TUI.resourcePattern + ")+" )
 
   override def action( commandInput:CommandInput ):Unit =
-    controller.game.state.yearOfPlentyAction( TUI.parseResources( commandInput.input ) )
+    controller.yearOfPlentyAction( TUI.parseResources( commandInput.input ) )
 }

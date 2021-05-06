@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.PlayerColor
@@ -8,62 +7,55 @@ import de.htwg.se.settlers.model.Player.PlayerColor
 /**
  * @author Vincent76;
  */
-abstract class State( controller:Controller ) {
+abstract class State {
 
-  def initPlayers( ):Unit = controller.error( WrongState )
+  def initPlayers( ):Option[Command] = None
 
-  def addPlayer( playerColor:PlayerColor, name:String ):Unit = controller.error( WrongState )
+  def addPlayer( playerColor:PlayerColor, name:String ):Option[Command] = None
 
-  def setInitBeginnerState():Unit = controller.error( WrongState )
+  def setInitBeginnerState():Option[Command] = None
 
-  def diceOutBeginner():Unit = controller.error( WrongState )
+  def diceOutBeginner():Option[Command] = None
 
-  def setBeginner():Unit = controller.error( WrongState )
+  def setBeginner():Option[Command] = None
 
-  def buildInitSettlement( vID:Int ):Unit = controller.error( WrongState )
+  def buildInitSettlement( vID:Int ):Option[Command] = None
 
-  def buildInitRoad( eID:Int ):Unit = controller.error( WrongState )
+  def buildInitRoad( eID:Int ):Option[Command] = None
 
-  def startTurn():Unit = controller.error( WrongState )
+  def startTurn():Option[Command] = None
 
-  def rollTheDices():Unit = controller.error( WrongState )
+  def rollTheDices():Option[Command] = None
 
-  def useDevCard( devCard:DevelopmentCard ):Unit = controller.error( WrongState )
+  def useDevCard( devCard:DevelopmentCard ):Option[Command] = None
 
-  def dropResourceCardsToRobber( cards:ResourceCards ):Unit = controller.error( WrongState )
+  def dropResourceCardsToRobber( cards:ResourceCards ):Option[Command] = None
 
-  def placeRobber( hID:Int ):Unit = controller.error( WrongState )
+  def placeRobber( hID:Int ):Option[Command] = None
 
-  def robberStealFromPlayer( stealPlayerID:PlayerID ):Unit = controller.error( WrongState )
+  def robberStealFromPlayer( stealPlayerID:PlayerID ):Option[Command] = None
 
-  def setBuildState( structure:StructurePlacement ):Unit = controller.error( WrongState )
+  def setBuildState( structure:StructurePlacement ):Option[Command] = None
 
-  def build( id:Int ):Unit = controller.error( WrongState )
+  def build( id:Int ):Option[Command] = None
 
-  def bankTrade( give:ResourceCards, get:ResourceCards ):Unit = controller.error( WrongState )
+  def bankTrade( give:ResourceCards, get:ResourceCards ):Option[Command] = None
 
-  def setPlayerTradeState( give:ResourceCards, get:ResourceCards ):Unit = controller.error( WrongState )
+  def setPlayerTradeState( give:ResourceCards, get:ResourceCards ):Option[Command] = None
 
-  def playerTradeDecision( decision:Boolean ):Unit = controller.error( WrongState )
+  def playerTradeDecision( decision:Boolean ):Option[Command] = None
 
-  def abortPlayerTrade():Unit = controller.error( WrongState )
+  def abortPlayerTrade():Option[Command] = None
 
-  def playerTrade( tradePlayerID:PlayerID ):Unit = controller.error( WrongState )
+  def playerTrade( tradePlayerID:PlayerID ):Option[Command] = None
 
-  def buyDevCard():Unit = controller.error( WrongState )
+  def buyDevCard():Option[Command] = None
 
-  def yearOfPlentyAction( resources:ResourceCards ):Unit = controller.error( WrongState )
+  def yearOfPlentyAction( resources:ResourceCards ):Option[Command] = None
 
-  def devBuildRoad( eID:Int ):Unit = controller.error( WrongState )
+  def devBuildRoad( eID:Int ):Option[Command] = None
 
-  def monopolyAction( r:Resource ):Unit = controller.error( WrongState )
+  def monopolyAction( r:Resource ):Option[Command] = None
 
-  def endTurn():Unit = controller.error( WrongState )
-
-
-  def exit():Unit = controller.exit()
-
-  def undo():Unit = controller.undoAction()
-
-  def redo():Unit = controller.redoAction()
+  def endTurn():Option[Command] = None
 }

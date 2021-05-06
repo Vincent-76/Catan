@@ -23,5 +23,5 @@ case class MonopolyTUIState( controller:Controller ) extends TUIState {
     Some( "(" + Resources.get.map( r => TUI.regexIgnoreCase( r.title ) ).mkString( "|" ) + ")" )
 
   override def action( commandInput:CommandInput ):Unit =
-    controller.game.state.monopolyAction( Resources.of( commandInput.input ).get )
+    controller.monopolyAction( Resources.of( commandInput.input ).get )
 }

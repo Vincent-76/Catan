@@ -30,7 +30,7 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
       }
       onKeyPressed = ( e:KeyEvent ) => {
         if ( e.getCode == KeyCode.ENTER )
-          controller.game.state.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
+          controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
       }
       children = List(
         new Text( "Enter a name and choose a color to add a player,\n or continue to dice out the beginner." ),
@@ -41,13 +41,13 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
           alignment = Pos.Center
           children = List(
             new Button( "Add Player" ) {
-              onAction = _ => controller.game.state.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
+              onAction = _ => controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
             },
             new Button( "Continue" ) {
               onAction = _ => {
                 if( textField.getText.nonEmpty )
-                  controller.game.state.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
-                controller.game.state.setInitBeginnerState()
+                  controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
+                controller.setInitBeginnerState()
               }
             }
           )

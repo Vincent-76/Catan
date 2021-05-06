@@ -1,6 +1,8 @@
 package de.htwg.se.settlers.controller
 
+import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util.Observable
@@ -11,9 +13,9 @@ import scala.util.{Failure, Success}
  * @author Vincent76;
  */
 
-class Controller( test:Boolean = false, debug:Boolean = false ) extends Observable {
+class Controller( test:Boolean = false/*, debug:Boolean = false*/ ) extends Observable {
   var running:Boolean = true
-  var game:Game = Game( InitState( this ), test )
+  var game:Game = Game( InitState(), test )
   private var undoStack:List[Command] = Nil
   private var redoStack:List[Command] = Nil
 
@@ -47,15 +49,17 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
     }
   }
 
-  def action( command:Command ):Unit = {
-    command.doStep( this, this.game ) match {
-      case Success( (game, info) ) => actionDone( game, command, Nil, info )
+  def action( command:Option[Command] ):Unit = {
+    if( command.isEmpty )
+      error( WrongState )
+    else command.get.doStep( this.game ) match {
+      case Success( (game, info) ) => actionDone( game, command.get, Nil, info )
       case Failure( t ) =>
         error( t )
     }
   }
 
-  def undoAction( ):Unit = undoStack match {
+  def undoAction():Unit = undoStack match {
     case Nil => error( NothingToUndo )
     case head :: stack =>
       this.game = head.undoStep( this.game )
@@ -64,10 +68,10 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
       update()
   }
 
-  def redoAction( ):Unit = redoStack match {
+  def redoAction():Unit = redoStack match {
     case Nil => error( NothingToRedo )
     case head :: stack =>
-      val (game, info) = head.doStep( this, this.game ).get
+      val (game, info) = head.doStep( this.game ).get
       actionDone( game, head, stack, info )
   }
 
@@ -75,4 +79,55 @@ class Controller( test:Boolean = false, debug:Boolean = false ) extends Observab
     running = false
     update( info )
   }
+
+
+  def initPlayers():Unit = action( game.state.initPlayers() )
+
+  def addPlayer( playerColor:PlayerColor, name:String ):Unit = action( game.state.addPlayer( playerColor, name ) )
+
+  def setInitBeginnerState():Unit = action( game.state.setInitBeginnerState() )
+
+  def diceOutBeginner():Unit = action( game.state.diceOutBeginner() )
+
+  def setBeginner():Unit = action( game.state.setBeginner() )
+
+  def buildInitSettlement( vID:Int ):Unit = action( game.state. buildInitSettlement( vID ))
+
+  def buildInitRoad( eID:Int ):Unit = action( game.state.buildInitRoad( eID ) )
+
+  def startTurn():Unit = action( game.state.startTurn() )
+
+  def rollTheDices():Unit = action( game.state.rollTheDices() )
+
+  def useDevCard( devCard:DevelopmentCard ):Unit = action( game.state.useDevCard( devCard ) )
+
+  def dropResourceCardsToRobber( cards:ResourceCards ):Unit = action( game.state.dropResourceCardsToRobber( cards ) )
+
+  def placeRobber( hID:Int ):Unit = action( game.state.placeRobber( hID ) )
+
+  def robberStealFromPlayer( stealPlayerID:PlayerID ):Unit = action( game.state.robberStealFromPlayer( stealPlayerID ) )
+
+  def setBuildState( structure:StructurePlacement ):Unit = action( game.state.setBuildState( structure ) )
+
+  def build( id:Int ):Unit = action( game.state.build( id ) )
+
+  def bankTrade( give:ResourceCards, get:ResourceCards ):Unit = action( game.state.bankTrade( give, get ) )
+
+  def setPlayerTradeState( give:ResourceCards, get:ResourceCards ):Unit = action( game.state.setPlayerTradeState( give, get ) )
+
+  def playerTradeDecision( decision:Boolean ):Unit = action( game.state.playerTradeDecision( decision ) )
+
+  def abortPlayerTrade():Unit = action( game.state.abortPlayerTrade() )
+
+  def playerTrade( tradePlayerID:PlayerID ):Unit = action( game.state.playerTrade( tradePlayerID) )
+
+  def buyDevCard():Unit = action( game.state.buyDevCard() )
+
+  def yearOfPlentyAction( resources:ResourceCards ):Unit = action( game.state.yearOfPlentyAction( resources ) )
+
+  def devBuildRoad( eID:Int ):Unit = action( game.state.devBuildRoad( eID ) )
+
+  def monopolyAction( r:Resource ):Unit = action( game.state.monopolyAction( r ) )
+
+  def endTurn():Unit = action( game.state.endTurn() )
 }

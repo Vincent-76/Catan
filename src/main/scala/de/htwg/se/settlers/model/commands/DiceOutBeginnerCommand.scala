@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.{ BuildInitSettlementState, InitBeginnerState }
+import de.htwg.se.settlers.model.state.InitBeginnerState
 import de.htwg.se.settlers.model.{ Command, _ }
 
 import scala.util.{ Failure, Random, Success, Try }
@@ -11,7 +10,7 @@ import scala.util.{ Failure, Random, Success, Try }
  */
 case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command {
 
-  override def doStep( controller:Controller, game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if ( state.beginner.isDefined )
       Failure( UniqueBeginnerExists )
     else {
@@ -26,13 +25,13 @@ case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command {
       val maxValue = values.maxBy( _._2 )
       val beginners = values.count( _._2 >= maxValue._2 )
       if ( beginners > 1 )
-        Success( game.setState( InitBeginnerState( controller, Option.empty, values, state.counter + 1 ) ), Option.empty )
+        Success( game.setState( InitBeginnerState( Option.empty, values, state.counter + 1 ) ), Option.empty )
       else
-        Success( game.setState( InitBeginnerState( controller, Some( maxValue._1 ), values ) ), Option.empty )
+        Success( game.setState( InitBeginnerState( Some( maxValue._1 ), values ) ), Option.empty )
     }
   }
 
   override def undoStep( game:Game ):Game = game.setState( state )
 
-  override def toString:String = getClass.getSimpleName + ": " + state
+  //override def toString:String = getClass.getSimpleName + ": " + state
 }
