@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards.{ResourceCards, devCards}
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.GameField.Edge
 import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
@@ -900,6 +900,235 @@ class CommandSpec extends WordSpec with Matchers {
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
         undoRes.turn shouldBe game.turn
+      }
+    }
+    "SetBuildStateCommand" should {
+      val state = ActionState()
+      val pID = new PlayerID( 0 )
+      val game = newGame.copy(
+        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
+        turn = Turn( pID )
+      )
+      "fail because of insufficient structures" in {
+        val game2 = game.updatePlayer( game.player.copy( structures = game.player.structures.updated( Road, 0 ) ) )
+        SetBuildStateCommand( Road, state ).doStep( game2 ) shouldBe
+          Failure( InsufficientStructures( Road ) )
+      }
+      "fail because of no placement points" in {
+        SetBuildStateCommand( Road, state ).doStep( game ) shouldBe
+          Failure( NoPlacementPoints( Road ) )
+      }
+      "fail because of insufficient resources" in {
+        val edge = game.gameField.edges.head._2
+        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+        SetBuildStateCommand( Road, state ).doStep( game2 ) shouldBe
+          Failure( InsufficientResources )
+      }
+      "success" in {
+        val edge = game.gameField.edges.head._2
+        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+          .updatePlayer( game.player.addResourceCards( Road.resources ) )
+        val command = SetBuildStateCommand( Road, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[LostResourcesInfo]]
+        res.get._1.state shouldBe BuildState( Road )
+        res.get._1.player.resources shouldBe ResourceCards.of()
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.player.resources shouldBe game2.player.resources
+      }
+    }
+    "SetInitBeginnerStateCommand" should {
+      val state = InitPlayerState()
+      "fail because of not enough players" in {
+        SetInitBeginnerStateCommand( state ).doStep( newGame ) shouldBe
+          Failure( NotEnoughPlayers )
+      }
+      "success" in {
+        val game = ( 1 to Game.minPlayers ).red( newGame, ( g:Game, i ) => {
+          val pID = new PlayerID( i )
+          g.copy( players = g.players + ( pID -> Player( pID, Green, i.toString ) ) )
+        } )
+        val command = SetInitBeginnerStateCommand( state )
+        val res = command.doStep( game )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe InitBeginnerState()
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+    }
+    "SetPlayerTradeStateCommand" should {
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val state = ActionState()
+      val game = newGame.copy(
+        state = state,
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ),
+          pID1 -> Player( pID1, Blue, "B" ),
+          pID2 -> Player( pID2, Yellow, "C" ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "fail because of insufficient resources" in {
+        SetPlayerTradeStateCommand( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), state ).doStep( game ) shouldBe
+          Failure( InsufficientResources )
+      }
+      "success without decisions" in {
+        val game2 = game.updatePlayer( game.player.addResourceCard( Wood ) )
+        val command = SetPlayerTradeStateCommand( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe a [PlayerTradeEndState]
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "success with decisions" in {
+        val game2 = game.updatePlayer( game.player.addResourceCard( Wood ) ).updatePlayer( game.player( pID1 ).addResourceCard( Clay ) )
+        val command = SetPlayerTradeStateCommand( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe a [PlayerTradeState]
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+    }
+    "UseDevCardCommand" should {
+      val state = ActionState()
+      val pID = new PlayerID( 0 )
+      val game = newGame.copy(
+        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
+        turn = Turn( pID )
+      )
+      "fail because a dev card has already used in this turn" in {
+        val game2 = game.copy( turn = game.turn.copy( usedDevCard = true ) )
+        UseDevCardCommand( KnightCard, state ).doStep( game2 ) shouldBe
+          Failure( AlreadyUsedDevCardInTurn )
+      }
+      "fail because of insufficient dev cards" in {
+        UseDevCardCommand( KnightCard, state ).doStep( game ) shouldBe
+          Failure( InsufficientDevCards( KnightCard ) )
+      }
+      "fail because this dev card was drawn in this turn" in {
+        val game2 = game.copy( turn = game.turn.copy( drawnDevCards = List( KnightCard ) ) )
+          .updatePlayer( game.player.addDevCard( KnightCard ) )
+        UseDevCardCommand( KnightCard, state ).doStep( game2 ) shouldBe
+          Failure( DevCardDrawnInTurn( KnightCard ) )
+      }
+      "success with knight card without new largest army" in {
+        val game2 = game.updatePlayer( game.player.addDevCard( KnightCard ) )
+        val command = UseDevCardCommand( KnightCard, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe RobberPlaceState( state )
+        res.get._1.turn.usedDevCard shouldBe true
+        res.get._1.player.devCards shouldBe empty
+        res.get._1.player.usedDevCards should contain theSameElementsAs Vector( KnightCard )
+        res.get._1.bonusCards shouldBe game2.bonusCards
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.turn.usedDevCard shouldBe false
+        undoRes.player.devCards shouldBe game2.player.devCards
+        undoRes.player.usedDevCards shouldBe game2.player.usedDevCards
+        undoRes.bonusCards shouldBe game2.bonusCards
+      }
+      "success with knight card with new largest army" in {
+        val game2 = game.updatePlayer( game.player.copy(
+          usedDevCards = ( 1 until LargestArmyCard.required ).map( _ => KnightCard ).toVector,
+          devCards = Vector( KnightCard )
+        ) )
+        val command = UseDevCardCommand( KnightCard, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe RobberPlaceState( state )
+        res.get._1.turn.usedDevCard shouldBe true
+        res.get._1.player.devCards shouldBe empty
+        res.get._1.player.usedDevCards should contain theSameElementsAs ( 1 to LargestArmyCard.required ).map( _ => KnightCard ).toVector
+        res.get._1.bonusCards( LargestArmyCard ) shouldBe Some( pID, LargestArmyCard.required )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.turn.usedDevCard shouldBe false
+        undoRes.player.devCards shouldBe game2.player.devCards
+        undoRes.player.usedDevCards shouldBe game2.player.usedDevCards
+        undoRes.bonusCards shouldBe game2.bonusCards
+      }
+      "success with year of plenty card" in {
+        val game2 = game.updatePlayer( game.player.addDevCard( YearOfPlentyCard ) )
+        val command = UseDevCardCommand( YearOfPlentyCard, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe YearOfPlentyState( state )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "fail with road building card because of insufficient structures" in {
+        val game2 = game.updatePlayer( game.player.addDevCard( RoadBuildingCard )
+          .copy( structures = game.player.structures.updated( Road, 0 ) ) )
+        UseDevCardCommand( RoadBuildingCard, state ).doStep( game2 ) shouldBe
+          Failure( InsufficientStructures( Road ) )
+      }
+      "fail with road building card because there are no placement points" in {
+        val game2 = game.updatePlayer( game.player.addDevCard( RoadBuildingCard ) )
+        UseDevCardCommand( RoadBuildingCard, state ).doStep( game2 ) shouldBe
+          Failure( NoPlacementPoints( Road ) )
+      }
+      "success with road building card" in {
+        val game2 = game.updatePlayer( game.player.addDevCard( RoadBuildingCard ) )
+          .updateGameField( game.gameField.update( game.gameField.edges.head._2.setRoad( Some( Road( pID ) ) ) ) )
+        val command = UseDevCardCommand( RoadBuildingCard, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe DevRoadBuildingState( state )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "success with monopoly card" in {
+        val game2 = game.updatePlayer( game.player.addDevCard( MonopolyCard ) )
+        val command = UseDevCardCommand( MonopolyCard, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe MonopolyState( state )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+    }
+    "YearOfPlentyCommand" should {
+      val nextState = ActionState()
+      val state = YearOfPlentyState( nextState )
+      val pID = new PlayerID( 0 )
+      val game = newGame.copy(
+        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
+        turn = Turn( pID )
+      )
+      "fail because of invalid resource amount" in {
+        YearOfPlentyCommand( ResourceCards.of(), state ).doStep( game ) shouldBe
+          Failure( InvalidResourceAmount( 0 ) )
+      }
+      "success" in {
+        val resources = ResourceCards.of( wood = 2 )
+        val command = YearOfPlentyCommand( resources, state )
+        val undoRes1 = command.undoStep( game )
+        undoRes1.state shouldBe state
+        val res = command.doStep( game )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[GotResourcesInfo]]
+        res.get._1.state shouldBe nextState
+        Success( res.get._1.resourceStack ) shouldBe game.resourceStack.subtract( resources )
+        res.get._1.player.resources shouldBe resources
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.resourceStack shouldBe game.resourceStack
+        undoRes.player.resources shouldBe game.player.resources
       }
     }
   }

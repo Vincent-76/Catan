@@ -5,7 +5,7 @@ import de.htwg.se.settlers.model.{Command, Game, Info, NotEnoughPlayers, State}
 
 import scala.util.{Failure, Success, Try}
 
-case class SetInitBeginnerStateCommand(state:State ) extends Command {
+case class SetInitBeginnerStateCommand( state:State ) extends Command {
 
   override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     if( game.players.size >= Game.minPlayers )

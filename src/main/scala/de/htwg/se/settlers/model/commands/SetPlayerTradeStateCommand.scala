@@ -21,7 +21,7 @@ case class SetPlayerTradeStateCommand( give:ResourceCards, get:ResourceCards, st
         case Some( pID ) => PlayerTradeState( pID, give, get, decisions )
         case None => PlayerTradeEndState( give, get, decisions )
       }
-      Success( game.setState( nextState ), Option.empty )
+      Success( game.setState( nextState ), None )
     }
   }
 
