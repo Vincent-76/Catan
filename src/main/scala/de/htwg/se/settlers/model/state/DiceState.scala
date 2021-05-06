@@ -8,7 +8,9 @@ import de.htwg.se.settlers.model.commands.{ RollDicesCommand, UseDevCardCommand 
  */
 case class DiceState() extends State {
 
-  override def useDevCard( devCard:DevelopmentCard ):Option[Command] = Some( UseDevCardCommand( devCard, this ) )
+  override def useDevCard( devCard:DevelopmentCard ):Option[Command] = Some(
+    UseDevCardCommand( devCard, this )
+  )
 
 
   override def rollTheDices( ):Option[Command] = Some(

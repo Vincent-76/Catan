@@ -57,9 +57,10 @@ class ControllerSpec extends WordSpec with Matchers {
         ( 1 to 8 ).foreach( _ => controller.undoAction() )
       }
       "call state methods" in {
-        controller.initPlayers()
         controller.addPlayer( Green, "A" )
         controller.setInitBeginnerState()
+        controller.initPlayers()
+        controller.initPlayers()
         controller.diceOutBeginner()
         controller.setBeginner()
         controller.buildInitSettlement( 0 )

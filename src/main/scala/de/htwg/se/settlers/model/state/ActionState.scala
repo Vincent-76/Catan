@@ -2,7 +2,7 @@ package de.htwg.se.settlers.model.state
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.commands.{BankTradeCommand, BuyDevCardCommand, EndTurnCommand, SetBuildStateCommand, SetPlayerTradeStateCommand, UseDevCardCommand}
-import de.htwg.se.settlers.model.{Command, DevelopmentCard, Resource, State, StructurePlacement}
+import de.htwg.se.settlers.model.{Command, DevelopmentCard, State, StructurePlacement}
 
 /**
  * @author Vincent76;
