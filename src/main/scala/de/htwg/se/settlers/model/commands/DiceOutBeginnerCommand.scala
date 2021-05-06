@@ -25,9 +25,9 @@ case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command {
       val maxValue = values.maxBy( _._2 )
       val beginners = values.count( _._2 >= maxValue._2 )
       if ( beginners > 1 )
-        Success( game.setState( InitBeginnerState( Option.empty, values, state.counter + 1 ) ), Option.empty )
+        Success( game.setState( InitBeginnerState( Option.empty, values, state.counter + 1 ) ), None )
       else
-        Success( game.setState( InitBeginnerState( Some( maxValue._1 ), values ) ), Option.empty )
+        Success( game.setState( InitBeginnerState( Some( maxValue._1 ), values ) ), None )
     }
   }
 

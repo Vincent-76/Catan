@@ -24,7 +24,7 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
             Some( GotResourcesInfo( game.onTurn, resources ) )
           )
         }
-        else Success( game.setState( BuildInitRoadState( vID ) ), Option.empty )
+        else Success( game.setState( BuildInitRoadState( vID ) ), None )
       case f => f.rethrow
     }
   }
@@ -36,7 +36,7 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
     else game
     newGame.copy(
       state = state,
-      gameField = newGame.gameField.update( v.setBuilding( Option.empty ) ),
+      gameField = newGame.gameField.update( v.setBuilding( None ) ),
       players = newGame.updatePlayers( newGame.player.addStructure( Settlement ) )
     )
   }

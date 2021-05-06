@@ -24,9 +24,9 @@ case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPla
     else {
       val newGame = game.addPlayer( playerColor, name )
       if ( newGame.players.size >= Game.maxPlayers )
-        Success( newGame.setState( InitBeginnerState() ), Option.empty )
+        Success( newGame.setState( InitBeginnerState() ), None )
       else
-        Success( newGame, Option.empty )
+        Success( newGame, None )
     }
   }
 

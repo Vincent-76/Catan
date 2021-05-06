@@ -15,7 +15,7 @@ import scala.util.{Failure, Success}
 
 class Controller( test:Boolean = false/*, debug:Boolean = false*/ ) extends Observable {
   var running:Boolean = true
-  var game:Game = Game( InitState(), test )
+  var game:Game = Game( test )
   private var undoStack:List[Command] = Nil
   private var redoStack:List[Command] = Nil
 

@@ -49,7 +49,7 @@ class StateSpec extends WordSpec with Matchers {
       }
     }
     "DevRoadBuildingState" should {
-      val state = DevRoadBuildingState( ActionState(), 0 )
+      val state = DevRoadBuildingState( ActionState(), 1 )
       "devBuildRoad" in {
         state.devBuildRoad( 0 ) shouldBe a [Some[DevBuildRoadCommand]]
       }
@@ -70,7 +70,7 @@ class StateSpec extends WordSpec with Matchers {
       }
     }
     "InitBeginnerState" should {
-      val state = InitBeginnerState( None, Map.empty, 1 )
+      val state = InitBeginnerState( None, Map.empty, 2 )
       "diceOutBeginner" in {
         state.diceOutBeginner() shouldBe a [Some[DiceOutBeginnerCommand]]
       }

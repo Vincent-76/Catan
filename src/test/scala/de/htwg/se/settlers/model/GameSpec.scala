@@ -14,8 +14,8 @@ import scala.util.{Failure, Random, Success}
  */
 class GameSpec extends WordSpec with Matchers {
   "Game" when {
-    val newGame:Game = Game( InitState(), test = true )
-    val randomGame = Game( InitState(), test = false )
+    val newGame:Game = Game( test = true )
+    val randomGame = Game( test = false )
     "random new" should {
       "have state" in {
         randomGame.state shouldBe a [InitState]
@@ -218,7 +218,7 @@ class GameSpec extends WordSpec with Matchers {
         val edge2 = edge.setRoad( Some( Road( pID ) ) )
         val edge3 = game.gameField.adjacentEdges( edge2 ).head.setRoad( Some( Road( pID ) ) )
         val game2 = game.updateGameField( game.gameField.update( edge2 ).update( edge3 ) )
-        game2.roadLength( pID, edge2, 0, None ) shouldBe 2
+        game2.roadLength( pID, edge2, 0, List.empty ) shouldBe 2
       }
       "checkHandCardsInOrder" in {
         val game2 = game.drawResourceCards( pID, Wood, Game.maxHandCards + 1 )

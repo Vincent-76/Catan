@@ -12,7 +12,7 @@ case class AbortPlayerTradeCommand( state:PlayerTradeEndState ) extends Command 
 
   override def doStep( game:Game ):Try[(Game, Option[Info])] = Success(
     game.setState( ActionState() ),
-    Option.empty
+    None
   )
 
   override def undoStep( game:Game ):Game = game.setState( state )

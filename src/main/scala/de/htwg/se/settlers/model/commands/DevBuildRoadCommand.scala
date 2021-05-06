@@ -14,10 +14,10 @@ case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Co
     Road.build( game, game.onTurn, eID ) match {
       case Failure( t ) => Failure( t )
       case Success( newGame ) =>
-        val (nextState, info) = if ( !game.player.hasStructure( Road ) )
-          (state.nextState, InsufficientStructuresInfo( game.onTurn, Road ))
-        else if ( Road.getBuildablePoints( game, game.onTurn ).isEmpty )
-          (state.nextState, NoPlacementPointsInfo( game.onTurn, Road ))
+        val (nextState, info) = if ( !newGame.player.hasStructure( Road ) )
+          (state.nextState, InsufficientStructuresInfo( newGame.onTurn, Road ))
+        else if ( Road.getBuildablePoints( newGame, newGame.onTurn ).isEmpty )
+          (state.nextState, NoPlacementPointsInfo( newGame.onTurn, Road ))
         else if ( state.roads == 0 )
           (DevRoadBuildingState( state.nextState, state.roads + 1 ), BuiltInfo( Road, eID ))
         else
@@ -28,7 +28,7 @@ case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Co
 
   override def undoStep( game:Game ):Game = game.copy(
       state = state,
-      gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( Option.empty ) ),
+      gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( None ) ),
       players = game.updatePlayers( game.player.addStructure( Road ) )
     )
 

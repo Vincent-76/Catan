@@ -197,7 +197,7 @@ package object util {
     def amount:Int = resources.values.sum
 
     def has( requiredResources:ResourceCards ):Boolean = {
-      requiredResources.foreach( data => if ( resources.get( data._1 ).isEmpty || resources( data._1 ) < data._2 ) return false )
+      requiredResources.foreach( data => if ( !resources.contains( data._1 ) || resources( data._1 ) < data._2 ) return false )
       true
     }
 

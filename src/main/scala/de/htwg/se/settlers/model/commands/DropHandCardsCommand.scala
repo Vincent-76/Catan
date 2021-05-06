@@ -22,11 +22,11 @@ case class DropHandCardsCommand( state:DropHandCardsState, cards:ResourceCards )
           case None => RobberPlaceState( ActionState() )
         }
         Success( newGame.setState( nextState ), Some( LostResourcesInfo( state.pID, cards ) ) )
-      case f => f.rethrow
+      //case f => f.rethrow
     }
   }
 
   override def undoStep( game:Game ):Game = game.drawResourceCards( state.pID, cards ).setState( state )
 
-  override def toString:String = getClass.getSimpleName + ": " + state + ", cards[" + cards + "]"
+  //override def toString:String = getClass.getSimpleName + ": " + state + ", cards[" + cards + "]"
 }

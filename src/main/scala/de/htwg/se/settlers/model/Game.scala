@@ -30,8 +30,8 @@ object Game {
     override def toString:String = id.toString;
   }
 
-  def apply( state:InitState, test:Boolean ):Game = {
-    if ( test ) new Game( state, gameField = GameField( new Random( testSeed ) ), seed = testSeed, developmentCards = Cards.getDevStack( new Random( testSeed ) ) ) else Game( state )
+  def apply( test:Boolean ):Game = {
+    if ( test ) new Game( gameField = GameField( new Random( testSeed ) ), seed = testSeed, developmentCards = Cards.getDevStack( new Random( testSeed ) ) ) else Game()
   }
 
 }
@@ -40,7 +40,7 @@ object PlayerOrdering extends Ordering[PlayerID] {
   override def compare( x:PlayerID, y:PlayerID ):Int = x.id.compareTo( y.id )
 }
 
-case class Game( state:State,
+case class Game( state:State = InitState(),
                  gameField:GameField = GameField(),
                  resourceStack:ResourceCards = Cards.getResourceCards(),
                  developmentCards:List[DevelopmentCard] = Cards.getDevStack(),
@@ -210,10 +210,13 @@ case class Game( state:State,
   def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = ( playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
     playerHasAdjacentVertex( pID, gameField.adjacentVertices( edge ) ) ) && ( edge.h1.isLand || edge.h2.isLand )
 
-  def roadLength( pID:PlayerID, e:Edge, count:Int = 0, previous:Option[Edge] = None ):Int = {
+  def roadLength( pID:PlayerID, e:Edge, count:Int = 0, previous:List[Edge] = List.empty ):Int = {
     if ( e.road.isEmpty || e.road.get.owner != pID )
       return count
-    gameField.adjacentEdges( e ).filter( !previous.contains( _ ) ).map(e2 => roadLength( pID, e2, count + 1, Some( e ) ) ).max
+    val lengths = gameField.adjacentEdges( e ).filter( !previous.contains( _ ) ).map( e2 => roadLength( pID, e2, count + 1, previous :+ e ) )
+    if( lengths.isEmpty )
+      count
+    else lengths.max
   }
 
   def checkHandCardsInOrder( p:Player = player, dropped:List[PlayerID] = List.empty ):Option[Player] = {

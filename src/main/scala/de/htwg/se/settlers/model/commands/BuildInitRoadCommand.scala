@@ -47,7 +47,7 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
     }
     game.copy(
       state = state,
-      gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( Option.empty ) ),
+      gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( None ) ),
       turn = Turn( nTurn ),
       players = game.updatePlayers( game.players( nTurn ).addStructure( Road ) )
     )

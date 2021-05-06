@@ -83,7 +83,8 @@ case object Road extends StructurePlacement( "Road", 15, Map( Wood -> 1, Clay ->
     else if ( !game.roadBuildable( edge.get, pID ) )
       Failure( NoConnectedStructures( id ) )
     else {
-      val length = game.roadLength( pID, edge.get )
+      val newEdge = edge.get.setRoad( Some( Road( pID ) ) )
+      val length = game.roadLength( pID, newEdge )
       val newBonusCards =
         if ( length >= LongestRoadCard.minimumRoads &&
           ( game.bonusCards( LongestRoadCard ).isEmpty || length > game.bonusCards( LongestRoadCard ).get._2 )
@@ -91,7 +92,7 @@ case object Road extends StructurePlacement( "Road", 15, Map( Wood -> 1, Clay ->
           game.bonusCards.updated( LongestRoadCard, Some( pID, length ) )
         else game.bonusCards
       Success( game.copy(
-        gameField = game.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) ),
+        gameField = game.gameField.update( newEdge ),
         bonusCards = newBonusCards
       ) )
     }

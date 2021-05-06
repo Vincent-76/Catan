@@ -10,7 +10,7 @@ import scala.util.{ Success, Try }
  */
 case class EndTurnCommand( state:State ) extends Command {
 
-  var turn:Option[Turn] = Option.empty
+  var turn:Option[Turn] = None
 
   override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     turn = Some( game.turn )
@@ -18,7 +18,7 @@ case class EndTurnCommand( state:State ) extends Command {
       state = NextPlayerState(),
       turn = Turn( game.nextTurn() ),
       round = game.round + 1
-    ), Option.empty )
+    ), None )
   }
 
 

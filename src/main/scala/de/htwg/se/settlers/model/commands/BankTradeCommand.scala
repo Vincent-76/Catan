@@ -14,32 +14,32 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
   var giveResources:Option[ResourceCards] = Option.empty
 
   override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    val (amount, factors) = give.red( (0, Map.empty[Resource, Int]), ( data:(Int, Map[Resource, Int]), r:Resource, i:Int ) => {
+    val (maxGetAmount, factors) = give.red( (0, Map.empty[Resource, Int]), ( data:(Int, Map[Resource, Int]), r:Resource, i:Int ) => {
       val factor = game.getBankTradeFactor( game.onTurn, r )
       (data._1 + i / factor, data._2.updated( r, factor ))
     } )
     if ( !game.player.resources.has( give ) )
       Failure( InsufficientResources )
-    else if ( amount < 0 || amount < get.amount )
+    else if ( maxGetAmount < 0 || maxGetAmount < get.amount )
       Failure( InsufficientResources )
     else if ( !game.resourceStack.has( get ) )
       Failure( InsufficientBankResources )
     else {
-      val (giveResources, _) = give.red( (give, 0), ( data:(ResourceCards, Int), r:Resource, i:Int ) => {
-        val a = if ( data._2 < amount ) {
-          val rAmount = i / factors( r )
-          if ( data._2 + rAmount > amount )
-            amount - data._2
+      val (giveResources, _) = give.red( (give, 0), (data:(ResourceCards, Int), r:Resource, amount:Int ) => {
+        if( data._2 < get.amount ) {
+          val rAmount = amount / factors( r )
+          val a = if ( data._2 + rAmount > get.amount )
+            get.amount - data._2
           else rAmount
-        } else 0
-        (data._1.updated( r, a * factors( r ) ), data._2 + a)
+          (data._1.updated( r, a * factors( r ) ), data._2 + a)
+        } else (data._1.updated( r, 0 ), data._2)
       } )
       this.giveResources = Some( giveResources )
       game.drawResourceCards( game.onTurn, get ).dropResourceCards( game.onTurn, giveResources ) match {
         case Success( newGame ) => Success(
           newGame,
           Some( BankTradedInfo( game.onTurn, giveResources, get ) ) )
-        case f => f.rethrow
+        //case f => f.rethrow
       }
     }
   }

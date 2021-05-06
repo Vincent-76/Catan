@@ -7,7 +7,7 @@ import scala.util.{ Success, Try }
 /**
  * @author Vincent76;
  */
-case class ChangeStateCommand( state:State, nextState:State, info:Option[Info] = Option.empty ) extends Command {
+case class ChangeStateCommand( state:State, nextState:State, info:Option[Info] = None ) extends Command {
 
   override def doStep( game:Game ):Try[(Game, Option[Info])] = Success( game.setState( nextState ), info )
 
