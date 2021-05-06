@@ -659,5 +659,37 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.round shouldBe game2.round
       }
     }
+    "MonopolyCommand" should {
+      val nextState = ActionState()
+      val state = MonopolyState( nextState )
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val game = newGame.copy(
+        state = state,
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ),
+          pID1 -> Player( pID1, Blue, "B" ),
+          pID2 -> Player( pID2, Yellow, "C" ).addResourceCards( ResourceCards.of( wood = 3 ) ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "success" in {
+        val command = MonopolyCommand( Wood, state )
+        val undoRes1 = command.undoStep( game )
+        undoRes1.state shouldBe state
+        val res = command.doStep( game )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[ResourceChangeInfo]]
+        res.get._1.state shouldBe nextState
+        res.get._1.player.resources shouldBe ResourceCards.of( wood = 3 )
+        res.get._1.player( pID2 ).resources shouldBe ResourceCards.of()
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.player.resources shouldBe ResourceCards.of()
+        undoRes.player( pID2 ).resources shouldBe ResourceCards.of( wood = 3 )
+      }
+    }
+
   }
 }
