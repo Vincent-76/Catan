@@ -26,6 +26,5 @@ class Observable {
 
   //def info( info:Info ):Unit = subscribers.foreach( _.onInfo( info ) )
 
-  def error( t:Throwable ):Unit =
-    subscribers.foreach( _.onError( t ) )
+  def error( t:Throwable ):Unit = subscribers.foreach( _.onError( t ) )
 }

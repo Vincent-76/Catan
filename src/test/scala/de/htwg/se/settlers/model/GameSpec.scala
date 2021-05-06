@@ -197,15 +197,20 @@ class GameSpec extends WordSpec with Matchers {
         game2.playerHasAdjacentVertex( pID, List( game2.gameField.vertices.values.head ) ) shouldBe true
       }
       "roadBuildable" in {
-        val edge = game.gameField.findEdge( 17 )
+        val edge = game.gameField.findEdge( 44 )
         edge shouldNot be( None )
         game.roadBuildable( edge.get, pID ) shouldBe false
-        val edge2 = game.gameField.adjacentEdges( edge.get ).head.setRoad( Some( Road( pID ) ) )
-        val game2 = game.updateGameField( game.gameField.update( edge2 ) )
+        val vertex = game.gameField.findVertex( 27 )
+        vertex shouldNot be( None )
+        val game2 = game.updateGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
         game2.roadBuildable( edge.get, pID ) shouldBe true
-        val vertex = game.gameField.adjacentVertices( edge.get ).head.setBuilding( Some( Settlement( pID ) ) )
-        val game3 = game.updateGameField( game.gameField.update( vertex ) )
-        game3.roadBuildable( edge.get, pID ) shouldBe true
+        val game3 = game2.updateGameField( game2.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) ) )
+        val edge2 = game3.gameField.findEdge( 45 )
+        edge2 shouldNot be( None )
+        game3.roadBuildable( edge2.get, pID ) shouldBe true
+        val edge3 = game3.gameField.findEdge( 42 )
+        edge3 shouldNot be( None )
+        game3.roadBuildable( edge3.get, pID ) shouldBe false
       }
       "roadLength" in {
         val edge = game.gameField.edges.values.head
