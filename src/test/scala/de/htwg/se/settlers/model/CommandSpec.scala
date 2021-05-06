@@ -873,5 +873,34 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.resourceStack shouldBe game2.resourceStack
       }
     }
+    "SetBeginnerCommand" should {
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val game = newGame.copy(
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ),
+          pID1 -> Player( pID1, Blue, "B" ),
+        )( PlayerOrdering ),
+      )
+      "fail because of no unique beginner specified" in {
+        val state = InitBeginnerState()
+        SetBeginnerCommand( state ).doStep( game ) shouldBe
+          Failure( NoUniqueBeginner )
+      }
+      "success" in {
+        val state = InitBeginnerState( Some( pID ) )
+        val command = SetBeginnerCommand( state )
+        val undoRes1 = command.undoStep( game )
+        undoRes1.state shouldBe state
+        val res = command.doStep( game )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe BuildInitSettlementState()
+        res.get._1.turn shouldBe Turn( pID )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.turn shouldBe game.turn
+      }
+    }
   }
 }
