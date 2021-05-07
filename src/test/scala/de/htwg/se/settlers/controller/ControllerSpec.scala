@@ -1,34 +1,45 @@
 package de.htwg.se.settlers.controller
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
-import de.htwg.se.settlers.model.Player.{Blue, Green, Red, Yellow}
+import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.util._
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.util.Success
-
 /**
  * @author Vincent76;
  */
 class ControllerSpec extends WordSpec with Matchers {
+  class TestObserver extends Observer {
+    var updateInfo:Option[Info] = None
+    var info:Option[Info] = None
+    var error:Option[Throwable] = None
+
+    override def onUpdate(info: Option[Info]): Unit = this.updateInfo = info
+
+    override def onInfo(info: Info): Unit = this.info = Some( info )
+
+    override def onError(t: Throwable): Unit = this.error = Some( t )
+  }
+
   "Controller" when {
     val controller = new Controller( test = true )
     "new" should {
       "have game" in {
-        val observer = new Observer {
-          override def onUpdate( info:Option[Info] ): Unit = ???
-          override def onInfo(info: Info): Unit = ???
-          override def onError(t: Throwable): Unit = ???
-        }
-        controller.add( observer )
+        val observer = new TestObserver()
         controller.remove( observer )
+        controller.add( observer )
         controller.game.state shouldBe an[InitState]
         controller.hasUndo shouldBe false
         controller.hasRedo shouldBe false
-        undoRedo( controller )
+        controller.undoAction()
+        observer.error shouldBe Some( NothingToUndo )
+        controller.redoAction()
+        observer.error shouldBe Some( NothingToRedo )
         controller.endTurn()
+        controller.update( Some( DiceInfo( 1, 2 ) ) )
+        observer.updateInfo shouldBe Some( DiceInfo( 1, 2 ) )
       }
     }
     "running" should {
