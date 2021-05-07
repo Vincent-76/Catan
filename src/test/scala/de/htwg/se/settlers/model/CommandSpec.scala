@@ -771,7 +771,6 @@ class CommandSpec extends WordSpec with Matchers {
       val pID = new PlayerID( 0 )
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
-      val nextState = ActionState()
       val game = newGame.copy(
         players = TreeMap(
           pID -> Player( pID, Green, "A" ).addResourceCard( Wood ),
