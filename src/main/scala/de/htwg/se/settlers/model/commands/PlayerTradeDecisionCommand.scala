@@ -15,7 +15,7 @@ case class PlayerTradeDecisionCommand( decision:Boolean, state:PlayerTradeState 
     Success( game.getNextTradePlayerInOrder( decisions, state.pID ) match {
       case Some( pID ) => game.setState( PlayerTradeState( pID, state.give, state.get, decisions ) )
       case None => game.setState( PlayerTradeEndState( state.give, state.get, decisions ) )
-    }, Option.empty )
+    }, None )
   }
 
   override def undoStep( game:Game ):Game = game.setState( state )

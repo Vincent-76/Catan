@@ -767,6 +767,88 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.gameField.robber.id shouldBe game.gameField.robber.id
       }
     }
+    "PlayerTradeCommand" should {
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val nextState = ActionState()
+      val game = newGame.copy(
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ).addResourceCard( Wood ),
+          pID1 -> Player( pID1, Blue, "B" ),
+          pID2 -> Player( pID2, Yellow, "C" ).addResourceCard( Clay ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "fail because of invalid player specified" in {
+        val state = PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID2 -> false ) )
+        val game2 = game.setState( state )
+        PlayerTradeCommand( pID2, state ).doStep( game2 ) shouldBe
+          Failure( InvalidPlayer( pID2 ) )
+      }
+      "fail because of insufficient resources" in {
+        val state = PlayerTradeEndState( ResourceCards.of( wood = 2 ), ResourceCards.of( clay = 1 ), Map( pID2 -> true ) )
+        val game2 = game.setState( state )
+        PlayerTradeCommand( pID2, state ).doStep( game2 ) shouldBe
+          Failure( InsufficientResources )
+      }
+      "fail because of trade player has insufficient resources" in {
+        val state = PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 2 ), Map( pID2 -> true ) )
+        val game2 = game.setState( state )
+        PlayerTradeCommand( pID2, state ).doStep( game2 ) shouldBe
+          Failure( TradePlayerInsufficientResources )
+      }
+      "success" in {
+        val state = PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID2 -> true ) )
+        val game2 = game.setState( state )
+        val command = PlayerTradeCommand( pID2, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe a [Some[ResourceChangeInfo]]
+        res.get._1.state shouldBe ActionState()
+        res.get._1.player.resources shouldBe ResourceCards.of( clay = 1 )
+        res.get._1.player( pID2 ).resources shouldBe ResourceCards.of( wood = 1 )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.player.resources shouldBe ResourceCards.of( wood = 1 )
+        undoRes.player( pID2 ).resources shouldBe ResourceCards.of( clay = 1 )
+      }
+    }
+    "PlayerTradeDecisionCommand" should {
+      val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
+      val pID2 = new PlayerID( 2 )
+      val game = newGame.copy(
+        players = TreeMap(
+          pID -> Player( pID, Green, "A" ).addResourceCard( Wood ),
+          pID1 -> Player( pID1, Blue, "B" ).addResourceCard( Clay ),
+          pID2 -> Player( pID2, Yellow, "C" ).addResourceCard( Clay ),
+        )( PlayerOrdering ),
+        turn = Turn( pID )
+      )
+      "success without next" in {
+        val state = PlayerTradeState( pID2, ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID1 -> false ) )
+        val game2 = game.setState( state )
+        val command = PlayerTradeDecisionCommand( true, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe a [PlayerTradeEndState]
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+      "success with next" in {
+        val state = PlayerTradeState( pID1, ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty )
+        val game2 = game.setState( state )
+        val command = PlayerTradeDecisionCommand( true, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe a [PlayerTradeState]
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+      }
+    }
     "RobberStealCommand" should {
       val pID = new PlayerID( 0 )
       val pID1 = new PlayerID( 1 )
@@ -1001,8 +1083,9 @@ class CommandSpec extends WordSpec with Matchers {
     "UseDevCardCommand" should {
       val state = ActionState()
       val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
       val game = newGame.copy(
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
+        players = newGame.players + ( pID -> Player( pID, Green, "A" ), pID1 -> Player( pID1, Blue, "B" ) ),
         turn = Turn( pID )
       )
       "fail because a dev card has already used in this turn" in {
@@ -1023,6 +1106,9 @@ class CommandSpec extends WordSpec with Matchers {
       "success with knight card without new largest army" in {
         val game2 = game.updatePlayer( game.player.addDevCard( KnightCard ) )
         val command = UseDevCardCommand( KnightCard, state )
+        val undoRes1 = command.undoStep( game2 )
+        undoRes1.state shouldBe state
+        undoRes1.bonusCards shouldBe game2.bonusCards
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
@@ -1038,7 +1124,7 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.player.usedDevCards shouldBe game2.player.usedDevCards
         undoRes.bonusCards shouldBe game2.bonusCards
       }
-      "success with knight card with new largest army" in {
+      "success with knight card with new largest army from empty" in {
         val game2 = game.updatePlayer( game.player.copy(
           usedDevCards = ( 1 until LargestArmyCard.required ).map( _ => KnightCard ).toVector,
           devCards = Vector( KnightCard )
@@ -1052,6 +1138,30 @@ class CommandSpec extends WordSpec with Matchers {
         res.get._1.player.devCards shouldBe empty
         res.get._1.player.usedDevCards should contain theSameElementsAs ( 1 to LargestArmyCard.required ).map( _ => KnightCard ).toVector
         res.get._1.bonusCards( LargestArmyCard ) shouldBe Some( pID, LargestArmyCard.required )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.state shouldBe state
+        undoRes.turn.usedDevCard shouldBe false
+        undoRes.player.devCards shouldBe game2.player.devCards
+        undoRes.player.usedDevCards shouldBe game2.player.usedDevCards
+        undoRes.bonusCards shouldBe game2.bonusCards
+      }
+      "success with knight card with new largest army from defined" in {
+        val game2 = game.updatePlayer( game.player.copy(
+          usedDevCards = ( 0 until LargestArmyCard.required ).map( _ => KnightCard ).toVector,
+          devCards = Vector( KnightCard )
+        ) )
+          .copy(
+            bonusCards = game.bonusCards.updated( LargestArmyCard, Some( pID1, LargestArmyCard.required ) )
+          )
+        val command = UseDevCardCommand( KnightCard, state )
+        val res = command.doStep( game2 )
+        res shouldBe a [Success[_]]
+        res.get._2 shouldBe None
+        res.get._1.state shouldBe RobberPlaceState( state )
+        res.get._1.turn.usedDevCard shouldBe true
+        res.get._1.player.devCards shouldBe empty
+        res.get._1.player.usedDevCards should contain theSameElementsAs ( 0 to LargestArmyCard.required ).map( _ => KnightCard ).toVector
+        res.get._1.bonusCards( LargestArmyCard ) shouldBe Some( pID, LargestArmyCard.required + 1 )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
         undoRes.turn.usedDevCard shouldBe false
