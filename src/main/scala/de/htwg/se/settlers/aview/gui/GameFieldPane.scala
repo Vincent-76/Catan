@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.model.GameField.Hex
-import de.htwg.se.settlers.model.{ Game, GameField }
+import de.htwg.se.settlers.model.{ Game, ClassicGameField, Hex }
 import de.htwg.se.settlers.aview.gui.GameFieldPane.Coords
 import javafx.geometry.Side
 import javafx.scene.layout.{ BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize }
@@ -36,7 +35,7 @@ class GameFieldPane extends BorderPane {
     )
   }
 
-  private def getChildSize( gameField:GameField ):(Double, Double) = {
+  private def getChildSize( gameField:ClassicGameField ):(Double, Double) = {
     val hexes = gameField.hexagons.map( r => r.size ).max
     val ratio = ( ( 1 / ( hexes * Math.sqrt( 3 ) ) ) * ( ( 2d / 4 ) + ( hexes * ( 6d / 4 ) ) ) ) / 1
     if ( width.value < height.value / ratio )

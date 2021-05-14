@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.{ RobberPlaceState, RobberStealState }
 

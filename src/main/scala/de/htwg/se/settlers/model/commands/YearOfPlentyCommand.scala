@@ -1,9 +1,8 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.state.YearOfPlentyState
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Success, Try }
 

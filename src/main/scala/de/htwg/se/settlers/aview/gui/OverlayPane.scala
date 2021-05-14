@@ -1,8 +1,7 @@
 package de.htwg.se.settlers.aview.gui
 
 import de.htwg.se.settlers.Catan
-import de.htwg.se.settlers.model.GameField.Hex
-import de.htwg.se.settlers.model.{City, Game, Settlement}
+import de.htwg.se.settlers.model.{City, Game, Settlement, Hex}
 import scalafx.geometry.VPos
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color

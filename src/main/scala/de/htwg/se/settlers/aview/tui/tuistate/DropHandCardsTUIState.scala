@@ -3,6 +3,7 @@ package de.htwg.se.settlers.aview.tui.tuistate
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Resources
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 import de.htwg.se.settlers.util._
 

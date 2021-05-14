@@ -4,6 +4,7 @@ import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Player._
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state._
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.aview.gui.guistate._
 import de.htwg.se.settlers.util.{ Observer, _ }
 import scalafx.application.Platform

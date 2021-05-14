@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, Vertex }
+import de.htwg.se.settlers.model.{ Edge, Hex, Vertex }
 import scalafx.Includes._
 import scalafx.scene.layout.{ AnchorPane, StackPane }
 import scalafx.scene.paint.Color

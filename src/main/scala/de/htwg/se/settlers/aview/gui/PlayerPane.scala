@@ -1,12 +1,10 @@
 package de.htwg.se.settlers.aview.gui
 
 import de.htwg.se.settlers.model.{ Cards, Game, Player }
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.aview.gui.util.{ CustomDialog, FlowGridPane, GlowButton }
 import de.htwg.se.settlers.util._
-import scalafx.geometry.{ Insets, Orientation, Pos }
-import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.ButtonBar.ButtonData
-import scalafx.scene.control.{ Alert, Button, ButtonType, DialogPane, Label }
+import scalafx.geometry.{ Insets, Orientation }
 import scalafx.scene.effect.Glow
 import scalafx.scene.layout._
 import scalafx.scene.paint.Color

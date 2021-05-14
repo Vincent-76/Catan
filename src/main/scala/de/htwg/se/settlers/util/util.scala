@@ -170,43 +170,6 @@ package object util {
     }
   }
 
-
-  implicit class RichResourceCards( resources:ResourceCards ) {
-
-    def add( r:Resource, amount:Int = 1 ):ResourceCards = resources.updated( r, resources.getOrElse( r, 0 ) + amount )
-
-    def add( toAdd:ResourceCards ):ResourceCards = Resources.get.red( resources, ( cards:ResourceCards, r:Resource ) => {
-      cards.updated( r, cards.getOrElse( r, 0 ) + toAdd.getOrElse( r, 0 ) )
-    } )
-
-    def subtract( r:Resource, amount:Int = 1 ):Try[ResourceCards] = {
-      val n = resources.getOrElse( r, 0 ) - amount
-      if ( n >= 0 )
-        Success( resources.updated( r, n ) )
-      else
-        Failure( InsufficientResources )
-    }
-
-    def subtract( toRemove:ResourceCards ):Try[ResourceCards] = Success( Resources.get.red( resources, ( cards:ResourceCards, r:Resource ) => {
-      val n = cards.getOrElse( r, 0 ) - toRemove.getOrElse( r, 0 )
-      if ( n < 0 )
-        return Failure( InsufficientResources )
-      cards.updated( r, n )
-    } ) )
-
-    def amount:Int = resources.values.sum
-
-    def has( requiredResources:ResourceCards ):Boolean = {
-      requiredResources.foreach( data => if ( !resources.contains( data._1 ) || resources( data._1 ) < data._2 ) return false )
-      true
-    }
-
-    def sort:Seq[(Resource, Int)] = resources.sortBySeq( Resources.get )
-
-    def toString( prefix:String ):String =
-      resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.title ).mkString( ", " )
-  }
-
 }
 
 

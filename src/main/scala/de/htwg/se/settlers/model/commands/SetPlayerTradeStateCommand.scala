@@ -1,9 +1,8 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.state.{ PlayerTradeEndState, PlayerTradeState }
 import de.htwg.se.settlers.model.{ Command, Game, Info, InsufficientResources, State }
-import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Success, Try }
 

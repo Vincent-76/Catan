@@ -1,11 +1,11 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.ClassicGameField.Row
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, PlacementPoint, Row, Vertex }
 import de.htwg.se.settlers.util._
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 /**
  * @author Vincent76;

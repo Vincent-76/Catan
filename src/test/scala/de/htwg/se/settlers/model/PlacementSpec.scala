@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model.Player.{Blue, Green}
 import de.htwg.se.settlers.util._
 import org.scalatest.{Matchers, WordSpec}

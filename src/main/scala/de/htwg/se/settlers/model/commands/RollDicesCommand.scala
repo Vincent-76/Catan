@@ -1,14 +1,14 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.ClassicGameField.Row
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{Hex, Row, Vertex}
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.{ActionState, DropHandCardsState, RobberPlaceState}
 import de.htwg.se.settlers.util._
 
 import scala.collection.immutable.SortedMap
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * @author Vincent76;

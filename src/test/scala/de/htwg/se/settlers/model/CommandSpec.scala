@@ -1,8 +1,7 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards.{ResourceCards, devCards}
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.Edge
 import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
 import de.htwg.se.settlers.model.commands._
 import de.htwg.se.settlers.model.state._
@@ -533,7 +532,7 @@ class CommandSpec extends WordSpec with Matchers {
         val edge = game.gameField.findEdge( 1 )
         val vertex = game.gameField.adjacentVertices( edge.get ).head
         val pID1 = new PlayerID( 1 )
-        val game2 = game.updateGameField( game.gameField.adjacentEdges( edge.get ).red( game.gameField, ( g:GameField, e:Edge ) =>
+        val game2 = game.updateGameField( game.gameField.adjacentEdges( edge.get ).red( game.gameField, (g:ClassicGameField, e:Edge ) =>
           g.update( e.setRoad( Some( Road( pID1 ) ) ) )
         ).update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
         val command = DevBuildRoadCommand( edge.get.id, state )

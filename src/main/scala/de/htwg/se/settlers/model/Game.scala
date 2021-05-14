@@ -1,8 +1,7 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, PlacementPoint, Row, Vertex }
 import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.util._
@@ -31,7 +30,7 @@ object Game {
   }
 
   def apply( test:Boolean ):Game = {
-    if ( test ) new Game( gameField = GameField( new Random( testSeed ) ), seed = testSeed, developmentCards = Cards.getDevStack( new Random( testSeed ) ) ) else Game()
+    if ( test ) new Game( gameField = ClassicGameField( new Random( testSeed ) ), seed = testSeed, developmentCards = Cards.getDevStack( new Random( testSeed ) ) ) else Game()
   }
 
 }
@@ -40,27 +39,27 @@ object PlayerOrdering extends Ordering[PlayerID] {
   override def compare( x:PlayerID, y:PlayerID ):Int = x.id.compareTo( y.id )
 }
 
-case class Game( state:State = InitState(),
-                 gameField:GameField = GameField(),
-                 resourceStack:ResourceCards = Cards.getResourceCards(),
-                 developmentCards:List[DevelopmentCard] = Cards.getDevStack(),
-                 players:SortedMap[PlayerID, Player] = TreeMap.empty[PlayerID, Player]( PlayerOrdering ),
-                 turn:Turn = Turn( new PlayerID( -1 ) ),
-                 bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, Option.empty) ).toMap,
-                 winner:Option[PlayerID] = Option.empty,
-                 round:Int = 1,
-                 seed:Int = Random.nextInt( Int.MaxValue / 1000 )
+case class Game(state:State = InitState(),
+                gameField:ClassicGameField = ClassicGameField(),
+                resourceStack:ResourceCards = Cards.getResourceCards(),
+                developmentCards:List[DevelopmentCard] = Cards.getDevStack(),
+                players:SortedMap[PlayerID, Player] = TreeMap.empty[PlayerID, Player]( PlayerOrdering ),
+                turn:Turn = Turn( new PlayerID( -1 ) ),
+                bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, Option.empty) ).toMap,
+                winner:Option[PlayerID] = Option.empty,
+                round:Int = 1,
+                seed:Int = Random.nextInt( Int.MaxValue / 1000 )
                ) {
 
-  def copy( state:State = state,
-            gameField:GameField = gameField,
-            resourceStack:ResourceCards = resourceStack,
-            developmentCards:List[DevelopmentCard] = developmentCards,
-            players:SortedMap[PlayerID, Player] = players,
-            turn:Turn = turn,
-            bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = bonusCards,
-            winner:Option[PlayerID] = winner,
-            round:Int = round
+  def copy(state:State = state,
+           gameField:ClassicGameField = gameField,
+           resourceStack:ResourceCards = resourceStack,
+           developmentCards:List[DevelopmentCard] = developmentCards,
+           players:SortedMap[PlayerID, Player] = players,
+           turn:Turn = turn,
+           bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = bonusCards,
+           winner:Option[PlayerID] = winner,
+           round:Int = round
           ):Game = new Game( state, gameField, resourceStack, developmentCards, players, turn, bonusCards, winner, round, seed )
 
   def onTurn:PlayerID = turn.playerID
@@ -164,7 +163,7 @@ case class Game( state:State = InitState(),
     }
   }
 
-  def updateGameField( newField:GameField ):Game = {
+  def updateGameField( newField:ClassicGameField ):Game = {
     copy( gameField = newField )
   }
 

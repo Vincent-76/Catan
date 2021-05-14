@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.util._

@@ -1,7 +1,7 @@
 package de.htwg.se.settlers.aview.tui
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.Player.{ Blue, Green, PlayerColor, Red, Yellow }
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.model.{ PlacementPointNotEmpty, _ }
@@ -214,7 +214,7 @@ class TUI( val controller:Controller ) extends Observer {
       case GameEndInfo( winner ) =>
         val p = controller.player( winner )
         TUI.out( TUI.displayName( p ) + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" )
-      case _ => return
+      case _ =>
     }
   }
 

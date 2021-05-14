@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.aview.gui
 
 import de.htwg.se.settlers.Catan
-import de.htwg.se.settlers.model.GameField.Hex
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.aview.gui.GameFieldPane.Coords
 import de.htwg.se.settlers.util._
@@ -25,7 +24,7 @@ class GameFieldCanvas extends Canvas {
   graphicsContext2D.textAlign = TextAlignment.Center
   graphicsContext2D.textBaseline = VPos.Center
 
-  def update( gameField:GameField, hWidth:Double, hSize:Double ):Coords = {
+  def update(gameField:ClassicGameField, hWidth:Double, hSize:Double ):Coords = {
     graphicsContext2D.clearRect( 0, 0, width.value, height.value )
     val coords = gameField.hexagons.redByKey( Map.empty:Coords, ( coords:Coords, i:Int ) => {
       val row = gameField.hexagons( i )
@@ -71,7 +70,7 @@ class GameFieldCanvas extends Canvas {
     }
   }
 
-  private def drawWater( gameField:GameField, coords:Coords, hSize:Double, h:Hex, center:(Double, Double) ):Unit = h.area match {
+  private def drawWater(gameField:ClassicGameField, coords:Coords, hSize:Double, h:Hex, center:(Double, Double) ):Unit = h.area match {
     case w:WaterArea =>
       if ( w.port.isDefined ) {
         graphicsContext2D.font = Font.font( Font.default.getFamily, FontWeight.Bold, GameFieldPane.mult( 14, hSize ) )

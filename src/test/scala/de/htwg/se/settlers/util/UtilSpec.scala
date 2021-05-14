@@ -1,7 +1,7 @@
 package de.htwg.se.settlers.util
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
-import de.htwg.se.settlers.model.{Clay, InsufficientResources, Ore, Resource, Resources, Sheep, Wheat, Wood}
+import de.htwg.se.settlers.model.{Clay, Ore, Resource, Resources, Sheep, Wheat, Wood}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.{Failure, Random, Success, Try}
@@ -138,34 +138,6 @@ class UtilSpec extends WordSpec with Matchers {
       "failureOption" in {
         tr.failureOption shouldNot be( None )
         Success( 5 ).failureOption shouldBe None
-      }
-    }
-    "RichResourceCards" should {
-      val cards = ResourceCards.of( 4, 2, 3, 7, 1 )
-      "add" in {
-        cards.add( Clay, 2 ) shouldBe ResourceCards.of( 4, 4, 3, 7, 1 )
-        cards.add( ResourceCards.of( 4, 2 ) ) shouldBe
-          ResourceCards.of( 8, 4, 3, 7, 1 )
-      }
-      "subtract" in {
-        cards.subtract( Wheat, 7 ) shouldBe
-          Success( ResourceCards.of( 4, 2, 3, 0, 1 ) )
-        cards.subtract( Clay, 3 ) shouldBe Failure( InsufficientResources )
-        cards.subtract( ResourceCards.of( 2 ) ) shouldBe
-          Success( ResourceCards.of( 2, 2, 3, 7, 1 ) )
-        ResourceCards.ofResource( Wood, 2 ).subtract( ResourceCards.of( clay = 5 ) ) shouldBe Failure( InsufficientResources )
-      }
-      "amount" in {
-        cards.amount shouldBe 17
-      }
-      "has" in {
-        cards.has( ResourceCards.of( 2, 1, 3, 5, 1 ) ) shouldBe true
-      }
-      "sort" in {
-        cards.sort shouldBe Seq( (Wood, 4), (Clay, 2), (Sheep, 3), (Wheat, 7), (Ore, 1) )
-      }
-      "toString" in {
-        cards.toString( "+" ) shouldBe "+2 Clay, +3 Sheep, +7 Wheat, +1 Ore, +4 Wood"
       }
     }
   }

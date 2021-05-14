@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.model.GameField.PlacementPoint
+import de.htwg.se.settlers.model.PlacementPoint
 import scalafx.scene.Node
 
 /**

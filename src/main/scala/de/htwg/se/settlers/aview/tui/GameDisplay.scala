@@ -2,8 +2,8 @@ package de.htwg.se.settlers.aview.tui
 
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.GameField.{ Edge, Hex, PlacementPoint, Vertex }
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.util._
 
 /**

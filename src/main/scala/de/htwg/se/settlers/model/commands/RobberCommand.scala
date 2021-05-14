@@ -2,7 +2,7 @@ package de.htwg.se.settlers.model.commands
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.{ Command, Game, GameField, Info, Resource, ResourceChangeInfo, State }
+import de.htwg.se.settlers.model.{ Command, Game, ClassicGameField, Info, Resource, ResourceChangeInfo, State }
 
 import scala.util.{ Success, Try }
 
@@ -13,7 +13,7 @@ abstract class RobberCommand( ) extends Command {
 
   var robbedResource:Option[Resource] = None
 
-  protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[GameField] = None ):Try[(Game, Option[Info])] = {
+  protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[ClassicGameField] = None ):Try[(Game, Option[Info])] = {
     robbedResource = game.players( stealPlayerID ).randomHandResource()
     robbedResource match {
       case Some( r ) => Success( game.copy(

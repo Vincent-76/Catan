@@ -2,12 +2,12 @@ package de.htwg.se.settlers.aview.gui
 
 import scalafx.Includes._
 import de.htwg.se.settlers.model.{ Game, KnightCard, Player }
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.aview.gui.GUIApp._
-import de.htwg.se.settlers.util._
 import scalafx.geometry.Insets
 import scalafx.scene.control.Label
 import scalafx.scene.effect.{ DropShadow, Glow }
-import scalafx.scene.layout.{ AnchorPane, Border, BorderStroke, BorderStrokeStyle, BorderWidths, ColumnConstraints, CornerRadii, GridPane, HBox, Priority, RowConstraints, StackPane, VBox }
+import scalafx.scene.layout.{ AnchorPane, ColumnConstraints, GridPane, HBox, Priority, RowConstraints, StackPane, VBox }
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 import scalafx.scene.text.Text
