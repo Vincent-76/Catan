@@ -206,8 +206,7 @@ class GUIApp( val controller:Controller ) extends Observer {
     Platform.runLater {
       new Alert( AlertType.Warning ) {
         initOwner( gui.stage )
-        headerText = "Error"
-        contentText = text
+        headerText = text
       }.showAndWait()
     }
   }
