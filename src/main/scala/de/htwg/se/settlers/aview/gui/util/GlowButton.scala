@@ -4,14 +4,17 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.Label
 import scalafx.scene.effect.Glow
 import scalafx.scene.layout.StackPane
+import scalafx.scene.paint.Color
 
 /**
  * @author Vincent76;
  */
 class GlowButton( title:String ) extends StackPane {
-  style = "-fx-font-size: 9; -fx-border-color: #202020; -fx-background-color: #5a5a5a; -fx-cursor: hand"
+  styleClass.add( "glowButton" )
   padding = Insets( 2 )
-  children = new Label( title )
+  children = new Label( title ) {
+    styleClass.add( "glowButtonLabel" )
+  }
   onMouseEntered = _ => effect = new Glow( 0.7 )
   onMouseExited = _ => effect = null
 }

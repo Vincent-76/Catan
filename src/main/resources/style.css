@@ -22,3 +22,20 @@
 .resourceCounter {
     -fx-font-size: 16;
 }
+
+.infoTextArea .text {
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5px;
+}
+
+.glowButton {
+    -fx-border-color: #202020;
+    -fx-background-color: #5a5a5a;
+    -fx-cursor: hand
+}
+
+.glowButtonLabel .text {
+    -fx-fill: #FFFFFF;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 9;
+}

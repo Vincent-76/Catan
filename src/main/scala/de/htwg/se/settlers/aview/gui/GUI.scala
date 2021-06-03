@@ -91,7 +91,6 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
 
   Platform.runLater {
     infoPane.setBackground
-    infoPane.showInfo( "A           +2 Ore" )
   }
   /*def postInit():Unit = {
     infoPane.setBackground

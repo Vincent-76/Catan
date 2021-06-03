@@ -55,7 +55,7 @@ class PlayerPane( gui:GUI ) extends VBox {
           }
         )
       },
-    ) ++ ( if ( full || true )
+    ) ++ ( if ( full )
       List(
         new FlowGridPane( 3 ) {
           padding = Insets( 10, 10, 10, 10 )
@@ -79,9 +79,10 @@ class PlayerPane( gui:GUI ) extends VBox {
         },
         new StackPane {
           margin = Insets( 0, 6, 0, 6 )
-          style = "-fx-font-size: 14; -fx-border-color: #353535; -fx-border-width: 0 0 1 0"
+          style = "-fx-font-size: 14; -fx-border-color: #FFFFFF; -fx-border-width: 0 0 1 0"
           children = new Text( "Development Cards" ) {
             fill = Color.White
+            style = "-fx-font-size: 16"
           }
         },
         new TilePane {

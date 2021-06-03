@@ -35,6 +35,7 @@ class InfoPane( gui:GUI ) extends BorderPane {
   val textArea:TextArea = new TextArea {
     setEditable( false )
     setPrefColumnCount( 1 )
+    styleClass.add( "infoTextArea" )
     textProperty().addListener( new ChangeListener[String] {
       override def changed( observableValue:ObservableValue[_ <: String], t:String, t1:String ):Unit = setScrollTop( Double.MaxValue )
     } )
@@ -58,9 +59,6 @@ class InfoPane( gui:GUI ) extends BorderPane {
     if( l != null && l.isInstanceOf[Region] ) {
       l.asInstanceOf[Region].setBackground( GUIApp.woodBackground )// "-fx-background-image: url( \"/wood_background.png\" );"
     }
-    val t = textArea.lookup( ".text" )
-    if( t != null )
-      t.setStyle( "-fx-stroke: black; -fx-stroke-width: 0.5px;" )
   }
 
   def update( ):Unit = {
