@@ -9,7 +9,7 @@ import scalafx.scene.layout.StackPane
  * @author Vincent76;
  */
 class GlowButton( title:String ) extends StackPane {
-  style = "-fx-font-size: 9; -fx-border-color: #353535; -fx-background-color: #FFFFFF; -fx-cursor: hand"
+  style = "-fx-font-size: 9; -fx-border-color: #202020; -fx-background-color: #5a5a5a; -fx-cursor: hand"
   padding = Insets( 2 )
   children = new Label( title )
   onMouseEntered = _ => effect = new Glow( 0.7 )
