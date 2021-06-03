@@ -3,13 +3,14 @@ package de.htwg.se.settlers.aview.gui.guistate
 import scalafx.Includes._
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Player
-import de.htwg.se.settlers.aview.gui.{ DisplayState, FieldDisplayState, GUIApp, GUIState, InitDisplayState }
+import de.htwg.se.settlers.aview.gui.{DisplayState, FieldDisplayState, GUIApp, GUIState, InitDisplayState}
 import javafx.scene.input.KeyCode
 import scalafx.geometry.Pos
 import scalafx.scene.Node
-import scalafx.scene.control.{ Button, ComboBox, TextField }
+import scalafx.scene.control.{Button, ComboBox, TextField}
 import scalafx.scene.input.KeyEvent
-import scalafx.scene.layout.{ HBox, VBox }
+import scalafx.scene.layout.{HBox, Pane, VBox}
+import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 
 /**
@@ -17,7 +18,7 @@ import scalafx.scene.text.Text
  */
 case class InitPlayerGUIState( controller:Controller ) extends GUIState {
   override def getDisplayState:DisplayState = new InitDisplayState {
-    override def getDisplayNode:Node = new VBox {
+    override def getDisplayPane:Pane = new VBox {
       spacing = 10
       alignment = Pos.Center
       val textField:TextField = new TextField {
@@ -33,7 +34,9 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
           controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
       }
       children = List(
-        new Text( "Enter a name and choose a color to add a player,\n or continue to dice out the beginner." ),
+        new Text( "Enter a name and choose a color to add a player,\n or continue to dice out the beginner." ) {
+          fill = Color.White
+        },
         textField,
         comboBox,
         new HBox {

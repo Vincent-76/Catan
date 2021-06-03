@@ -8,6 +8,7 @@ import scalafx.scene.layout.{ AnchorPane, Priority, VBox }
  * @author Vincent76;
  */
 class ActionPane( gui:GUI ) extends VBox {
+  background = GUIApp.stoneBackground
   hgrow = Priority.Always
   vgrow = Priority.Always
   padding = Insets( 10 )

@@ -2,6 +2,7 @@ package de.htwg.se.settlers.aview.gui
 
 import de.htwg.se.settlers.model.PlacementPoint
 import scalafx.scene.Node
+import scalafx.scene.layout.Pane
 
 /**
  * @author Vincent76;
@@ -9,7 +10,7 @@ import scalafx.scene.Node
 sealed trait DisplayState
 
 trait InitDisplayState extends DisplayState {
-  def getDisplayNode:Node
+  def getDisplayPane:Pane
 
 
 }

@@ -1,10 +1,13 @@
 package de.htwg.se.settlers.aview.gui
 
 import de.htwg.se.settlers.controller.Controller
-import javafx.beans.value.{ ChangeListener, ObservableValue }
+import javafx.beans.value.{ChangeListener, ObservableValue}
+import javafx.geometry.Side
 import javafx.scene.control.TextArea
+import javafx.scene.layout.{BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize, Region}
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{ AnchorPane, BorderPane, Priority, VBox }
+import scalafx.scene.image.Image
+import scalafx.scene.layout.{AnchorPane, Background, BorderPane, Priority, VBox}
 
 /**
  * @author Vincent76;
@@ -30,18 +33,34 @@ class InfoPane( gui:GUI ) extends BorderPane {
     } )
   }
   val textArea:TextArea = new TextArea {
-    style = "-fx-font-family: monospace"
     setEditable( false )
     setPrefColumnCount( 1 )
     textProperty().addListener( new ChangeListener[String] {
       override def changed( observableValue:ObservableValue[_ <: String], t:String, t1:String ):Unit = setScrollTop( Double.MaxValue )
     } )
   }
-  center = new scalafx.scene.control.TextArea( textArea )
+  center = new scalafx.scene.control.TextArea( textArea ) {
+    style = "-fx-font-family: monospace;" +
+      "-fx-text-fill: white;" +
+      "-fx-text-inner-color: white;" +
+      "-fx-font-weight:bold;" +
+      "-fx-font-size: 16;" +
+      "-fx-focus-color: transparent;"
+  }
 
 
   def showInfo( info:String ):Unit = {
     textArea.appendText( "\n" + info )
+  }
+
+  def setBackground:Unit = {
+    val l = textArea.lookup( ".content" )
+    if( l != null && l.isInstanceOf[Region] ) {
+      l.asInstanceOf[Region].setBackground( GUIApp.woodBackground )// "-fx-background-image: url( \"/wood_background.png\" );"
+    }
+    val t = textArea.lookup( ".text" )
+    if( t != null )
+      t.setStyle( "-fx-stroke: black; -fx-stroke-width: 0.5px;" )
   }
 
   def update( ):Unit = {

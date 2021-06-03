@@ -1,0 +1,24 @@
+.playerInfoName {
+    -fx-font-weight: bold;
+}
+
+.playerInfoName .text {
+    /*-fx-fill: white;*/
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5px;
+}
+
+.playerInfoPaneDataLabel {
+    -fx-font-size: 12;
+    -fx-fill: white;
+}
+
+.initBeginnerName {
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5px;
+    -fx-font-size: 20;
+}
+
+.resourceCounter {
+    -fx-font-size: 16;
+}

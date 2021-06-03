@@ -15,9 +15,9 @@ object InteractionPane {
 }
 
 class InteractionPane extends AnchorPane {
-  var input:Option[FieldInputDisplayState] = Option.empty
+  var input:Option[FieldInputDisplayState] = None
 
-  def resetInput():Unit = this.input = Option.empty
+  def resetInput():Unit = this.input = None
 
   def setInput( input:FieldInputDisplayState ):Unit = this.input = Some( input )
 

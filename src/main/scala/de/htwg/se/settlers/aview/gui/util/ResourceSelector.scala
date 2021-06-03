@@ -1,9 +1,10 @@
 package de.htwg.se.settlers.aview.gui.util
 
 import de.htwg.se.settlers.model.Cards.ResourceCards
-import de.htwg.se.settlers.model.{ Resource, Resources }
+import de.htwg.se.settlers.model.{Resource, Resources}
 import de.htwg.se.settlers.aview.gui.GUIApp
-import scalafx.geometry.{ Insets, Orientation, Pos }
+import scalafx.geometry.{Insets, Orientation, Pos}
+import scalafx.scene.image.ImageView
 import scalafx.scene.layout._
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
@@ -32,9 +33,13 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
       minWidth = 50
       alignment = Pos.Center
       children = List(
-        new Text( d._1.title + ( if ( maximum.contains( d._1 ) ) ": " + maximum( d._1 ) else "" ) ) {
+        new Text( if ( maximum.contains( d._1 ) ) "Max: " + maximum( d._1 ) else "" ) {
           style = "-fx-font-size: 12"
           fill = GUIApp.colorOf( d._1 ).darker.darker
+        },
+        new ImageView( GUIApp.resourceIcons( d._1 ) ) {
+          fitWidth = 40
+          preserveRatio = true
         },
         new BorderPane {
           hgrow = Priority.Always

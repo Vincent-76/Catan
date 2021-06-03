@@ -3,11 +3,13 @@ package de.htwg.se.settlers.aview.gui.guistate
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.InitBeginnerState
-import de.htwg.se.settlers.aview.gui.{ DisplayState, GUIApp, GUIState, InitDisplayState }
-import scalafx.geometry.{ Insets, Pos }
+import de.htwg.se.settlers.aview.gui.{DisplayState, GUIApp, GUIState, InitDisplayState}
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Node
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{ GridPane, VBox }
+import scalafx.scene.effect.{ColorInput, Glow}
+import scalafx.scene.layout.{GridPane, Pane, VBox}
+import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 
 /**
@@ -15,7 +17,7 @@ import scalafx.scene.text.Text
  */
 case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller ) extends GUIState {
   override def getDisplayState:DisplayState = new InitDisplayState {
-    override def getDisplayNode:Node = new VBox {
+    override def getDisplayPane:Pane = new VBox {
       spacing = 10
       alignment = Pos.Center
       children = List(
@@ -25,11 +27,13 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
             val p = controller.player( d._1._1 )
             add( new Text( p.name ) {
               fill = GUIApp.colorOf( p.color )
-              style = "-fx-font-size: 16"
+              //effect = new Glow( 1.0 )
+              styleClass.add( "initBeginnerName" )
             }, 0, d._2 )
-            add( new Text( d._1._2.toString ){
+            add( new Text( d._1._2.toString ) {
+              fill = Color.White
               margin = Insets( 0, 0, 0, 20 )
-              style = "-fx-font-size: 16"
+              style = "-fx-font-size: 20"
             }, 1, d._2 )
           } )
         }
@@ -38,7 +42,8 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
       else {
         ( if ( state.diceValues.nonEmpty )
           List( new Text( "Tie, roll again." ) {
-            style = "-fx-font-size: 16"
+            fill = Color.White
+            style = "-fx-font-size: 20"
           } )
         else Nil ) :+ new Button( "Roll the dices" ) {
           onAction = _ => controller.diceOutBeginner()
@@ -48,8 +53,8 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
 
     private def beginnerInfo( beginner:PlayerID ):List[Node] = List(
       new Text( controller.player( beginner ).name + " begins." ) {
-        fill = GUIApp.colorOf( controller.player( beginner ).color )
-        style = "-fx-font-size: 16"
+        fill = Color.White //GUIApp.colorOf( controller.player( beginner ).color )
+        style = "-fx-font-size: 20"
       },
       new Button( "Continue" ) {
         onAction = _ => controller.setBeginner()

@@ -6,21 +6,39 @@ import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.aview.gui.guistate._
-import de.htwg.se.settlers.util.{ Observer, _ }
+import de.htwg.se.settlers.util.{Observer, _}
+import javafx.geometry.Side
+import javafx.scene.layout.{BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize}
 import scalafx.application.Platform
 import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.image.Image
+import scalafx.scene.layout.Background
 import scalafx.scene.paint.Color
 
 /**
  * @author Vincent76;
  */
 object GUIApp {
+  val stoneBackground:Background = getBackground( "/stone_background.png" )
+  val woodBackground:Background = getBackground( "/wood_background.png" )
+  val resourceIcons:Map[Resource, Image] = Resources.get.map( r => (r, new Image( "/resources/" + r.title.toLowerCase + ".png" )) ).toMap
+  val devCardIcon:Image = new Image( "/resources/dev.png" )
+
+
+  private def getBackground( url:String ):Background = {
+    val tile:Image = new Image( url)
+    val backgroundPosition = new BackgroundPosition( Side.LEFT, 0, false, Side.TOP, 0, false )
+    val backgroundImage = new BackgroundImage( tile, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, backgroundPosition,
+      new BackgroundSize( 80, 80, false, false, false, false ) )
+    new Background( new javafx.scene.layout.Background( backgroundImage ) )
+  }
+
   def colorOf( playerColor:PlayerColor ):Color = playerColor match {
-    case Green => Color.Green.darker
-    case Red => Color.Red.darker
+    case Green => Color.Green.brighter
+    case Red => Color.Red
     case Yellow => Color.Yellow.darker
-    case Blue => Color.Blue
+    case Blue => Color.CornflowerBlue
   }
 
   def colorOf( f:FieldType ):Color = f match {

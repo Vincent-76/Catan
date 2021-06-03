@@ -3,17 +3,19 @@ package de.htwg.se.settlers.aview.gui
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.aview.gui.util.CustomDialog
 import javafx.geometry.Side
-import javafx.scene.input.{ KeyCode, KeyCodeCombination, KeyCombination }
-import javafx.scene.layout.{ BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize }
+import javafx.scene.input.{KeyCode, KeyCodeCombination, KeyCombination}
+import javafx.scene.layout.{BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize}
 import scalafx.application.JFXApp.PrimaryStage
-import scalafx.application.{ JFXApp, Platform }
+import scalafx.application.{JFXApp, Platform}
 import scalafx.geometry.Pos
 import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.image.Image
 import scalafx.scene.layout._
-import scalafx.scene.text.{ Text, TextAlignment }
-import scalafx.scene.{ Node, Scene }
+import scalafx.scene.text.{Text, TextAlignment}
+import scalafx.scene.{Node, Scene}
+
+import scala.io.Source
 
 /**
  * @author Vincent76;
@@ -29,13 +31,15 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
 
   stage = new PrimaryStage {
     title = "Settlers of Catan"
-    minWidth = 750
-    minHeight = 500
+    minWidth = 850
+    minHeight = 650
     width.addListener( ( _, _, _ ) => gameFieldPane.center = null )
     height.addListener( ( _, _, _ ) => gameFieldPane.center = null )
     gameFieldPane.width.addListener( ( _, _, _ ) => gameFieldPane.updateAll( controller.game ) )
     gameFieldPane.height.addListener( ( _, _, _ ) => gameFieldPane.updateAll( controller.game ) )
-    scene = new Scene( 750, 500 ) {
+    scene = new Scene( 850, 650 ) {
+      //val css = Source.fromResource( "style.css" ).mkString
+      stylesheets.add( "style.css" )// getClass.getResource( "/style.css" ).toExternalForm )
       root = new GridPane {
         style = "-fx-border-color: #353535; -fx-border-width: 2"
         rowConstraints = List(
@@ -50,6 +54,7 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
           percentWidth = 100
         } )
         add( new BorderPane {
+          background = GUIApp.stoneBackground
           left = new VBox {
             style = "-fx-border-color: #353535; -fx-border-width: 0 2 0 0"
             minWidth = 160
@@ -62,8 +67,8 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
           center = CenterPane
           right = new VBox {
             style = "-fx-border-color: #353535; -fx-border-width: 0 0 0 2"
-            minWidth = 140
-            maxWidth = 140
+            minWidth = 160
+            maxWidth = 160
             children = List(
               playerPane,
               actionPane
@@ -84,6 +89,15 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
   guiApp.onUpdate( None )
 
 
+  Platform.runLater {
+    infoPane.setBackground
+    infoPane.showInfo( "A           +2 Ore" )
+  }
+  /*def postInit():Unit = {
+    infoPane.setBackground
+  }*/
+
+
   def update( state:Option[GUIState] = Option.empty ):Unit = Platform.runLater {
     if ( dialog.isDefined )
       dialog.get.close()
@@ -96,9 +110,10 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
         actionPane.update( guiState.getActions )
         guiState.getDisplayState match {
           case i:InitDisplayState =>
-            val node = i.getDisplayNode
-            node.style = node.style.value + ";-fx-background-color: #FFFFFF"
-            setCenter( node )
+            val pane = i.getDisplayPane
+            pane.background = GUIApp.stoneBackground
+            //pane.style = pane.style.value + ";-fx-background-color: #FFFFFF"
+            setCenter( pane )
           case s:FieldDisplayState =>
             s match {
               case f:FieldInputDisplayState => gameFieldPane.interactionPane.setInput( f )
