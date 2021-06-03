@@ -159,11 +159,57 @@ class GUIApp( val controller:Controller ) extends Observer {
   }
 
 
-  override def onError( t:Throwable ):Unit = Platform.runLater {
-    new Alert( AlertType.Warning ) {
-      initOwner( gui.stage )
-      headerText = t.getClass.getSimpleName
-    }.showAndWait()
+  override def onError( t:Throwable ):Unit = {
+    val text = t match {
+      case WrongState => "Unable in this state!"
+      case InsufficientResources => "Insufficient resources for this action!"
+      case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
+      case InsufficientStructures( structure ) =>
+        "Insufficient structures of " + structure.title + " for this action!"
+      case NonExistentPlacementPoint( id ) => "This placement point does not exists!"
+      case PlacementPointNotEmpty( id ) => "This placement point is not empty!"
+      case NoAdjacentStructure => "Player has no adjacent structure!"
+      case TooCloseToBuilding( id ) => "This placement point is too close to another building!"
+      case NoConnectedStructures( id ) => "No connected structures on this placement point!"
+      case SettlementRequired( id ) =>
+        "You need a settlement on this placement point to build a city!"
+      case InvalidPlacementPoint( id ) => "Invalid placement point!"
+      case NotEnoughPlayers => "Minimum " + Game.minPlayers + " players required!"
+      case InvalidPlayerColor( color ) => "Invalid player color: [" + color + "]!"
+      case RobberOnlyOnLand => "Robber can only be placed on land!"
+      case NoPlacementPoints( structure ) =>
+        "No available placement points for structure " + structure.title + "!"
+      case InvalidResourceAmount( amount ) => "Invalid resource amount: " + amount + "!"
+      case InvalidTradeResources( give, get ) =>
+        "Invalid trade resources: " + give.title + " <-> " + get.title + "!"
+      case InvalidDevCard( devCard ) => "Invalid dev card: [" + devCard + "]!"
+      case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + devCard.title + "!"
+      case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
+      case DevCardDrawnInTurn( devCard ) =>
+        "You've drawn this development card (" + devCard.title + ") in this turn, you can use it in your next turn."
+      case InsufficientBankResources => "Bank has insufficient resources!"
+      case InconsistentData => "Internal problem, please try again."
+      case DevStackIsEmpty => "Development card stack is empty!"
+      case PlayerNameAlreadyExists( name ) => "Player with name: [" + name + "] already exists!"
+      case PlayerNameEmpty => "Player name can't be empty!"
+      case PlayerNameTooLong( name ) =>
+        "Player name [" + name + "] is too long, maximum " + Game.maxPlayerNameLength + " characters!"
+      case PlayerColorIsAlreadyInUse( playerColor ) =>
+        "Player color: [" + playerColor.name + "] is already in use!"
+      case InvalidPlayerID( id ) => "Invalid player id: [" + id + "]!"
+      case InvalidPlayer( playerID ) => "Invalid player with id: " + playerID + "!"
+      case NothingToUndo => "Nothing to undo!"
+      case NothingToRedo => "Nothing to redo!"
+      case e:ControllerError => "Unknown error!"
+      case t:Throwable => t + ": " + t.getMessage
+    }
+    Platform.runLater {
+      new Alert( AlertType.Warning ) {
+        initOwner( gui.stage )
+        headerText = "Error"
+        contentText = text
+      }.showAndWait()
+    }
   }
 
 }

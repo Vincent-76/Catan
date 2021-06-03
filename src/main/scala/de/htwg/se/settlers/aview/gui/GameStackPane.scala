@@ -30,7 +30,7 @@ class GameStackPane extends VBox {
   children = List(
     new Text( "Stacks" ) {
       fill = Color.White
-      style = "-fx-font-size: 18; -fx-font-weight: bold; -fx-stroke: black; -fx-stroke-width: 0.5px"
+      styleClass.add( "gameStackHeader" )
       //styleClass = styleClass :+ ""
       textAlignment = TextAlignment.Center
       margin = Insets( 0, 8, 8, 8 )

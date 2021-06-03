@@ -20,9 +20,11 @@ case class InitGUIState( controller:Controller ) extends GUIState {
       children = List(
         new Text( "Welcome to the Settlers of Catan" ) {
           fill = Color.White
+          styleClass.add( "initHeader" )
         },
         new Button( "Add Players" ) {
           onAction = _ => controller.initPlayers()
+          style = "-fx-font-size: 16; -fx-font-weight: bold;"
         }
       )
     }

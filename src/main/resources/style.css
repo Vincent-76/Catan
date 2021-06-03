@@ -1,3 +1,10 @@
+.initHeader {
+    -fx-font-size: 28;
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5px;
+    -fx-font-weight: bold;
+}
+
 .playerInfoName {
     -fx-font-weight: bold;
 }
@@ -21,6 +28,7 @@
 
 .resourceCounter {
     -fx-font-size: 16;
+    -fx-font-weight: bold;
 }
 
 .infoTextArea .text {
@@ -38,4 +46,16 @@
     -fx-fill: #FFFFFF;
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 9;
+}
+
+.gameStackHeader {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5px;
+}
+
+.addPlayerInput {
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
 }
