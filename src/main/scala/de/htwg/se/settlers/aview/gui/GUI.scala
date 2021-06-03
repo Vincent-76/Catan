@@ -118,7 +118,7 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
 
     def setBackground():Unit = {
       //CenterPane.style = "-fx-background-color: " + GUIApp.colorOf( Water ).toHex
-      val tile:Image = new Image( "/water.png" )
+      val tile:Image = new Image("/water_background.png")
       val backgroundPosition = new BackgroundPosition( Side.LEFT, 0, false, Side.TOP, 0, false )
       val backgroundImage = new BackgroundImage( tile, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, backgroundPosition,
         new BackgroundSize( 300, 300, false, false, false, false ) )

@@ -29,8 +29,7 @@ case class ClassicGameField(
     if ( ai < adjacentOffset.size ) {
       val o = adjacentOffset( ai )
       return findHex( h.r + o._1, h.c + o._2 )
-    }
-    Option.empty
+    } else None
   }
 
   /*override*/ def adjacentEdges( h:Hex ):List[Edge] = {
@@ -42,6 +41,14 @@ case class ClassicGameField(
       else
         edges
     } )
+  }
+
+  /*override*/ def adjacentEdge( h:Hex, ai:Int ):Option[Edge] = {
+    if ( ai < adjacentOffset.size ) {
+      val o = adjacentOffset( ai )
+      val hex1 = findHex( h.r + o._1, h.c + o._2 )
+      if ( hex1.isDefined ) findEdge( h, hex1.get ) else None
+    } else None
   }
 
   /*override*/ def adjacentVertices( h:Hex ):List[Vertex] = {
@@ -59,10 +66,9 @@ case class ClassicGameField(
   private def getVertex( h:Hex, c1:(Int, Int), c2:(Int, Int) ):Option[Vertex] = {
     val hex1 = findHex( c1._1, c1._2 )
     val hex2 = findHex( c2._1, c2._2 )
-    if ( hex1.isDefined && hex2.isDefined ) {
-      return findVertex( h, hex1.get, hex2.get )
-    }
-    Option.empty
+    if ( hex1.isDefined && hex2.isDefined )
+      findVertex( h, hex1.get, hex2.get )
+    else None
   }
 
   /*override*/ def adjacentPlayers( h:Hex ):List[PlayerID] = {

@@ -8,6 +8,20 @@ object Numbers {
   val maxFrequency = 5
   val maxSum = 12
 
+  def all:List[Number] = List(
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Eleven,
+    Twelve
+  )
+
   def of( n:Int ):Option[Number] = {
     n match {
       case 2 => Some( Two )
@@ -26,7 +40,7 @@ object Numbers {
   }
 }
 
-sealed abstract class Number( value:Int, val frequency:Int ) {
+sealed abstract class Number( val value:Int, val frequency:Int ) {
 
   override def toString:String = {
     if( value < 10 )

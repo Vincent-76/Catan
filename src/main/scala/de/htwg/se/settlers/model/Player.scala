@@ -76,6 +76,7 @@ case class Player( id:PlayerID,
   def hasStructure( structure:StructurePlacement ):Boolean = structures.getOrElse( structure, 0 ) > 0
 
   def getStructure( structure:StructurePlacement ):Try[Player] = {
+    new PlayerID( 1 );
     val available = structures.getOrElse( structure, 0 )
     if ( available > 0 ) {
       val newStructures = if ( structure.replaces.isDefined )

@@ -11,7 +11,7 @@ import scala.util.{ Failure, Success, Try }
  */
 case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Command {
 
-  var giveResources:Option[ResourceCards] = Option.empty
+  var giveResources:Option[ResourceCards] = None
 
   override def doStep( game:Game ):Try[(Game, Option[Info])] = {
     val (maxGetAmount, factors) = give.red( (0, Map.empty[Resource, Int]), ( data:(Int, Map[Resource, Int]), r:Resource, i:Int ) => {

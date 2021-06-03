@@ -6,9 +6,9 @@ package de.htwg.se.settlers.model
 
 sealed abstract class FieldType( val title:String )
 
-case object Water extends FieldType( "" )
+case object Water extends FieldType( "Water" )
 
-case object Desert extends FieldType( "D" )
+case object Desert extends FieldType( "Desert" )
 
 
 object Resources {

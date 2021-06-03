@@ -51,7 +51,8 @@ case class Game(state:State = InitState(),
                 seed:Int = Random.nextInt( Int.MaxValue / 1000 )
                ) {
 
-  def copy(state:State = state,
+  def copy(
+            state:State = state,
            gameField:ClassicGameField = gameField,
            resourceStack:ResourceCards = resourceStack,
            developmentCards:List[DevelopmentCard] = developmentCards,
