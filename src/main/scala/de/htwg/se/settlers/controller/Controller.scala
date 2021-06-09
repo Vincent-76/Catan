@@ -1,10 +1,12 @@
 package de.htwg.se.settlers.controller
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.PlayerColor
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.cards.DevelopmentCard
+import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.util.Observable
 
 import scala.util.{Failure, Success}

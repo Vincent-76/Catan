@@ -1,13 +1,13 @@
 package de.htwg.se.settlers.aview.gui.commands
 
-import de.htwg.se.settlers.model.Cards
 import de.htwg.se.settlers.aview.gui.GUI
 import de.htwg.se.settlers.aview.gui.util.CustomDialog
+import de.htwg.se.settlers.model.cards.Cards
 import de.htwg.se.settlers.util._
 import scalafx.geometry.Pos
 import scalafx.scene.Node
-import scalafx.scene.control.{ Button, ButtonType }
-import scalafx.scene.layout.{ HBox, Priority, VBox }
+import scalafx.scene.control.{Button, ButtonType}
+import scalafx.scene.layout.{HBox, Pane, Priority, VBox}
 
 /**
  * @author Vincent76;
@@ -32,7 +32,7 @@ case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" )
     }
   }.show()
 
-  override def getNode( gui:GUI ):Node = super.getNode( gui ).use( n => {
+  override def getPane(gui:GUI ):Node = super.getPane(gui).use(n => {
     n.disable = !gui.controller.player.devCards.exists( _.usable )
     n
   } )

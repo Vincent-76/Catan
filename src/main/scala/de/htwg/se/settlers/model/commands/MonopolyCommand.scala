@@ -1,13 +1,14 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.MonopolyState
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.util._
 
 import scala.collection.immutable.SortedMap
-import scala.util.{ Success, Try }
+import scala.util.{Success, Try}
 
 /**
  * @author Vincent76;

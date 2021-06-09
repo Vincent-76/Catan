@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
+import de.htwg.se.settlers.model.cards.{GreatHallCard, LongestRoadCard}
 import de.htwg.se.settlers.model.state.{ActionState, InitState}
 import de.htwg.se.settlers.util._
 import org.scalatest.{Matchers, WordSpec}

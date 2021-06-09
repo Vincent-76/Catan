@@ -1,9 +1,11 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.Green
+import de.htwg.se.settlers.model.cards.{KnightCard, MonopolyCard}
+import de.htwg.se.settlers.model.player.Player
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.{Failure, Success}

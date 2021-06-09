@@ -1,6 +1,7 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.cards.KnightCard
 import org.scalatest.{Matchers, WordSpec}
 
 class TurnSpec extends WordSpec with Matchers {

@@ -2,6 +2,7 @@ package de.htwg.se.settlers.model.commands
 
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.cards.{BonusCard, DevelopmentCard, KnightCard, LargestArmyCard, MonopolyCard, RoadBuildingCard, YearOfPlentyCard}
 import de.htwg.se.settlers.model.state.{DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState}
 import de.htwg.se.settlers.util._
 

@@ -1,13 +1,15 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.PlayerColor
+import de.htwg.se.settlers.model.cards.{BonusCard, Cards, DevelopmentCard, GreatHallCard}
+import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.util._
 
-import scala.collection.immutable.{ SortedMap, TreeMap, List }
-import scala.util.{ Failure, Random, Success, Try }
+import scala.collection.immutable.{List, SortedMap, TreeMap}
+import scala.util.{Failure, Random, Success, Try}
 
 /**
  * @author Vincent76;

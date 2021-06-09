@@ -1,8 +1,10 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.model.{Cards, Game, Player}
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.Game
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.aview.gui.util.{CustomDialog, FlowGridPane, GlowButton}
+import de.htwg.se.settlers.model.cards.Cards
+import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.util._
 import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.control.Label

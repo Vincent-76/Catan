@@ -1,13 +1,14 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.{ Player, Resources }
-import de.htwg.se.settlers.aview.gui.{ GUI, GUICommand, GUIState, GUIApp }
-import scalafx.geometry.{ Insets, Pos }
+import de.htwg.se.settlers.model.Resources
+import de.htwg.se.settlers.aview.gui.{GUI, GUIApp, GUICommand, GUIState}
+import de.htwg.se.settlers.model.player.Player
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Node
 import scalafx.scene.control.Label
 import scalafx.scene.effect.Glow
-import scalafx.scene.layout.{ BorderPane, Priority, StackPane, VBox }
+import scalafx.scene.layout.{BorderPane, Pane, Priority, StackPane, VBox}
 import scalafx.scene.text.Text
 
 /**
@@ -16,7 +17,7 @@ import scalafx.scene.text.Text
 case class MonopolyGUIState( controller:Controller ) extends GUIState {
 
   override def getActions:List[GUICommand] = List( new GUICommand {
-    override def getNode( gui:GUI ):Node = new BorderPane {
+    override def getPane(gui:GUI ):Node = new BorderPane {
       vgrow = Priority.Always
       top = new Text( "Specify a resource to get all the corresponding cards from the other players" ) {
         alignmentInParent = Pos.Center

@@ -1,10 +1,11 @@
 package de.htwg.se.settlers.aview.gui
 
 import scalafx.scene.Node
+import scalafx.scene.layout.Pane
 
 /**
  * @author Vincent76;
  */
 trait GUICommand {
-  def getNode( gui:GUI ):Node
+  def getPane(gui:GUI ):Node
 }

@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.{ Cards, Command, DrawnDevCardInfo, Game, Info, State }
+import de.htwg.se.settlers.model.cards.Cards
+import de.htwg.se.settlers.model.{Command, DrawnDevCardInfo, Game, Info, State}
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 /**
  * @author Vincent76;

@@ -3,7 +3,7 @@ package de.htwg.se.settlers.aview.tui.tuistate
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.InvalidPlayerID
 import de.htwg.se.settlers.model.state.RobberStealState
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**

@@ -1,7 +1,9 @@
-package de.htwg.se.settlers.model
+package de.htwg.se.settlers.model.cards
+
+import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.util._
 
 import scala.util.{Failure, Random, Success, Try}
-import de.htwg.se.settlers.util._
 
 /**
  * @author Vincent76;
@@ -23,7 +25,7 @@ object Cards {
     LongestRoadCard,
     LargestArmyCard
   )
-
+dawd
   type ResourceCards = Map[Resource, Int]
 
   object ResourceCards {

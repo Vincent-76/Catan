@@ -1,9 +1,11 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.model.ClassicGameField.Row
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.cards.Cards
+import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.model.state.{ActionState, DropHandCardsState, RobberPlaceState}
 import de.htwg.se.settlers.util._
 

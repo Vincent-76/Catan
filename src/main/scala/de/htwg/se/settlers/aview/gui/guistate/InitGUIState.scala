@@ -24,7 +24,7 @@ case class InitGUIState( controller:Controller ) extends GUIState {
         },
         new Button( "Add Players" ) {
           onAction = _ => controller.initPlayers()
-          style = "-fx-font-size: 16; -fx-font-weight: bold;"
+          styleClass.add( "button" )
         }
       )
     }

@@ -2,8 +2,8 @@ package de.htwg.se.settlers.aview.gui.guistate
 
 import scalafx.Includes._
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Player
 import de.htwg.se.settlers.aview.gui.{DisplayState, FieldDisplayState, GUIApp, GUIState, InitDisplayState}
+import de.htwg.se.settlers.model.player.Player
 import javafx.scene.input.KeyCode
 import scalafx.geometry.Pos
 import scalafx.scene.Node
@@ -29,7 +29,7 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
       }
       val comboBox:ComboBox[String] = new ComboBox[String]( Player.availableColors( controller.game.players.values ).map( _.name ) ) {
         selectionModel.value.selectFirst()
-        style = "-fx-font-size: 16; -fx-font-weight: bold;"
+        styleClass.add( "button" )
       }
       onKeyPressed = ( e:KeyEvent ) => {
         if ( e.getCode == KeyCode.ENTER )
@@ -47,11 +47,11 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
           alignment = Pos.Center
           children = List(
             new Button( "Add Player" ) {
-              style = "-fx-font-size: 16; -fx-font-weight: bold;"
+              styleClass.add( "button" )
               onAction = _ => controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
             },
             new Button( "Continue" ) {
-              style = "-fx-font-size: 16; -fx-font-weight: bold;"
+              styleClass.add( "button" )
               onAction = _ => {
                 if( textField.getText.nonEmpty )
                   controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )

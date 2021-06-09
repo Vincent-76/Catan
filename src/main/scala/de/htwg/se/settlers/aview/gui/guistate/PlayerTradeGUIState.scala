@@ -1,15 +1,16 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Cards._
-import de.htwg.se.settlers.model.Player
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.model.state.PlayerTradeState
-import de.htwg.se.settlers.aview.gui.util.{ ActionHeader, FlowGridPane }
-import de.htwg.se.settlers.aview.gui.{ GUI, GUICommand, GUIState }
+import de.htwg.se.settlers.aview.gui.util.{ActionHeader, FlowGridPane}
+import de.htwg.se.settlers.aview.gui.{GUI, GUICommand, GUIState}
+import de.htwg.se.settlers.model.player.Player
 import scalafx.geometry.Pos
 import scalafx.scene.Node
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{ BorderPane, HBox, Priority, VBox }
+import scalafx.scene.layout.{BorderPane, HBox, Pane, Priority, VBox}
+import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 
 /**
@@ -18,7 +19,7 @@ import scalafx.scene.text.Text
 case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) extends GUIState {
 
   override def getActions:List[GUICommand] = List( new GUICommand {
-    override def getNode( gui:GUI ):Node = new BorderPane {
+    override def getPane(gui:GUI ):Node = new BorderPane {
       vgrow = Priority.Always
       val p:Player = controller.player( state.pID )
       top = new ActionHeader( "Do you want to trade with " + controller.player.name + "?" )
@@ -27,7 +28,10 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
         alignment = Pos.Center
         hgrow = Priority.Always
         children = List(
-          new Text( "Give" ),
+          new Text( "Give" ) {
+            fill = Color.White
+            style = "-fx-font-size: 16; -fx-font-weight: bold;"
+          },
           resourceDisplay( state.get ),
           new Text( "Get" ),
           resourceDisplay( state.give )

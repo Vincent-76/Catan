@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.{ Command, Game, ClassicGameField, Info, Resource, ResourceChangeInfo, State }
 

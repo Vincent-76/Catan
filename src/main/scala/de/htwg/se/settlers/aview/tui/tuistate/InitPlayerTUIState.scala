@@ -1,7 +1,7 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.{ InvalidPlayerColor, Player }
+import de.htwg.se.settlers.model.InvalidPlayerColor
 import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
 
 /**

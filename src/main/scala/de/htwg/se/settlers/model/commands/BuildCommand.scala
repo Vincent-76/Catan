@@ -3,6 +3,7 @@ package de.htwg.se.settlers.model.commands
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.state.{ActionState, BuildState}
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.cards.BonusCard
 import de.htwg.se.settlers.util._
 
 import scala.util.{Success, Try}

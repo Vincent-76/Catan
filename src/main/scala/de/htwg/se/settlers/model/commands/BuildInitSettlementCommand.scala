@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.model.{ Hex, Vertex }
 import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState }
 import de.htwg.se.settlers.model.{ Command, Game, GotResourcesInfo, Info, Resource, Settlement }

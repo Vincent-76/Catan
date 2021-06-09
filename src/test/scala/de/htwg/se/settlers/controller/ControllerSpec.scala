@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.controller
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
 import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.cards.KnightCard
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.util._
 import org.scalatest.{Matchers, WordSpec}

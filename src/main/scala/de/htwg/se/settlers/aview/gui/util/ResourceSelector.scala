@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.gui.util
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.{Resource, Resources}
 import de.htwg.se.settlers.aview.gui.GUIApp
 import scalafx.geometry.{Insets, Orientation, Pos}

@@ -4,7 +4,7 @@ import de.htwg.se.settlers.Catan
 import de.htwg.se.settlers.aview.gui.GameFieldCanvas.{desertTileImage, numberImages, numberSize, portImages, resourceTileImages, waterTileImage}
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.aview.gui.GameFieldPane.Coords
-import de.htwg.se.settlers.model.Cards.{ResourceCards, getResourceCards}
+import de.htwg.se.settlers.model.cards.Cards.{ResourceCards, getResourceCards}
 import de.htwg.se.settlers.util._
 import scalafx.geometry.VPos
 import scalafx.scene.SnapshotParameters

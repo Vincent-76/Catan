@@ -1,10 +1,10 @@
 package de.htwg.se.settlers.aview.gui.commands
 
-import de.htwg.se.settlers.aview.gui.{ GUIApp, GUI, GUICommand }
+import de.htwg.se.settlers.aview.gui.{GUI, GUIApp, GUICommand}
 import scalafx.geometry.Pos
 import scalafx.scene.Node
 import scalafx.scene.control.Button
-import scalafx.scene.layout.Priority
+import scalafx.scene.layout.{Pane, Priority}
 import scalafx.scene.text.TextAlignment
 
 /**
@@ -13,7 +13,7 @@ import scalafx.scene.text.TextAlignment
 abstract class SimpleGUICommand( val text:String ) extends GUICommand {
   protected def action( gui:GUI ):Unit
 
-  override def getNode( gui:GUI ):Node = new Button( text ) {
+  override def getPane( gui:GUI ):Node = new Button( text ) {
     onAction = _ => action( gui )
     alignment = Pos.Center
     textAlignment = TextAlignment.Center

@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.util
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.{Clay, Ore, Resource, Resources, Sheep, Wheat, Wood}
 import org.scalatest.{Matchers, WordSpec}
 

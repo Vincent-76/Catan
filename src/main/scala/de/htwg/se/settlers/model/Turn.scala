@@ -1,6 +1,7 @@
 package de.htwg.se.settlers.model
 
 import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.cards.DevelopmentCard
 
 /**
  * @author Vincent76;

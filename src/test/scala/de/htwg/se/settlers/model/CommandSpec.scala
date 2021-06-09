@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.Player.{Blue, Green, Yellow}
+import de.htwg.se.settlers.model.cards.{Cards, KnightCard, LargestArmyCard, LongestRoadCard, MonopolyCard, RoadBuildingCard, YearOfPlentyCard}
 import de.htwg.se.settlers.model.commands._
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.util._

@@ -1,6 +1,7 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.model.{ Game, Player }
+import de.htwg.se.settlers.model.Game
+import de.htwg.se.settlers.model.player.Player
 
 /**
  * @author Vincent76;

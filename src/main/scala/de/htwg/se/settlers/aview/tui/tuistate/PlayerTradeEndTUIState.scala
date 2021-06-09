@@ -1,7 +1,7 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model.InvalidPlayerID
 import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }

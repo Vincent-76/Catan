@@ -1,14 +1,14 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Player
-import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.aview.gui.util.ResourceSelector
-import de.htwg.se.settlers.aview.gui.{ GUI, GUICommand, GUIState }
-import scalafx.geometry.{ Insets, Pos }
+import de.htwg.se.settlers.aview.gui.{GUI, GUICommand, GUIState}
+import de.htwg.se.settlers.model.player.Player
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Node
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{ BorderPane, Priority }
+import scalafx.scene.layout.{BorderPane, Pane, Priority}
 import scalafx.scene.text.Text
 
 /**
@@ -17,7 +17,7 @@ import scalafx.scene.text.Text
 case class YearOfPlentyGUIState( controller:Controller ) extends GUIState {
 
   override def getActions:List[GUICommand] = List( new GUICommand {
-    override def getNode( gui:GUI ):Node = new BorderPane {
+    override def getPane(gui:GUI ):Node = new BorderPane {
       vgrow = Priority.Always
       val p:Player = controller.player
       val selector:ResourceSelector = new ResourceSelector( maxAmount = Some( p.resources.amount / 2 ) ) {

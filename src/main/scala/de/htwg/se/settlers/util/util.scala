@@ -2,7 +2,7 @@ package de.htwg.se.settlers
 
 import java.util.function.Predicate
 
-import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.cards.Cards.ResourceCards
 import de.htwg.se.settlers.model.{ InsufficientResources, Resource, Resources }
 
 import scala.reflect.ClassTag

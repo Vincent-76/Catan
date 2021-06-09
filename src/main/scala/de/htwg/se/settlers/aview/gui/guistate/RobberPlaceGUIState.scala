@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.{ Player, Robber }
-import de.htwg.se.settlers.aview.gui.{ DisplayState, FieldInputDisplayState, GUIState }
+import de.htwg.se.settlers.model.Robber
+import de.htwg.se.settlers.aview.gui.{DisplayState, FieldInputDisplayState, GUIState}
+import de.htwg.se.settlers.model.player.Player
 
 /**
  * @author Vincent76;

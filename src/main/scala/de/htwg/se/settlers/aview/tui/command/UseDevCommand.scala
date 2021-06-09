@@ -1,9 +1,10 @@
 package de.htwg.se.settlers.aview.tui.command
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.{ Cards, InvalidDevCard }
+import de.htwg.se.settlers.model.InvalidDevCard
 import de.htwg.se.settlers.aview.tui.TUI.InvalidFormat
-import de.htwg.se.settlers.aview.tui.{ CommandAction, CommandInput, TUI }
+import de.htwg.se.settlers.aview.tui.{CommandAction, CommandInput, TUI}
+import de.htwg.se.settlers.model.cards.Cards
 
 /**
  * @author Vincent76;

@@ -1,13 +1,14 @@
 package de.htwg.se.settlers.aview.tui
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Cards._
-import de.htwg.se.settlers.model.Player.{ Blue, Green, PlayerColor, Red, Yellow }
+import de.htwg.se.settlers.model.cards.Cards._
+import de.htwg.se.settlers.model.Player.{Blue, Green, PlayerColor, Red, Yellow}
 import de.htwg.se.settlers.model.state._
-import de.htwg.se.settlers.model.{ PlacementPointNotEmpty, _ }
+import de.htwg.se.settlers.model.{PlacementPointNotEmpty, _}
 import de.htwg.se.settlers.aview.tui.TUI.InvalidFormat
-import de.htwg.se.settlers.aview.tui.command.{ ExitCommand, HelpCommand, RedoCommand, UndoCommand }
+import de.htwg.se.settlers.aview.tui.command.{ExitCommand, HelpCommand, RedoCommand, UndoCommand}
 import de.htwg.se.settlers.aview.tui.tuistate._
+import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.util._
 
 import scala.util.Try
