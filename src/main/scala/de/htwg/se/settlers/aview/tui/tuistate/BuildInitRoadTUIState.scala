@@ -1,16 +1,15 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
+import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Road
-import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
 case class BuildInitRoadTUIState( vID:Int, controller:Controller ) extends TUIState {
 
-  override def getGameDisplay:Option[String] = {
-    Some( GameDisplay( controller, controller.game.getBuildableRoadSpotsForSettlement( vID ) ).buildGameField )
+  override def createGameDisplay:Option[String] = {
+    Some( getGameDisplay( controller, controller.game.getBuildableRoadSpotsForSettlement( vID ) ).buildGameField )
   }
 
   override def getActionInfo:String = {

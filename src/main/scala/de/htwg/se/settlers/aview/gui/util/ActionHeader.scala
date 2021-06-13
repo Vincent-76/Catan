@@ -2,7 +2,7 @@ package de.htwg.se.settlers.aview.gui.util
 
 import scalafx.geometry.Pos
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Text, TextAlignment}
+import scalafx.scene.text.{ Text, TextAlignment }
 
 /**
  * @author Vincent76;

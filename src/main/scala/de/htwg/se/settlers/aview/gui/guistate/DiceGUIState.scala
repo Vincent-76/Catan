@@ -1,9 +1,9 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
+import de.htwg.se.settlers.aview.gui.commands.{ RollDicesCommand, UseDevCardCommand }
+import de.htwg.se.settlers.aview.gui.{ GUICommand, GUIState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.aview.gui.commands.{RollDicesCommand, UseDevCardCommand}
-import de.htwg.se.settlers.aview.gui.{DisplayState, FieldDisplayState, GUICommand, GUIState}
-import de.htwg.se.settlers.model.player.Player
+import de.htwg.se.settlers.model.Player
 
 /**
  * @author Vincent76;

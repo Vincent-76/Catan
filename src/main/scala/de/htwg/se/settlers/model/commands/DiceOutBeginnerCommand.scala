@@ -10,7 +10,7 @@ import scala.util.{ Failure, Random, Success, Try }
  */
 case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[CommandSuccess] = {
     if ( state.beginner.isDefined )
       Failure( UniqueBeginnerExists )
     else {
@@ -25,9 +25,9 @@ case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command {
       val maxValue = values.maxBy( _._2 )
       val beginners = values.count( _._2 >= maxValue._2 )
       if ( beginners > 1 )
-        Success( game.setState( InitBeginnerState( Option.empty, values, state.counter + 1 ) ), None )
+        success( game.setState( InitBeginnerState( None, values, state.counter + 1 ) ), None )
       else
-        Success( game.setState( InitBeginnerState( Some( maxValue._1 ), values ) ), None )
+        success( game.setState( InitBeginnerState( Some( maxValue._1 ), values ) ), None )
     }
   }
 

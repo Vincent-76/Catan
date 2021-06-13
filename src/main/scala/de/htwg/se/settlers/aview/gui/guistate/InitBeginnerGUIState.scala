@@ -1,14 +1,13 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
+import de.htwg.se.settlers.aview.gui.{ DisplayState, GUIApp, GUIState, InitDisplayState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Game.PlayerID
+import de.htwg.se.settlers.model.PlayerID
 import de.htwg.se.settlers.model.state.InitBeginnerState
-import de.htwg.se.settlers.aview.gui.{DisplayState, GUIApp, GUIState, InitDisplayState}
-import scalafx.geometry.{Insets, Pos}
+import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.Node
 import scalafx.scene.control.Button
-import scalafx.scene.effect.{ColorInput, Glow}
-import scalafx.scene.layout.{GridPane, Pane, VBox}
+import scalafx.scene.layout.{ GridPane, Pane, VBox }
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 
@@ -37,19 +36,19 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
             }, 1, d._2 )
           } )
         }
-      ) ++ ( if ( state.beginner.isDefined )
+      ) ++ (if( state.beginner.isDefined )
         beginnerInfo( state.beginner.get )
       else {
-        ( if ( state.diceValues.nonEmpty )
+        (if( state.diceValues.nonEmpty )
           List( new Text( "Tie, roll again." ) {
             fill = Color.White
             style = "-fx-font-size: 20"
           } )
-        else Nil ) :+ new Button( "Roll the dices" ) {
+        else Nil) :+ new Button( "Roll the dices" ) {
           styleClass.add( "button" )
           onAction = _ => controller.diceOutBeginner()
         }
-      } )
+      })
     }
 
     private def beginnerInfo( beginner:PlayerID ):List[Node] = List(

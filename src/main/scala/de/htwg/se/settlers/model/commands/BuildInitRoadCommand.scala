@@ -1,7 +1,8 @@
 package de.htwg.se.settlers.model.commands
 
+import de.htwg.se.settlers.model.impl.placement.RoadPlacement
 import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState, NextPlayerState }
-import de.htwg.se.settlers.model.{ Command, Game, Info, InvalidPlacementPoint, Road, Turn }
+import de.htwg.se.settlers.model.{ Command, Game, InvalidPlacementPoint }
 import de.htwg.se.settlers.util._
 
 import scala.util.{ Failure, Success, Try }
@@ -11,10 +12,10 @@ import scala.util.{ Failure, Success, Try }
  */
 case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Command {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    if ( !game.gameField.adjacentEdges( game.gameField.findVertex( state.settlementVID ).get ).exists( _.id == eID ) )
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    if( !game.gameField.adjacentEdges( game.gameField.findVertex( state.settlementVID ).get ).exists( _.id == eID ) )
       Failure( InvalidPlacementPoint( eID ) )
-    else Road.build( game, game.onTurn, eID ) match {
+    else RoadPlacement.build( game, game.onTurn, eID ) match {
       case Success( game ) =>
         val (nTurn, nState) = game.settlementAmount( game.onTurn ) match {
           case 1 => game.settlementAmount( game.nextTurn() ) match {
@@ -26,10 +27,9 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
             case _ => (game.onTurn, NextPlayerState())
           }
         }
-        Success( game.copy(
-          state = nState,
-          turn = Turn( nTurn )
-        ), None )
+        success( game.setState( nState )
+          .setTurn( game.turn.set( nTurn ) )
+        )
       case f => f.rethrow
     }
   }
@@ -45,12 +45,10 @@ case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Com
         }
       }
     }
-    game.copy(
-      state = state,
-      gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( None ) ),
-      turn = Turn( nTurn ),
-      players = game.updatePlayers( game.players( nTurn ).addStructure( Road ) )
-    )
+    game.setState( state )
+      .setGameField( game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( None ) ) )
+      .setTurn( game.turn.set( nTurn ) )
+      .updatePlayer( game.players( nTurn ).addStructure( RoadPlacement ) )
   }
 
   //override def toString:String = getClass.getSimpleName + ": eID[" + eID + "], " + state

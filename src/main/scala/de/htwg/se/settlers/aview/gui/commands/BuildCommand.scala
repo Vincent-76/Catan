@@ -1,8 +1,9 @@
 package de.htwg.se.settlers.aview.gui.commands
 
-import de.htwg.se.settlers.model.StructurePlacement
 import de.htwg.se.settlers.aview.gui.GUI
 import de.htwg.se.settlers.aview.gui.util.CustomDialog
+import de.htwg.se.settlers.model.StructurePlacement
+import de.htwg.se.settlers.util.RichIterable
 import scalafx.geometry.Pos
 import scalafx.scene.control.{ Button, ButtonType }
 import scalafx.scene.layout.HBox
@@ -17,7 +18,7 @@ case object BuildCommand extends SimpleGUICommand( "Build" ) {
     content = new HBox {
       spacing = 10
       alignment = Pos.Center
-      children = StructurePlacement.get.map( s => new Button( s.title ) {
+      children = gui.controller.game.availablePlacements.withType[StructurePlacement].map( s => new Button( s.title ) {
         onAction = _ => gui.controller.setBuildState( s )
       } )
     }

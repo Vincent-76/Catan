@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.model.state
 
-import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.model.cards.DevelopmentCard
+import de.htwg.se.settlers.model.{DevelopmentCard, _}
 import de.htwg.se.settlers.model.commands.{RollDicesCommand, UseDevCardCommand}
 
 /**

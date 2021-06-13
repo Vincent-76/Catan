@@ -1,6 +1,5 @@
-package de.htwg.se.settlers.model.cards
+package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
 
 import scala.util.{Failure, Random, Success, Try}
@@ -9,7 +8,6 @@ import scala.util.{Failure, Random, Success, Try}
  * @author Vincent76;
  */
 object Cards {
-  private val resourceCardAmount:Int = 19
 
   val developmentCardCost:ResourceCards = Map( Sheep -> 1, Wheat -> 1, Ore -> 1 )
 
@@ -25,7 +23,7 @@ object Cards {
     LongestRoadCard,
     LargestArmyCard
   )
-dawd
+
   type ResourceCards = Map[Resource, Int]
 
   object ResourceCards {
@@ -33,10 +31,6 @@ dawd
 
     def of( wood:Int = 0, clay:Int = 0, sheep:Int = 0, wheat:Int = 0, ore:Int = 0 ):ResourceCards =
       Map( Wood -> wood, Clay -> clay, Sheep -> sheep, Wheat -> wheat, Ore -> ore )
-  }
-
-  def getResourceCards( amount:Int = resourceCardAmount ):ResourceCards = {
-    Resources.get.map( r => r -> amount ).toMap
   }
 
   implicit class RichResourceCards( resources:ResourceCards ) {
@@ -73,6 +67,10 @@ dawd
 
     def toString( prefix:String ):String =
       resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.title ).mkString( ", " )
+  }
+
+  def getResourceCards( amount:Int ):ResourceCards = {
+    Resources.get.map( r => r -> amount ).toMap
   }
 
   def getDevStack( random:Random = Random ):List[DevelopmentCard] = {

@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model.state
 
-import de.htwg.se.settlers.model.{Command, Resource, State}
+import de.htwg.se.settlers.model.{ Command, Resource, State }
 import de.htwg.se.settlers.model.commands.MonopolyCommand
 
 /**

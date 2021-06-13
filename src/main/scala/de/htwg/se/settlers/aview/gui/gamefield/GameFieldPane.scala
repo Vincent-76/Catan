@@ -1,11 +1,8 @@
-package de.htwg.se.settlers.aview.gui
+package de.htwg.se.settlers.aview.gui.gamefield
 
-import de.htwg.se.settlers.model.{ Game, ClassicGameField, Hex }
-import de.htwg.se.settlers.aview.gui.GameFieldPane.Coords
-import javafx.geometry.Side
-import javafx.scene.layout.{ BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize }
-import scalafx.scene.image.Image
-import scalafx.scene.layout.{ Background, BorderPane, StackPane }
+import de.htwg.se.settlers.aview.gui.gamefield.GameFieldPane.Coords
+import de.htwg.se.settlers.model.{ Game, GameField, Hex }
+import scalafx.scene.layout.{ BorderPane, StackPane }
 
 /**
  * @author Vincent76;
@@ -18,10 +15,9 @@ object GameFieldPane {
   type Coords = Map[Hex, (Double, Double)]
 }
 
-class GameFieldPane extends BorderPane {
+class GameFieldPane[T <: GameField]( val fieldPane:GameFieldCanvas[T], placements:List[PlacementOverlay] ) extends BorderPane {
 
-  val fieldPane = new GameFieldCanvas
-  val overlayPane = new OverlayPane
+  val overlayPane = new OverlayPane( placements )
   val interactionPane:InteractionPane = new InteractionPane
 
   var coords:Coords = Map.empty
@@ -35,8 +31,8 @@ class GameFieldPane extends BorderPane {
     )
   }
 
-  private def getChildSize( gameField:ClassicGameField ):(Double, Double) = {
-    val hexes = gameField.hexagons.map( r => r.size ).max
+  private def getChildSize( gameField:GameField ):(Double, Double) = {
+    val hexes = gameField.fieldWidth
     val ratio = ( ( 1 / ( hexes * Math.sqrt( 3 ) ) ) * ( ( 2d / 4 ) + ( hexes * ( 6d / 4 ) ) ) ) / 1
     if ( width.value < height.value / ratio )
       (width.value - 20, ( width.value - 20 ) * ratio)
@@ -53,7 +49,7 @@ class GameFieldPane extends BorderPane {
     GameFieldContainer.maxHeight = size._2
     fieldPane.width = size._1
     fieldPane.height = size._2
-    val hWidth = ( size._1 - 2 * GameFieldPane.padding ) / game.gameField.hexagons.size
+    val hWidth = ( size._1 - 2 * GameFieldPane.padding ) / game.gameField.fieldHeight
     hSize = hWidth / Math.sqrt( 3 )
     coords = fieldPane.update( game.gameField, hWidth, hSize )
     overlayPane.width = size._1

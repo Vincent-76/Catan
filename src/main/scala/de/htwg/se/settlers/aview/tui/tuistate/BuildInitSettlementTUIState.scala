@@ -1,16 +1,16 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
+import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Settlement
-import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
+import de.htwg.se.settlers.model.impl.placement.SettlementPlacement
 
 /**
  * @author Vincent76;
  */
 case class BuildInitSettlementTUIState( controller:Controller ) extends TUIState {
 
-  override def getGameDisplay:Option[String] = {
-    Some( GameDisplay( controller, Settlement.getBuildablePoints( controller.game, controller.onTurn, any = true ) ).buildGameField )
+  override def createGameDisplay:Option[String] = {
+    Some( getGameDisplay( controller, SettlementPlacement.getBuildablePoints( controller.game, controller.onTurn, any = true ) ).buildGameField )
   }
 
   override def getActionInfo:String = {

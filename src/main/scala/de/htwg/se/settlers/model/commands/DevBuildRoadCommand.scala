@@ -1,5 +1,6 @@
 package de.htwg.se.settlers.model.commands
 
+import de.htwg.se.settlers.model.impl.placement.RoadPlacement
 import de.htwg.se.settlers.model.state.DevRoadBuildingState
 import de.htwg.se.settlers.model.{ Command, _ }
 
@@ -10,27 +11,25 @@ import scala.util.{ Failure, Success, Try }
  */
 case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Command {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    Road.build( game, game.onTurn, eID ) match {
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    RoadPlacement.build( game, game.onTurn, eID ) match {
       case Failure( t ) => Failure( t )
       case Success( newGame ) =>
-        val (nextState, info) = if ( !newGame.player.hasStructure( Road ) )
-          (state.nextState, InsufficientStructuresInfo( newGame.onTurn, Road ))
-        else if ( Road.getBuildablePoints( newGame, newGame.onTurn ).isEmpty )
-          (state.nextState, NoPlacementPointsInfo( newGame.onTurn, Road ))
+        val (nextState, info) = if ( !newGame.player.hasStructure( RoadPlacement ) )
+          (state.nextState, InsufficientStructuresInfo( newGame.onTurn, RoadPlacement ))
+        else if ( RoadPlacement.getBuildablePoints( newGame, newGame.onTurn ).isEmpty )
+          (state.nextState, NoPlacementPointsInfo( newGame.onTurn, RoadPlacement ))
         else if ( state.roads == 0 )
-          (DevRoadBuildingState( state.nextState, state.roads + 1 ), BuiltInfo( Road, eID ))
+          (DevRoadBuildingState( state.nextState, state.roads + 1 ), BuiltInfo( RoadPlacement, eID ))
         else
-          (state.nextState, BuiltInfo( Road, eID ))
-        Success( newGame.setState( nextState ), Some( info ) )
+          (state.nextState, BuiltInfo( RoadPlacement, eID ))
+        success( newGame.setState( nextState ), info = Some( info ) )
     }
   }
 
-  override def undoStep( game:Game ):Game = game.copy(
-      state = state,
-      gameField = game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( None ) ),
-      players = game.updatePlayers( game.player.addStructure( Road ) )
-    )
+  override def undoStep( game:Game ):Game = game.setState( state )
+    .setGameField( game.gameField.update( game.gameField.findEdge( eID ).get.setRoad( None ) ) )
+    .updatePlayer( game.player.addStructure( RoadPlacement ) )
 
   //override def toString:String = getClass.getSimpleName + ": eID[" + eID + "], " + state
 }

@@ -1,13 +1,18 @@
 package de.htwg.se.settlers.model
 
-import scala.util.Try
+import scala.util.{ Success, Try }
 
 /**
  * @author Vincent76;
  */
+
 trait Command {
 
-  def doStep( game:Game ):Try[(Game, Option[Info])]
+  type CommandSuccess = (Game, Option[Info])
+
+  def success( game:Game, info:Option[Info] = None ):Success[CommandSuccess] = Success( (game, info) )
+
+  def doStep( game:Game ):Try[CommandSuccess]
 
   def undoStep( game:Game ):Game
 }

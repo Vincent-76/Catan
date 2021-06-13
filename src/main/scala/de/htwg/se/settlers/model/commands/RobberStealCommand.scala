@@ -1,6 +1,5 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.model.state.RobberStealState
 
@@ -11,18 +10,18 @@ import scala.util.{ Failure, Try }
  */
 case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) extends RobberCommand {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    if ( !game.playerHasAdjacentVertex( stealPlayerID, game.gameField.adjacentVertices( game.gameField.robber ) ) )
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    if( !game.playerHasAdjacentVertex( stealPlayerID, game.gameField.adjacentVertices( game.gameField.robberHex ) ) )
       Failure( NoAdjacentStructure )
     else steal( game, stealPlayerID, state.nextState )
   }
 
   override def undoStep( game:Game ):Game = robbedResource match {
-    case Some( r ) => game.copy(
-      state = state,
-      players = game.players.updated( game.onTurn, game.player.removeResourceCard( r ).get )
-        .updated( stealPlayerID, game.players( stealPlayerID ).addResourceCard( r ) )
-    )
+    case Some( r ) => game.setState( state )
+      .updatePlayers(
+        game.player.removeResourceCard( r ).get,
+        game.players( stealPlayerID ).addResourceCard( r )
+      )
     case None => game.setState( state )
   }
 

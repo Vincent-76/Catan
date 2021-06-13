@@ -1,16 +1,15 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
-import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.state.DropHandCardsState
-import de.htwg.se.settlers.model.cards.Cards._
 import de.htwg.se.settlers.aview.gui.util.ResourceSelector
-import de.htwg.se.settlers.aview.gui.{GUI, GUICommand, GUIState}
-import de.htwg.se.settlers.model.player.Player
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Node
+import de.htwg.se.settlers.aview.gui.{ GUI, GUICommand, GUIState }
+import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.Player
+import de.htwg.se.settlers.model.state.DropHandCardsState
+import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{BorderPane, Pane, Priority}
-import scalafx.scene.text.{Text, TextAlignment}
+import scalafx.scene.layout.{ BorderPane, Pane, Priority }
+import scalafx.scene.text.{ Text, TextAlignment }
 
 /**
  * @author Vincent76;
@@ -18,7 +17,7 @@ import scalafx.scene.text.{Text, TextAlignment}
 case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controller ) extends GUIState {
 
   override def getActions:List[GUICommand] = List( new GUICommand() {
-    override def getPane(gui:GUI ):Node = new BorderPane {
+    override def getPane( gui:GUI ):Pane = new BorderPane {
       vgrow = Priority.Always
       val p:Player = controller.player( state.pID )
       val selector:ResourceSelector = new ResourceSelector( p.resources, maxAmount = Some( p.resources.amount / 2 ) ) {
@@ -27,7 +26,7 @@ case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controlle
         alignmentInParent = Pos.Center
         margin = Insets( 6, 0, 6, 0 )
       }
-      top = new Text( "Drop " + ( p.resources.amount / 2 ) + " resources!" ) {
+      top = new Text( "Drop " + (p.resources.amount / 2) + " resources!" ) {
         alignmentInParent = Pos.Center
         textAlignment = TextAlignment.Center
       }

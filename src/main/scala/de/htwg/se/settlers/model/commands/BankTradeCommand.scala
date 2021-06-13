@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.cards.Cards._
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
 
@@ -13,30 +13,30 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
 
   var giveResources:Option[ResourceCards] = None
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
+  override def doStep( game:Game ):Try[CommandSuccess] = {
     val (maxGetAmount, factors) = give.red( (0, Map.empty[Resource, Int]), ( data:(Int, Map[Resource, Int]), r:Resource, i:Int ) => {
       val factor = game.getBankTradeFactor( game.onTurn, r )
       (data._1 + i / factor, data._2.updated( r, factor ))
     } )
-    if ( !game.player.resources.has( give ) )
+    if( !game.player.hasResources( give ) )
       Failure( InsufficientResources )
-    else if ( maxGetAmount < 0 || maxGetAmount < get.amount )
+    else if( maxGetAmount < 0 || maxGetAmount < get.amount )
       Failure( InsufficientResources )
-    else if ( !game.resourceStack.has( get ) )
+    else if( !game.hasStackResources( get ) )
       Failure( InsufficientBankResources )
     else {
-      val (giveResources, _) = give.red( (give, 0), (data:(ResourceCards, Int), r:Resource, amount:Int ) => {
+      val (giveResources, _) = give.red( (give, 0), ( data:(ResourceCards, Int), r:Resource, amount:Int ) => {
         if( data._2 < get.amount ) {
           val rAmount = amount / factors( r )
-          val a = if ( data._2 + rAmount > get.amount )
+          val a = if( data._2 + rAmount > get.amount )
             get.amount - data._2
           else rAmount
           (data._1.updated( r, a * factors( r ) ), data._2 + a)
         } else (data._1.updated( r, 0 ), data._2)
       } )
       this.giveResources = Some( giveResources )
-      game.drawResourceCards( game.onTurn, get ).dropResourceCards( game.onTurn, giveResources ) match {
-        case Success( newGame ) => Success(
+      game.drawResourceCards( game.onTurn, get )._1.dropResourceCards( game.onTurn, giveResources ) match {
+        case Success( newGame ) => success(
           newGame,
           Some( BankTradedInfo( game.onTurn, giveResources, get ) ) )
         //case f => f.rethrow
@@ -46,7 +46,7 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
 
   override def undoStep( game:Game ):Game = giveResources match {
     case Some( given ) =>
-      game.drawResourceCards( game.onTurn, given ).dropResourceCards( game.onTurn, get ).get
+      game.drawResourceCards( game.onTurn, given )._1.dropResourceCards( game.onTurn, get ).get
     case None => game
   }
 

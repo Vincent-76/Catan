@@ -4,11 +4,11 @@ package de.htwg.se.settlers.model
  * @author Vincent76;
  */
 
-object Numbers {
+object DiceValues {
   val maxFrequency = 5
   val maxSum = 12
 
-  def all:List[Number] = List(
+  val all:List[DiceValue] = List(
     Two,
     Three,
     Four,
@@ -22,7 +22,7 @@ object Numbers {
     Twelve
   )
 
-  def of( n:Int ):Option[Number] = {
+  def of( n:Int ):Option[DiceValue] = {
     n match {
       case 2 => Some( Two )
       case 3 => Some( Three )
@@ -40,7 +40,7 @@ object Numbers {
   }
 }
 
-sealed abstract class Number( val value:Int, val frequency:Int ) {
+sealed abstract class DiceValue( val value:Int, val frequency:Int ) {
 
   override def toString:String = {
     if( value < 10 )
@@ -50,24 +50,24 @@ sealed abstract class Number( val value:Int, val frequency:Int ) {
   }
 }
 
-case object Two extends Number( 2, 1 )
+case object Two extends DiceValue( 2, 1 )
 
-case object Three extends Number( 3, 2 )
+case object Three extends DiceValue( 3, 2 )
 
-case object Four extends Number( 4, 3 )
+case object Four extends DiceValue( 4, 3 )
 
-case object Five extends Number( 5, 4 )
+case object Five extends DiceValue( 5, 4 )
 
-case object Six extends Number( 6, 5 )
+case object Six extends DiceValue( 6, 5 )
 
-case object Seven extends Number( 7, 0 )
+case object Seven extends DiceValue( 7, 0 )
 
-case object Eight extends Number( 8, 5 )
+case object Eight extends DiceValue( 8, 5 )
 
-case object Nine extends Number( 9, 4 )
+case object Nine extends DiceValue( 9, 4 )
 
-case object Ten extends Number( 10, 3 )
+case object Ten extends DiceValue( 10, 3 )
 
-case object Eleven extends Number( 11, 2 )
+case object Eleven extends DiceValue( 11, 2 )
 
-case object Twelve extends Number( 12, 1 )
+case object Twelve extends DiceValue( 12, 1 )

@@ -4,7 +4,7 @@ package de.htwg.se.settlers.model
  * @author Vincent76;
  */
 
-sealed abstract class FieldType( val title:String )
+abstract class FieldType( val title:String )
 
 case object Water extends FieldType( "Water" )
 
@@ -23,7 +23,7 @@ object Resources {
   def of( s:String ):Option[Resource] = get.find( _.title.toLowerCase == s.toLowerCase )
 }
 
-sealed abstract class Resource( override val title:String ) extends FieldType( title ) {
+abstract class Resource( override val title:String ) extends FieldType( title ) {
   override def toString:String = title
 }
 

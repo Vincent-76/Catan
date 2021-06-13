@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.cards.Cards._
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.state.YearOfPlentyState
 import de.htwg.se.settlers.model._
 
@@ -11,25 +11,25 @@ import scala.util.{ Failure, Success, Try }
  */
 case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState ) extends Command {
 
-  var drawnResources:Option[ResourceCards] = Option.empty
+  var drawnResources:Option[ResourceCards] = None
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    if ( resources.amount != 2 )
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    if( resources.amount != 2 )
       Failure( InvalidResourceAmount( resources.amount ) )
     else {
       val (availableResources, _) = game.getAvailableResourceCards( resources )
       drawnResources = Some( availableResources )
-      Success(
-        game.drawResourceCards( game.onTurn, availableResources ).setState( state.nextState ),
-        Some( GotResourcesInfo( game.onTurn, availableResources ) )
+      success(
+        game.setState( state.nextState ).drawResourceCards( game.onTurn, availableResources )._1,
+        info = Some( GotResourcesInfo( game.onTurn, availableResources ) )
       )
     }
   }
 
-  override def undoStep( game:Game ):Game = ( drawnResources match {
+  override def undoStep( game:Game ):Game = (drawnResources match {
     case None => game
     case Some( available ) => game.dropResourceCards( game.onTurn, available ).get
-  } ).setState( state )
+  }).setState( state )
 
   //override def toString:String = getClass.getSimpleName + ": resources[" + resources + "], " + state
 }

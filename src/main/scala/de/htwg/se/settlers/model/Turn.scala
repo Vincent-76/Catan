@@ -1,18 +1,23 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.cards.DevelopmentCard
-
 /**
  * @author Vincent76;
  */
-final case class Turn( playerID:PlayerID,
-                       usedDevCard:Boolean = false,
-                       drawnDevCards:List[DevelopmentCard] = List.empty ) {
+trait Turn {
 
-  def addDrawnDevCard( card:DevelopmentCard ):Turn = copy( drawnDevCards = drawnDevCards :+ card )
+  def playerID:PlayerID
 
-  def removeDrawnDevCard():Turn = copy( drawnDevCards = drawnDevCards.init )
+  def usedDevCard:Boolean
 
-  def getLastDrawnDevCard:Option[DevelopmentCard] = drawnDevCards.lastOption
+  def setUsedDevCard( used:Boolean ):Turn
+
+  def drawnDevCards( devCard:DevelopmentCard ):Int
+
+  def addDrawnDevCard( card:DevelopmentCard ):Turn
+
+  def removeDrawnDevCard( ):Turn
+
+  def getLastDrawnDevCard:Option[DevelopmentCard]
+
+  def set( playerID:PlayerID ):Turn
 }

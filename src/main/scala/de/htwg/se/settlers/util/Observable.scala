@@ -15,7 +15,7 @@ trait Observer {
 }
 
 
-class Observable {
+trait Observable {
   var subscribers:List[Observer] = List.empty
 
   def add( o:Observer ):Unit = subscribers = subscribers :+ o

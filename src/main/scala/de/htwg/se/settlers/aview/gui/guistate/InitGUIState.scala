@@ -1,11 +1,10 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
+import de.htwg.se.settlers.aview.gui.{ DisplayState, GUIState, InitDisplayState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.aview.gui.{DisplayState, GUIApp, GUIState, InitDisplayState}
 import scalafx.geometry.Pos
-import scalafx.scene.Node
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{Pane, VBox}
+import scalafx.scene.layout.{ Pane, VBox }
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 

@@ -1,17 +1,17 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
+import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
 import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.InvalidPlayerID
 import de.htwg.se.settlers.model.state.RobberStealState
-import de.htwg.se.settlers.model.cards.Cards._
-import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
 
 /**
  * @author Vincent76;
  */
 case class RobberStealTUIState( state:RobberStealState, controller:Controller ) extends TUIState {
 
-  override def getGameDisplay:Option[String] = Some( GameDisplay( controller ).buildGameField )
+  override def createGameDisplay:Option[String] = Some( getGameDisplay( controller ).buildGameField )
 
   override def getActionInfo:String = {
     TUI.outln( "Players to steal from:" )

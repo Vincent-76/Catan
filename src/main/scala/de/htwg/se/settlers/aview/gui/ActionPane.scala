@@ -20,7 +20,7 @@ class ActionPane( gui:GUI ) extends VBox {
       maxWidth = ActionPane.this.width.value - 20
       hgrow = Priority.Always
       vgrow = Priority.Always
-      val node:Node = s.getPane(gui)
+      val node:Node = s.getPane( gui )
       children = node
       AnchorPane.setAnchors( node, 0, 0, 0, 0 )
     } )

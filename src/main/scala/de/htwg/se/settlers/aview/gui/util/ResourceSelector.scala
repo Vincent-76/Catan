@@ -1,13 +1,11 @@
 package de.htwg.se.settlers.aview.gui.util
 
-import de.htwg.se.settlers.model.cards.Cards.ResourceCards
-import de.htwg.se.settlers.model.{Resource, Resources}
 import de.htwg.se.settlers.aview.gui.GUIApp
-import scalafx.geometry.{Insets, Orientation, Pos}
+import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.{ Resource, Resources }
+import scalafx.geometry.{ Orientation, Pos }
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout._
-import scalafx.scene.paint.Color
-import scalafx.scene.shape.Circle
 import scalafx.scene.text.Text
 
 import scala.util.Try
@@ -33,7 +31,7 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
       minWidth = 50
       alignment = Pos.Center
       children = List(
-        new Text( if ( maximum.contains( d._1 ) ) "Max: " + maximum( d._1 ) else "" ) {
+        new Text( if( maximum.contains( d._1 ) ) "Max: " + maximum( d._1 ) else "" ) {
           style = "-fx-font-size: 12"
           fill = GUIApp.colorOf( d._1 ).darker.darker
         },
@@ -69,13 +67,13 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
     def decrement( ):Unit = setValue( value - 1 )
 
     def setValue( v:Int ):Unit = {
-      if ( v <= 0 )
+      if( v <= 0 )
         set( 0 )
-      else if ( maximum.contains( r ) && v > maximum( r ) )
+      else if( maximum.contains( r ) && v > maximum( r ) )
         set( maximum( r ) )
       else {
         val amount = counter.filter( _._1 != r ).map( _._2.value ).sum
-        if ( maxAmount.isDefined && v + amount > maxAmount.get )
+        if( maxAmount.isDefined && v + amount > maxAmount.get )
           set( maxAmount.get - amount )
         else
           set( v )

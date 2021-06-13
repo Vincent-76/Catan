@@ -1,9 +1,9 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.cards.Cards._
-import de.htwg.se.settlers.model.{ Hex, Vertex }
+import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.model.impl.placement.SettlementPlacement
 import de.htwg.se.settlers.model.state.{ BuildInitRoadState, BuildInitSettlementState }
-import de.htwg.se.settlers.model.{ Command, Game, GotResourcesInfo, Info, Resource, Settlement }
 import de.htwg.se.settlers.util._
 
 import scala.util.{ Success, Try }
@@ -13,18 +13,18 @@ import scala.util.{ Success, Try }
  */
 case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState ) extends Command {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    Settlement.build( game, game.onTurn, vID, anywhere = true ) match {
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    SettlementPlacement.build( game, game.onTurn, vID, anywhere = true ) match {
       case Success( game ) =>
         if ( game.settlementAmount( game.onTurn ) == 2 ) {
           val resources = adjacentResources( game.gameField.findVertex( vID ).get )
-          Success(
-            game.drawResourceCards( game.onTurn, resources )
-              .setState( BuildInitRoadState( vID ) ),
+          success(
+            game.setState( BuildInitRoadState( vID ) )
+              .drawResourceCards( game.onTurn, resources )._1,
             Some( GotResourcesInfo( game.onTurn, resources ) )
           )
         }
-        else Success( game.setState( BuildInitRoadState( vID ) ), None )
+        else success( game.setState( BuildInitRoadState( vID ) ), None )
       case f => f.rethrow
     }
   }
@@ -34,11 +34,9 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
     val newGame = if( game.settlementAmount( game.onTurn ) == 2 )
       game.dropResourceCards( game.onTurn, adjacentResources( v ) ).get
     else game
-    newGame.copy(
-      state = state,
-      gameField = newGame.gameField.update( v.setBuilding( None ) ),
-      players = newGame.updatePlayers( newGame.player.addStructure( Settlement ) )
-    )
+    newGame.setState( state )
+      .setGameField( newGame.gameField.update( v.setBuilding( None ) ) )
+      .updatePlayer( newGame.player.addStructure( SettlementPlacement ) )
   }
 
   private def adjacentResources( v:Vertex ):ResourceCards = {

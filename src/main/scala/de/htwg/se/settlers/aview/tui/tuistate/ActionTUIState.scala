@@ -8,7 +8,7 @@ import de.htwg.se.settlers.util._
 /**
  * @author Vincent76;
  */
-case class ActionTUIState( controller: Controller ) extends TUIState {
+case class ActionTUIState( controller:Controller ) extends TUIState {
 
   private val availableCommands:List[CommandAction] = List(
     BuildCommand,
@@ -18,8 +18,8 @@ case class ActionTUIState( controller: Controller ) extends TUIState {
     UseDevCommand
   )
 
-  override def getGameDisplay:Option[String] = {
-    val gameDisplay = GameDisplay( controller )
+  override def createGameDisplay:Option[String] = {
+    val gameDisplay = getGameDisplay( controller )
     Some( gameDisplay.buildGameField + gameDisplay.buildPlayerDisplay( Some( controller.game.onTurn ) ) )
   }
 

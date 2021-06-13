@@ -1,14 +1,12 @@
 package de.htwg.se.settlers.aview.tui
 
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.cards.Cards._
-import de.htwg.se.settlers.model.Player.{Blue, Green, PlayerColor, Red, Yellow}
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.state._
-import de.htwg.se.settlers.model.{PlacementPointNotEmpty, _}
+import de.htwg.se.settlers.model.{PlacementPointNotEmpty, Player, _}
 import de.htwg.se.settlers.aview.tui.TUI.InvalidFormat
 import de.htwg.se.settlers.aview.tui.command.{ExitCommand, HelpCommand, RedoCommand, UndoCommand}
 import de.htwg.se.settlers.aview.tui.tuistate._
-import de.htwg.se.settlers.model.player.Player
 import de.htwg.se.settlers.util._
 
 import scala.util.Try
@@ -148,7 +146,7 @@ class TUI( val controller:Controller ) extends Observer {
   override def onUpdate( info:Option[Info] ):Unit = {
     val tuiState = findTUIState( controller.game.state )
     TUI.clear()
-    val gameDisplay = tuiState.getGameDisplay
+    val gameDisplay = tuiState.createGameDisplay
     if ( gameDisplay.isDefined )
       TUI.out( gameDisplay.get )
     //TUI.outln()
@@ -235,7 +233,7 @@ class TUI( val controller:Controller ) extends Observer {
       case SettlementRequired( id ) =>
         "You need a settlement on placement point " + TUI.errorHighlight( id ) + " to build a city!"
       case InvalidPlacementPoint( id ) => "Invalid placement point " + TUI.errorHighlight( id ) + "!"
-      case NotEnoughPlayers => "Minimum " + TUI.errorHighlight( Game.minPlayers ) + " players required!"
+      case NotEnoughPlayers => "Minimum " + TUI.errorHighlight( controller.game.minPlayers ) + " players required!"
       case InvalidPlayerColor( color ) => "Invalid player color: [" + TUI.errorHighlight( color ) + "]!"
       case RobberOnlyOnLand => "Robber can only be placed on land!"
       case NoPlacementPoints( structure ) =>
@@ -254,7 +252,7 @@ class TUI( val controller:Controller ) extends Observer {
       case PlayerNameAlreadyExists( name ) => "Player with name: [" + TUI.errorHighlight( name ) + "] already exists!"
       case PlayerNameEmpty => "Player name can't be empty!"
       case PlayerNameTooLong( name ) =>
-        "Player name [" + TUI.errorHighlight( name ) + "] is too long, maximum " + Game.maxPlayerNameLength + " characters!"
+        "Player name [" + TUI.errorHighlight( name ) + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
       case PlayerColorIsAlreadyInUse( playerColor ) =>
         "Player color " + TUI.colorOf( playerColor ) + playerColor.name + TUI.reset + " is already in use!"
       case InvalidPlayerID( id ) => "Invalid player id: [" + TUI.errorHighlight( id ) + "]!"

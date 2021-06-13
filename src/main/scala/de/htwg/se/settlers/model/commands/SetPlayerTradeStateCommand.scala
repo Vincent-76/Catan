@@ -1,26 +1,26 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.cards.Cards._
+import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.state.{ PlayerTradeEndState, PlayerTradeState }
-import de.htwg.se.settlers.model.{ Command, Game, Info, InsufficientResources, State }
+import de.htwg.se.settlers.model.{ Command, Game, InsufficientResources, State }
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Try }
 
 /**
  * @author Vincent76;
  */
 case class SetPlayerTradeStateCommand( give:ResourceCards, get:ResourceCards, state:State ) extends Command {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    if ( !game.player.resources.has( give ) )
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    if( !game.player.hasResources( give ) )
       Failure( InsufficientResources )
     else {
-      val decisions = game.players.values.filter( p => p != game.player && !p.resources.has( get ) ).map( p => (p.id, false) ).toMap
+      val decisions = game.players.values.filter( p => p != game.player && !p.hasResources( get ) ).map( p => (p.id, false) ).toMap
       val nextState = game.getNextTradePlayerInOrder( decisions ) match {
         case Some( pID ) => PlayerTradeState( pID, give, get, decisions )
         case None => PlayerTradeEndState( give, get, decisions )
       }
-      Success( game.setState( nextState ), None )
+      success( game.setState( nextState ) )
     }
   }
 

@@ -1,16 +1,16 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
-import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.aview.tui.command.UseDevCommand
-import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
+import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
+import de.htwg.se.settlers.controller.Controller
 
 /**
  * @author Vincent76;
  */
 case class DiceTUIState( controller:Controller ) extends TUIState {
 
-  override def getGameDisplay:Option[String] = {
-    val gameDisplay = GameDisplay( controller )
+  override def createGameDisplay:Option[String] = {
+    val gameDisplay = getGameDisplay( controller )
     Some( gameDisplay.buildGameField + gameDisplay.buildPlayerDisplay( Some( controller.game.onTurn ) ) )
   }
 

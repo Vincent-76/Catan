@@ -1,9 +1,9 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
+import de.htwg.se.settlers.aview.gui.{ DisplayState, FieldInputDisplayState, GUIState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Settlement
-import de.htwg.se.settlers.aview.gui.{DisplayState, FieldInputDisplayState, GUIState}
-import de.htwg.se.settlers.model.player.Player
+import de.htwg.se.settlers.model.Player
+import de.htwg.se.settlers.model.impl.placement.SettlementPlacement
 
 /**
  * @author Vincent76;
@@ -11,7 +11,7 @@ import de.htwg.se.settlers.model.player.Player
 case class BuildInitSettlementGUIState( controller:Controller ) extends GUIState {
 
   override def getDisplayState:DisplayState =
-    new FieldInputDisplayState( Settlement.getBuildablePoints( controller.game, controller.onTurn, any = true ) ) {
+    new FieldInputDisplayState( SettlementPlacement.getBuildablePoints( controller.game, controller.onTurn, any = true ) ) {
       override def action( id:Int ):Unit = controller.buildInitSettlement( id )
     }
 

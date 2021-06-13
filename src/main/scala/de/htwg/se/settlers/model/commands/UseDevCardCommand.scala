@@ -1,12 +1,11 @@
 package de.htwg.se.settlers.model.commands
 
-import de.htwg.se.settlers.model.Game.PlayerID
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.model.cards.{BonusCard, DevelopmentCard, KnightCard, LargestArmyCard, MonopolyCard, RoadBuildingCard, YearOfPlentyCard}
-import de.htwg.se.settlers.model.state.{DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState}
+import de.htwg.se.settlers.model.impl.placement.RoadPlacement
+import de.htwg.se.settlers.model.state.{ DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState }
 import de.htwg.se.settlers.util._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Try }
 
 /**
  * @author Vincent76;
@@ -15,51 +14,45 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
 
   var actualBonusCards:Option[Map[BonusCard, Option[(PlayerID, Int)]]] = None
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    if ( game.turn.usedDevCard )
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    if( game.turn.usedDevCard )
       return Failure( AlreadyUsedDevCardInTurn )
     val newPlayer = game.player.useDevCard( devCard )
-    if ( newPlayer.isFailure )
+    if( newPlayer.isFailure )
       return newPlayer.rethrow
-    if ( game.player.devCards.count( _ == devCard ) <= game.turn.drawnDevCards.count( _ == devCard ) )
+    if( game.player.devCards.count( _ == devCard ) <= game.turn.drawnDevCards( devCard ) )
       return Failure( DevCardDrawnInTurn( devCard ) )
     val nextState = devCard match {
       case KnightCard => RobberPlaceState( state )
       case YearOfPlentyCard => YearOfPlentyState( state )
       case RoadBuildingCard =>
-        if ( !game.player.hasStructure( Road ) )
-          return Failure( InsufficientStructures( Road ) )
-        if ( Road.getBuildablePoints( game, game.onTurn ).isEmpty )
-          return Failure( NoPlacementPoints( Road ) )
+        if( !game.player.hasStructure( RoadPlacement ) )
+          return Failure( InsufficientStructures( RoadPlacement ) )
+        if( RoadPlacement.getBuildablePoints( game, game.onTurn ).isEmpty )
+          return Failure( NoPlacementPoints( RoadPlacement ) )
         DevRoadBuildingState( state )
       case MonopolyCard => MonopolyState( state )
       //case _ => state
     }
-    val newBonusCards = if ( devCard == KnightCard ) {
-      val amount = newPlayer.get.usedDevCards.count( _ == KnightCard )
+    val largestArmyValue = if( devCard == KnightCard ) {
+      val amount = newPlayer.get.usedDevCards( KnightCard )
       val largestArmy = game.bonusCards( LargestArmyCard )
-      if ( amount >= LargestArmyCard.required && ( largestArmy.isEmpty || amount > largestArmy.get._2 ) )
-        game.bonusCards.updated( LargestArmyCard, Some( newPlayer.get.id, amount ) )
-      else game.bonusCards
-    } else game.bonusCards
+      if( amount >= LargestArmyCard.required && (largestArmy.isEmpty || amount > largestArmy.get._2) )
+        Some( newPlayer.get.id, amount )
+      else game.bonusCard( LargestArmyCard )
+    } else game.bonusCard( LargestArmyCard )
     actualBonusCards = Some( game.bonusCards )
-    Success( game.copy(
-      state = nextState,
-      turn = game.turn.copy( usedDevCard = true ),
-      players = game.players.updated( newPlayer.get.id, newPlayer.get ),
-      bonusCards = newBonusCards,
-    ), None )
+    success( game.setState( nextState )
+      .setTurn( game.turn.setUsedDevCard( true ) )
+      .updatePlayer( newPlayer.get )
+      .setBonusCard( LargestArmyCard, largestArmyValue )
+    )
   }
 
-  override def undoStep( game:Game ):Game = game.copy(
-    state = state,
-    players = game.players.updated( game.onTurn, game.player.copy(
-      devCards = game.player.devCards :+ devCard,
-      usedDevCards = game.player.usedDevCards.removed( devCard ).toVector
-    ) ),
-    turn = game.turn.copy( usedDevCard = false ),
-    bonusCards = actualBonusCards.getOrElse( game.bonusCards )
-  )
+  override def undoStep( game:Game ):Game = game.setState( state )
+    .updatePlayer( game.player.addDevCard( devCard, removeFromUsed = true ) )
+    .setTurn( game.turn.setUsedDevCard( false ) )
+    .setBonusCards( actualBonusCards.getOrElse( game.bonusCards ) )
 
   //override def toString:String = getClass.getSimpleName + ": devCard[" + devCard + "], " + state
 }

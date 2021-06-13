@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.gui.commands
 
-import de.htwg.se.settlers.model.cards.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.aview.gui.GUI
 
 /**

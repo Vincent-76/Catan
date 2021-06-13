@@ -2,7 +2,7 @@ package de.htwg.se.settlers
 
 import java.util.function.Predicate
 
-import de.htwg.se.settlers.model.cards.Cards.ResourceCards
+import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.{ InsufficientResources, Resource, Resources }
 
 import scala.reflect.ClassTag
@@ -49,7 +49,7 @@ package object util {
   }
 
   implicit class RichRandom( r:Random ) {
-    def element[R]( i:Seq[R] ):Option[R] = if ( i.nonEmpty ) Some( i( r.nextInt( i.size ) ) ) else Option.empty
+    def element[R]( i:Seq[R] ):Option[R] = if ( i.nonEmpty ) Some( i( r.nextInt( i.size ) ) ) else None
   }
 
   implicit class RichIterable[A, B[A] <: Iterable[A]]( iterable:B[A] ) {
@@ -68,6 +68,14 @@ package object util {
     def removeAt( i:Int ):B[A] = {
       iterable.splitAt( i ).use( d => d._1 ++ d._2.tail ).asInstanceOf[B[A]]
     }
+
+    def containsWhere( p: A => Boolean ):Boolean = {
+      iterable.foreach( e => {
+        if( p( e ) )
+          return true
+      } )
+      false
+    }
   }
 
   implicit class RichGeneralIterable( val iterable:Iterable[_] ) {
@@ -80,7 +88,7 @@ package object util {
           if ( res.isDefined )
             return res
       }
-      Option.empty
+      None
     }
   }
 
@@ -145,7 +153,7 @@ package object util {
   implicit class RichMatrix[E]( val iterable:Iterable[Iterable[E]] ) {
     def matrixFind( predicate:Predicate[E] ):Option[E] = {
       iterable.foreach( _.foreach( e => if ( predicate.test( e ) ) return Some( e ) ) )
-      Option.empty
+      None
     }
   }
 
@@ -166,7 +174,7 @@ package object util {
 
     def failureOption:Option[Throwable] = t match {
       case Failure( t ) => Some( t )
-      case _ => Option.empty
+      case _ => None
     }
   }
 

@@ -1,11 +1,11 @@
 package de.htwg.se.settlers.aview.gui.commands
 
-import de.htwg.se.settlers.model.cards.Cards.ResourceCards
+import de.htwg.se.settlers.aview.gui.GUI
 import de.htwg.se.settlers.aview.gui.util.{ CustomDialog, ResourceSelector }
-import de.htwg.se.settlers.aview.gui.{ GUI, GUIApp }
-import scalafx.geometry.{ Insets, Pos }
+import de.htwg.se.settlers.model.Cards.ResourceCards
+import scalafx.geometry.Pos
 import scalafx.scene.control.{ Button, ButtonType }
-import scalafx.scene.layout.{ BorderPane, Region, VBox }
+import scalafx.scene.layout.{ BorderPane, VBox }
 import scalafx.scene.text.{ Text, TextAlignment }
 
 /**

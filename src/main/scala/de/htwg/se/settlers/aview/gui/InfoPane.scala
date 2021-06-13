@@ -1,13 +1,10 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.controller.Controller
-import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.geometry.Side
+import javafx.beans.value.{ ChangeListener, ObservableValue }
 import javafx.scene.control.TextArea
-import javafx.scene.layout.{BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize, Region}
+import javafx.scene.layout.Region
 import scalafx.scene.control.Button
-import scalafx.scene.image.Image
-import scalafx.scene.layout.{AnchorPane, Background, BorderPane, Priority, VBox}
+import scalafx.scene.layout.{ AnchorPane, BorderPane, Priority, VBox }
 
 /**
  * @author Vincent76;
@@ -54,10 +51,10 @@ class InfoPane( gui:GUI ) extends BorderPane {
     textArea.appendText( "\n" + info )
   }
 
-  def setBackground:Unit = {
+  def setBackground( ):Unit = {
     val l = textArea.lookup( ".content" )
     if( l != null && l.isInstanceOf[Region] ) {
-      l.asInstanceOf[Region].setBackground( GUIApp.woodBackground )// "-fx-background-image: url( \"/wood_background.png\" );"
+      l.asInstanceOf[Region].setBackground( GUIApp.woodBackground ) // "-fx-background-image: url( \"/wood_background.png\" );"
     }
   }
 

@@ -1,9 +1,5 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.Player.PlayerColor
-import de.htwg.se.settlers.model.cards.DevelopmentCard
-
 /**
  * @author Vincent76;
  */
@@ -24,7 +20,9 @@ case object TradePlayerInsufficientResources extends ControllerError
 
 case class InsufficientStructures( structure:StructurePlacement ) extends ControllerError
 
-case class NonExistentPlacementPoint( id:Int) extends ControllerError
+case class NonExistentPlacementPoint( id:Int ) extends ControllerError
+
+case class UnavailableStructure( structure:StructurePlacement ) extends ControllerError
 
 case class PlacementPointNotEmpty( id:Int ) extends ControllerError
 

@@ -1,24 +1,21 @@
-package de.htwg.se.settlers.aview.gui
+package de.htwg.se.settlers.aview.gui.impl.gamefield
 
 import de.htwg.se.settlers.Catan
-import de.htwg.se.settlers.aview.gui.GameFieldCanvas.{desertTileImage, numberImages, numberSize, portImages, resourceTileImages, waterTileImage}
+import de.htwg.se.settlers.aview.gui.gamefield.GameFieldPane.Coords
+import de.htwg.se.settlers.aview.gui.gamefield.{ GameFieldCanvas, GameFieldPane }
+import de.htwg.se.settlers.aview.gui.impl.gamefield.ClassicGameFieldCanvasImpl._
+import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.aview.gui.GameFieldPane.Coords
-import de.htwg.se.settlers.model.cards.Cards.{ResourceCards, getResourceCards}
 import de.htwg.se.settlers.util._
 import scalafx.geometry.VPos
-import scalafx.scene.SnapshotParameters
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.image.Image
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Font, FontWeight, TextAlignment}
+import scalafx.scene.text.{ Font, TextAlignment }
 
 import scala.util.Random
 
-/**
- * @author Vincent76;
- */
-object GameFieldCanvas {
+object ClassicGameFieldCanvasImpl {
   val portLength:Double = 0.3
   val hexBorderWidth:Double = 2
   val numberSize:Double = 25
@@ -31,24 +28,24 @@ object GameFieldCanvas {
     Wheat -> shuffledImageList( Wheat, 4 ),
     Ore -> shuffledImageList( Ore, 3 ),
   )
-  val numberImages:Map[Number, Image] = Numbers.all.filter( _.frequency > 0 ).map( n => (n, new Image( "/numbers/" + n.value + ".png" )) ).toMap
-  val portImages:Map[Option[Resource], List[Image]] = ( Resources.get.map( Some( _ ) ) :+ Option.empty ).map( r =>
-    (r, ClassicGameField.adjacentOffset.indices.map(i =>
-        new Image( "/ports/" + ( if( r.isDefined ) r.get.title.toLowerCase else "unspecific" ) + "/" + i + ".png" )
+  val numberImages:Map[DiceValue, Image] = DiceValues.all.filter( _.frequency > 0 ).map( n => (n, new Image( "/numbers/" + n.value + ".png" )) ).toMap
+  val portImages:Map[Option[Resource], List[Image]] = (Resources.get.map( Some( _ ) ) :+ None).map( r =>
+    (r, ClassicGameFieldImpl.adjacentOffset.indices.map( i =>
+      new Image( "/ports/" + (if( r.isDefined ) r.get.title.toLowerCase else "unspecific") + "/" + i + ".png" )
     ).toList)
   ).toMap
 
   private def shuffledImageList( r:Resource, variants:Int ):List[Image] = {
-    Random.shuffle( ( 0 until variants ).map( i => new Image( "/" + r.title.toLowerCase + "/" + i + ".png" ) ).toList )
+    Random.shuffle( (0 until variants).map( i => new Image( "/" + r.title.toLowerCase + "/" + i + ".png" ) ).toList )
   }
 }
 
-class GameFieldCanvas extends Canvas {
+class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl] {
 
   graphicsContext2D.textAlign = TextAlignment.Center
   graphicsContext2D.textBaseline = VPos.Center
 
-  def update( gameField:ClassicGameField, hWidth:Double, hSize:Double ):Coords = {
+  def doUpdate( gameField:ClassicGameFieldImpl, hWidth:Double, hSize:Double ):Coords = {
     graphicsContext2D.clearRect( 0, 0, width.value, height.value )
     val coords = gameField.hexagons.redByKey( Map.empty:Coords, ( coords:Coords, i:Int ) => {
       val row = gameField.hexagons( i )
@@ -56,8 +53,8 @@ class GameFieldCanvas extends Canvas {
       val nulls = row.size - fRow.size
       fRow.redByKey( coords, ( coords:Coords, j:Int ) => {
         val hex = fRow( j )
-        val x = GameFieldPane.padding + ( hWidth / 2 * ( nulls + 1 ) ) + j * hWidth
-        val y = GameFieldPane.padding + hSize + i * ( 6d / 4d * hSize )
+        val x = GameFieldPane.padding + (hWidth / 2 * (nulls + 1)) + j * hWidth
+        val y = GameFieldPane.padding + hSize + i * (6d / 4d * hSize)
         coords.updated( hex.get, (x, y) )
       } )
     } )
@@ -81,10 +78,10 @@ class GameFieldCanvas extends Canvas {
   }
 
   private def drawHex( hWidth:Double, hSize:Double, h:Hex, center:(Double, Double), tileImg:Image ):Unit = {
-    val points = ( 0 to 5 ).map( i => hexCorner( hSize, center, i ) )
+    val points = (0 to 5).map( i => hexCorner( hSize, center, i ) )
     h.area match {
       case a:LandArea =>
-        graphicsContext2D.drawImage( tileImg, points( 4 )._1, ( center._2 - hSize ), hWidth, ( hSize * 2 ) )
+        graphicsContext2D.drawImage( tileImg, points( 4 )._1, center._2 - hSize, hWidth, hSize * 2 )
         //graphicsContext2D.fill = GUIApp.colorOf( h.area.f )
         //graphicsContext2D.fillPolygon( points )
         //graphicsContext2D.lineWidth = GameFieldCanvas.hexBorderWidth
@@ -98,7 +95,7 @@ class GameFieldCanvas extends Canvas {
             graphicsContext2D.font = Font.font( Font.default.getFamily, FontWeight.Bold, GameFieldPane.mult( fontSize, hSize ) )
             graphicsContext2D.fillText( number.value.toString, center._1, center._2 )*/
             val size = GameFieldPane.mult( numberSize, hSize )
-            graphicsContext2D.drawImage( numberImages( number ), center._1 - ( size / 2 ), center._2 - ( size / 2 ), size, size )
+            graphicsContext2D.drawImage( numberImages( number ), center._1 - (size / 2), center._2 - (size / 2), size, size )
           case _ =>
         }
       case _ =>
@@ -106,13 +103,13 @@ class GameFieldCanvas extends Canvas {
     if( Catan.debug ) {
       graphicsContext2D.fill = Color.White
       graphicsContext2D.font = Font.font( Font.default.getFamily, GameFieldPane.mult( 12, hSize ) )
-      graphicsContext2D.fillText( h.id.toString, center._1, ( center._2 - hSize / 2 ) )
+      graphicsContext2D.fillText( h.id.toString, center._1, center._2 - hSize / 2 )
     }
   }
 
-  private def drawWater( gameField:ClassicGameField, coords:Coords, hWidth:Double, hSize:Double, h:Hex, center:(Double, Double) ):Unit = h.area match {
+  private def drawWater( gameField:ClassicGameFieldImpl, coords:Coords, hWidth:Double, hSize:Double, h:Hex, center:(Double, Double) ):Unit = h.area match {
     case w:WaterArea =>
-      val image = if ( w.port.isDefined ) {
+      val image = if( w.port.isDefined ) {
         /*graphicsContext2D.font = Font.font( Font.default.getFamily, FontWeight.Bold, GameFieldPane.mult( 14, hSize ) )
         if ( w.port.get.specific.isDefined ) {
           graphicsContext2D.fill = GUIApp.colorOf( w.port.get.specific.get )
@@ -146,22 +143,22 @@ class GameFieldCanvas extends Canvas {
 
         //graphicsContext2D.drawImage( new Image( "/port_clay.png" ), hexCorner( hSize, center, 4 )._1, ( center._2 - hSize ), hWidth, ( hSize * 2 ) )
 
-        val rotNr = ClassicGameField.adjacentOffset.indices.find(i => gameField.adjacentEdge( h, i ) match {
+        val rotNr = ClassicGameFieldImpl.adjacentOffset.indices.find( i => gameField.adjacentEdge( h, i ) match {
           case Some( e ) if e.port.isDefined && e.port.get == w.port.get => true
           case _ => false
         } ).getOrElse( 0 )
         portImages( w.port.get.specific )( rotNr )
       }
       else waterTileImage
-      graphicsContext2D.drawImage( image, hexCorner( hSize, center, 4 )._1, ( center._2 - hSize ), hWidth, ( hSize * 2 ) )
-      //graphicsContext2D.stroke = GUIApp.colorOf( Water ).darker.darker.darker
-      //graphicsContext2D.lineWidth = GameFieldCanvas.hexBorderWidth
-      //graphicsContext2D.strokePolygon( ( 0 to 5 ).map( i => hexCorner( hSize, center, i ) ) )
+      graphicsContext2D.drawImage( image, hexCorner( hSize, center, 4 )._1, center._2 - hSize, hWidth, hSize * 2 )
+    //graphicsContext2D.stroke = GUIApp.colorOf( Water ).darker.darker.darker
+    //graphicsContext2D.lineWidth = GameFieldCanvas.hexBorderWidth
+    //graphicsContext2D.strokePolygon( ( 0 to 5 ).map( i => hexCorner( hSize, center, i ) ) )
     case _ =>
   }
 
   private def hexCorner( hSize:Double, center:(Double, Double), i:Int ):(Double, Double) = {
-    val rad = Math.PI / 180 * ( 60 * i - 30 )
+    val rad = Math.PI / 180 * (60 * i - 30)
     (center._1 + hSize * Math.cos( rad ), center._2 + hSize * Math.sin( rad ))
   }
 }

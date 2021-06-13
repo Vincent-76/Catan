@@ -1,5 +1,7 @@
-package de.htwg.se.settlers.aview.gui
+package de.htwg.se.settlers.aview.gui.gamefield
 
+import de.htwg.se.settlers.aview.gui.impl.placement.RobberPlacementOverlayImpl
+import de.htwg.se.settlers.aview.gui.{ FieldInputDisplayState, GUIApp }
 import de.htwg.se.settlers.model.{ Edge, Hex, Vertex }
 import scalafx.Includes._
 import scalafx.scene.layout.{ AnchorPane, StackPane }
@@ -17,7 +19,7 @@ object InteractionPane {
 class InteractionPane extends AnchorPane {
   var input:Option[FieldInputDisplayState] = None
 
-  def resetInput():Unit = this.input = None
+  def resetInput( ):Unit = this.input = None
 
   def setInput( input:FieldInputDisplayState ):Unit = this.input = Some( input )
 
@@ -27,7 +29,7 @@ class InteractionPane extends AnchorPane {
       input.points.map {
         case h:Hex =>
           val p = coords( h )
-          (h.id, (p._1, p._2 - OverlayPane.robberDist * hSize))
+          (h.id, (p._1, p._2 - RobberPlacementOverlayImpl.robberDist * hSize))
         case e:Edge =>
           (e.id, GUIApp.middleOf( coords( e.h1 ), coords( e.h2 ) ))
         case v:Vertex =>

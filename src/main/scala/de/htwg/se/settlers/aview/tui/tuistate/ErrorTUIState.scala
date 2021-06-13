@@ -6,7 +6,7 @@ import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
 /**
  * @author Vincent76;
  */
-case class ErrorTUIState( controller: Controller ) extends TUIState{
+case class ErrorTUIState( controller:Controller ) extends TUIState {
   override def getActionInfo:String = {
     TUI.outln( "Error!" )
     "Press Enter to undo"

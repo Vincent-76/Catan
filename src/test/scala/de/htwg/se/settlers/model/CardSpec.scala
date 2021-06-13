@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.cards.{Cards, KnightCard}
-import de.htwg.se.settlers.model.cards.Cards._
+import Cards._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.{Failure, Success}

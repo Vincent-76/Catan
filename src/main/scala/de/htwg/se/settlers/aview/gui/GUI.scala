@@ -1,30 +1,54 @@
 package de.htwg.se.settlers.aview.gui
 
-import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.aview.gui.gamefield.{ GameFieldCanvas, GameFieldPane, PlacementOverlay }
+import de.htwg.se.settlers.aview.gui.impl.game.ClassicGameStackPaneImpl
+import de.htwg.se.settlers.aview.gui.impl.gamefield.ClassicGameFieldCanvasImpl
+import de.htwg.se.settlers.aview.gui.impl.placement.{ CityPlacementOverlayImpl, RoadPlacementOverlayImpl, RobberPlacementOverlayImpl, SettlementPlacementOverlayImpl }
 import de.htwg.se.settlers.aview.gui.util.CustomDialog
+import de.htwg.se.settlers.controller.Controller
+import de.htwg.se.settlers.model.Game
+import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
+import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
+import de.htwg.se.settlers.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import javafx.geometry.Side
-import javafx.scene.input.{KeyCode, KeyCodeCombination, KeyCombination}
-import javafx.scene.layout.{BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize}
+import javafx.scene.input.{ KeyCode, KeyCodeCombination, KeyCombination }
+import javafx.scene.layout.{ BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize }
 import scalafx.application.JFXApp.PrimaryStage
-import scalafx.application.{JFXApp, Platform}
+import scalafx.application.{ JFXApp, Platform }
 import scalafx.geometry.Pos
 import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.image.Image
 import scalafx.scene.layout._
-import scalafx.scene.text.{Text, TextAlignment}
-import scalafx.scene.{Node, Scene}
-
-import scala.io.Source
+import scalafx.scene.text.{ Text, TextAlignment }
+import scalafx.scene.{ Node, Scene }
 
 /**
  * @author Vincent76;
  */
 class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
-  var dialog:Option[CustomDialog] = Option.empty
-  val gameStackPane:GameStackPane = new GameStackPane
-  val playerListPane:PlayerListPane = new PlayerListPane
-  val gameFieldPane:GameFieldPane = new GameFieldPane
+
+  private def gameStackPaneImpl():GameStackPane[_] = controller.game match {
+    case _:ClassicGameImpl => new ClassicGameStackPaneImpl()
+    case c => throw new NotImplementedError( "GameStackPane[" + c.getClass.getName + "]" )
+  }
+
+  //private def gameFieldCanvasImpl():GameFieldCanvas[_] =
+
+  private def placementOverlayImpls():List[PlacementOverlay] = controller.game.availablePlacements.map {
+    case RobberPlacement => RobberPlacementOverlayImpl
+    case RoadPlacement => RoadPlacementOverlayImpl
+    case SettlementPlacement => SettlementPlacementOverlayImpl
+    case CityPlacement => CityPlacementOverlayImpl
+  }
+
+  var dialog:Option[CustomDialog] = None
+  val gameStackPane:GameStackPane[_] = gameStackPaneImpl()
+  val playerListPane:PlayerListPane = new PlayerListPane( this )
+  val gameFieldPane:GameFieldPane[_] = new GameFieldPane( controller.game.gameField match {
+    case _:ClassicGameFieldImpl => new ClassicGameFieldCanvasImpl()
+    case c => throw new NotImplementedError( "GameFieldCanvas[" + c.getClass.getName + "]" )
+  }, placementOverlayImpls() )
   val playerPane:PlayerPane = new PlayerPane( this )
   val actionPane:ActionPane = new ActionPane( this )
   val infoPane:InfoPane = new InfoPane( this )
@@ -90,14 +114,14 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
 
 
   Platform.runLater {
-    infoPane.setBackground
+    infoPane.setBackground()
   }
   /*def postInit():Unit = {
     infoPane.setBackground
   }*/
 
 
-  def update( state:Option[GUIState] = Option.empty ):Unit = Platform.runLater {
+  def update( state:Option[GUIState] = None ):Unit = Platform.runLater {
     if ( dialog.isDefined )
       dialog.get.close()
     gameStackPane.update( controller.game )
@@ -157,15 +181,15 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
     infoPane.showInfo( info )
   }
 
-  def showInfoDialog( title:String, text:Option[String] = Option.empty, centered:Boolean = false ):Unit = Platform.runLater {
+  def showInfoDialog( title:String, text:Option[String] = None, centered:Boolean = false ):Unit = Platform.runLater {
     getMessageDialog( "Info", title, text, centered ).show()
   }
 
-  def showErrorDialog( title:String, text:Option[String] = Option.empty, centered:Boolean = false ):Unit = Platform.runLater {
+  def showErrorDialog( title:String, text:Option[String] = None, centered:Boolean = false ):Unit = Platform.runLater {
     getMessageDialog( "Error", title, text, centered ).show()
   }
 
-  def getMessageDialog( title:String, headerString:String, text:Option[String] = Option.empty, centered:Boolean = false ):CustomDialog =
+  def getMessageDialog( title:String, headerString:String, text:Option[String] = None, centered:Boolean = false ):CustomDialog =
     new CustomDialog( this, title ) {
       headerText = headerString
       if ( text.isDefined )
@@ -180,11 +204,11 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
     if ( this.dialog.isDefined )
       this.dialog.get.close()
     this.dialog = Some( dialog )
-    new Alert( AlertType.None ) {
+    new Alert( AlertType.None, dialog.title ) {
       initOwner( stage )
       dialogPane = dialog
     }.showAndWait()
-    this.dialog = Option.empty
+    this.dialog = None
   }
 
   override def stopApp( ):Unit = System.exit( 0 )

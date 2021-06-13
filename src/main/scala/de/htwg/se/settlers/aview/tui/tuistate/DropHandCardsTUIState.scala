@@ -1,10 +1,9 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
+import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.Resources
-import de.htwg.se.settlers.model.cards.Cards._
-import de.htwg.se.settlers.aview.tui.{ CommandInput, GameDisplay, TUI, TUIState }
+import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.{ PlayerID, Resources }
 import de.htwg.se.settlers.util._
 
 /**
@@ -12,11 +11,11 @@ import de.htwg.se.settlers.util._
  */
 case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends TUIState {
 
-  override def getGameDisplay:Option[String] = Some( GameDisplay( controller ).buildGameField )
+  override def createGameDisplay:Option[String] = Some( getGameDisplay( controller ).buildGameField )
 
   override def getActionInfo:String = {
     TUI.outln( TUI.displayName( controller.game.player( pID ) ) + ", you have to drop " +
-      ( controller.game.player( pID ).resources.amount / 2 ) + " cards!" )
+      (controller.game.player( pID ).resources.amount / 2) + " cards!" )
     TUI.outln( "Resources:" )
     val resourceNameLength = Resources.get.map( _.title.length ).max
     TUI.outln( controller.game.player( pID ).resources.sort.map( d =>

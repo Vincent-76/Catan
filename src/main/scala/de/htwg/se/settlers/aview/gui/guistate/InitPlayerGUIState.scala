@@ -1,15 +1,14 @@
 package de.htwg.se.settlers.aview.gui.guistate
 
-import scalafx.Includes._
+import de.htwg.se.settlers.aview.gui.{ DisplayState, GUIState, InitDisplayState }
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.aview.gui.{DisplayState, FieldDisplayState, GUIApp, GUIState, InitDisplayState}
-import de.htwg.se.settlers.model.player.Player
+import de.htwg.se.settlers.model.PlayerColor
 import javafx.scene.input.KeyCode
+import scalafx.Includes._
 import scalafx.geometry.Pos
-import scalafx.scene.Node
-import scalafx.scene.control.{Button, ComboBox, TextField}
+import scalafx.scene.control.{ Button, ComboBox, TextField }
 import scalafx.scene.input.KeyEvent
-import scalafx.scene.layout.{HBox, Pane, Priority, VBox}
+import scalafx.scene.layout.{ HBox, Pane, VBox }
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 
@@ -27,13 +26,13 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
         promptText = "Name"
         alignment = Pos.Center
       }
-      val comboBox:ComboBox[String] = new ComboBox[String]( Player.availableColors( controller.game.players.values ).map( _.name ) ) {
+      val comboBox:ComboBox[String] = new ComboBox[String]( PlayerColor.availableColors( controller.game.players.values.map( _.color ) ).map( _.name ) ) {
         selectionModel.value.selectFirst()
         styleClass.add( "button" )
       }
       onKeyPressed = ( e:KeyEvent ) => {
-        if ( e.getCode == KeyCode.ENTER )
-          controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
+        if( e.getCode == KeyCode.ENTER )
+          controller.addPlayer( PlayerColor.colorOf( comboBox.getValue ).get, textField.getText() )
       }
       children = List(
         new Text( "Enter a name and choose a color to add a player,\n or continue to dice out the beginner." ) {
@@ -48,13 +47,13 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
           children = List(
             new Button( "Add Player" ) {
               styleClass.add( "button" )
-              onAction = _ => controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
+              onAction = _ => controller.addPlayer( PlayerColor.colorOf( comboBox.getValue ).get, textField.getText() )
             },
             new Button( "Continue" ) {
               styleClass.add( "button" )
               onAction = _ => {
                 if( textField.getText.nonEmpty )
-                  controller.addPlayer( Player.colorOf( comboBox.getValue ).get, textField.getText() )
+                  controller.addPlayer( PlayerColor.colorOf( comboBox.getValue ).get, textField.getText() )
                 controller.setInitBeginnerState()
               }
             }

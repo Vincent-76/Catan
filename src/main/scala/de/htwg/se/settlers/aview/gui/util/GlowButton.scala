@@ -4,7 +4,6 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.Label
 import scalafx.scene.effect.Glow
 import scalafx.scene.layout.StackPane
-import scalafx.scene.paint.Color
 
 /**
  * @author Vincent76;

@@ -7,14 +7,14 @@ import scalafx.scene.layout.{ GridPane, _ }
 /**
  * @author Vincent76;
  */
-class PlayerListPane extends GridPane {
+class PlayerListPane( gui:GUI ) extends GridPane {
   vgrow = Priority.Always
   padding = Insets( 10, 0, 0, 0 )
   columnConstraints = List( new ColumnConstraints {
     percentWidth = 100
   } )
-  rowConstraints = ( 1 to Game.maxPlayers ).map( _ => new RowConstraints {
-    percentHeight = 100 / Game.maxPlayers
+  rowConstraints = ( 1 to gui.controller.game.maxPlayers ).map( _ => new RowConstraints {
+    percentHeight = 100 / gui.controller.game.maxPlayers
   } )
 
   def update( game:Game ):Unit = {

@@ -1,19 +1,17 @@
 package de.htwg.se.settlers.model
 
-import de.htwg.se.settlers.model.cards.Cards.ResourceCards
-import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.Player.Green
-import de.htwg.se.settlers.model.cards.KnightCard
+import Cards.ResourceCards
 import de.htwg.se.settlers.model.commands._
+import de.htwg.se.settlers.model.impl.placement.RoadPlacement
 import de.htwg.se.settlers.model.state._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class StateSpec extends WordSpec with Matchers {
   "State" when {
     "ActionState" should {
       val state = ActionState()
       "setBuildState" in {
-        state.setBuildState( Road ) shouldBe a [Some[SetBuildStateCommand]]
+        state.setBuildState( RoadPlacement ) shouldBe a [Some[SetBuildStateCommand]]
       }
       "bankTrade" in {
         state.bankTrade( ResourceCards.of(), ResourceCards.of() ) shouldBe a [Some[BankTradeCommand]]
@@ -44,7 +42,7 @@ class StateSpec extends WordSpec with Matchers {
       }
     }
     "BuildState" should {
-      val state = BuildState( Road )
+      val state = BuildState( RoadPlacement )
       "build" in {
         state.build( 0 ) shouldBe a [Some[BuildCommand]]
       }

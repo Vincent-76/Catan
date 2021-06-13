@@ -1,8 +1,8 @@
 package de.htwg.se.settlers.model.commands
 
 import de.htwg.se.settlers.model.state.BuildState
+import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
-import de.htwg.se.settlers.model.{ Command, Game, Info, InsufficientStructures, LostResourcesInfo, NoPlacementPoints, State, StructurePlacement }
 
 import scala.util.{ Failure, Success, Try }
 
@@ -11,21 +11,24 @@ import scala.util.{ Failure, Success, Try }
  */
 case class SetBuildStateCommand( structure:StructurePlacement, state:State ) extends Command {
 
-  override def doStep( game:Game ):Try[(Game, Option[Info])] = {
-    if ( !game.player.hasStructure( structure ) )
+  override def doStep( game:Game ):Try[CommandSuccess] = {
+    if( !game.availablePlacements.contains( structure ) )
+      Failure( UnavailableStructure( structure ) )
+    else if( !game.player.hasStructure( structure ) )
       Failure( InsufficientStructures( structure ) )
-    else if ( structure.getBuildablePoints( game, game.onTurn ).isEmpty )
+    else if( structure.getBuildablePoints( game, game.onTurn ).isEmpty )
       Failure( NoPlacementPoints( structure ) )
     else game.dropResourceCards( game.onTurn, structure.resources ) match {
-      case Success( newGame ) => Success(
+      case Success( newGame ) => success(
         newGame.setState( BuildState( structure ) ),
-        Some( LostResourcesInfo( game.onTurn, structure.resources ) ) )
+        info = Some( LostResourcesInfo( game.onTurn, structure.resources ) )
+      )
       case f => f.rethrow
     }
   }
 
   override def undoStep( game:Game ):Game = {
-    game.drawResourceCards( game.onTurn, structure.resources ).setState( state )
+    game.setState( state ).drawResourceCards( game.onTurn, structure.resources )._1
   }
 
   //override def toString:String = getClass.getSimpleName + ": structure[" + structure.title + "], " + state

@@ -1,7 +1,6 @@
 package de.htwg.se.settlers.model.state
 
-import de.htwg.se.settlers.model.Game.PlayerID
-import de.htwg.se.settlers.model.{Command, State}
+import de.htwg.se.settlers.model.{ Command, PlayerID, State }
 import de.htwg.se.settlers.model.commands.RobberStealCommand
 
 /**
