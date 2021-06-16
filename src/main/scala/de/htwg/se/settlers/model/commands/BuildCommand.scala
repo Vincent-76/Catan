@@ -34,7 +34,7 @@ case class BuildCommand( id:Int, state:BuildState ) extends Command {
     }
     game.setState( state )
       .setGameField( newGameField )
-      .setBonusCards( actualBonusCards.getOrElse( game.bonusCards ) )
+      .setBonusCards( actualBonusCards.get )
       .updatePlayer( game.player.addStructure( state.structure ) )
   }
 

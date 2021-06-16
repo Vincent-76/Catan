@@ -19,6 +19,8 @@ class ClassicGameFieldImplSpec extends WordSpec with Matchers {
         } ) should be( 37 ) )
       }
       "have a size" in {
+        gameField.fieldWidth shouldBe 7
+        gameField.fieldHeight shouldBe 7
         gameField.hexagons.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
         } ) should be( 37 )
@@ -141,11 +143,16 @@ class ClassicGameFieldImplSpec extends WordSpec with Matchers {
         nVertex.get.building.get.owner shouldBe pID
       }
       "have hex adjacent edges" in {
+        val adjacentF = gameField.adjacentEdge( h, ClassicGameFieldImpl.adjacentOffset.size )
+        adjacentF shouldBe None
+        val adjacent0 = gameField.adjacentEdge( h, 0 )
+        adjacent0 shouldNot be( None )
+        edgeTuple( adjacent0.get ) shouldBe (h, h1)
         val adjacent = gameField.adjacentEdges( h )
-        edgeTuple( adjacent.head ) should be( (h, h1) )
+        edgeTuple( adjacent.head ) shouldBe (h, h1)
         adjacent( 1 ) shouldBe e
         adjacent( 2 ) shouldBe e1
-        edgeTuple( adjacent( 3 ) ) should be( (h4, h) )
+        edgeTuple( adjacent( 3 ) ) shouldBe (h4, h)
       }
       "have hex adjacent vertices" in {
         val adjacent = gameField.adjacentVertices( h )

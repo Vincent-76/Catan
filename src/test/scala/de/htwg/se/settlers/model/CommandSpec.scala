@@ -12,7 +12,7 @@ import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
 
 import scala.collection.immutable.TreeMap
-import scala.util.{ Failure, Random, Success }
+import scala.util.{ Failure, Random, Success, Try }
 
 class CommandSpec extends WordSpec with Matchers {
   "Command" when {
@@ -786,7 +786,7 @@ class CommandSpec extends WordSpec with Matchers {
         turnVal = ClassicTurnImpl( pID )
       )
       "fail because of invalid player specified" in {
-        val state = PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID2 -> false ) )
+        val state = PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID1 -> false ) )
         val game2 = game.setState( state )
         PlayerTradeCommand( pID2, state ).doStep( game2 ) shouldBe
           Failure( InvalidPlayer( pID2 ) )
@@ -996,6 +996,15 @@ class CommandSpec extends WordSpec with Matchers {
         playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) ),
         turnVal = ClassicTurnImpl( pID )
       )
+      "fail because of unavailable placement" in {
+        object TestPlacement extends StructurePlacement( "Test", 1, ResourceCards.of() ) {
+          override protected def doBuild( game:Game, pID:PlayerID, id:Int, anywhere:Boolean ):Try[Game] = Success( game )
+
+          override def getBuildablePoints( game:Game, pID:PlayerID, any:Boolean ):List[PlacementPoint] = List.empty
+        }
+        SetBuildStateCommand( TestPlacement, state ).doStep( game ) shouldBe
+          Failure( UnavailableStructure( TestPlacement ) )
+      }
       "fail because of insufficient structures" in {
         val p = game.player.asInstanceOf[ClassicPlayerImpl]
         val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )

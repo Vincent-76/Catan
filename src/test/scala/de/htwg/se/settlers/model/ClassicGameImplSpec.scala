@@ -61,7 +61,10 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         game.players should have size 1
       }
     }
-    val game = addCleanPlayers( newGame )
+    val game = newGame.addPlayer( Green, "A" )
+      .addPlayer( Blue, "B" )
+      .addPlayer( Yellow, "C" )
+      .use( g => g.setTurn( g.turn.set( g.getPlayerID( 0 ).get ) ) )
     val pID = game.onTurn
     "used" should {
       "removeLastPlayer" in {
@@ -74,6 +77,21 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         game.previousTurn().id shouldBe 2
         game.nextPlayer().name shouldBe "B"
         game.previousPlayer().name shouldBe "C"
+      }
+      "setState" in {
+        game.setState( ActionState() ).state shouldBe a [ActionState]
+      }
+      "setGameField" in {
+        val nGameField = ClassicGameFieldImpl()
+        game.setGameField( nGameField ).gameField shouldBe nGameField
+      }
+      "setResourceStack" in {
+        val nResourceStack = ResourceCards.of( 1, 2, 3, 4, 5 )
+        game.setResourceStack( nResourceStack ).resourceStack shouldBe nResourceStack
+      }
+      "setDevelopmentCards" in {
+        val nDevCards = List( KnightCard, GreatHallCard )
+        game.setDevelopmentCards( nDevCards ).developmentCards shouldBe nDevCards
       }
       "updatePlayer" in {
         game.updatePlayer( game.player.addVictoryPoint() ).player.victoryPoints shouldBe 1
@@ -92,9 +110,6 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         newGame.player( player1ID.get ).victoryPoints shouldBe 1
         newGame.player( player2ID.get ) shouldNot be( None )
         newGame.player( player2ID.get ).victoryPoints shouldBe 1
-      }
-      "setState" in {
-        game.setState( ActionState() ).state shouldBe a [ActionState]
       }
       "rollDice" in {
         game.rollDice( new Random() ) should ( be >= 1 and be <= 6 )
@@ -234,15 +249,18 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         game2.getBuildableRoadSpotsForSettlement( vID ).map( _.id ) should contain theSameElementsAs List( 1, 3 )
       }
       "getBankTradeFactor" in {
-        game.getBankTradeFactor( pID, Wood ) shouldBe game.defaultBankTradeFactor
-        val vertex = game.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isEmpty )
+        val vertex = game.gameField.vertexList.find( v => v.port.isEmpty )
         vertex shouldNot be( None )
         val game2 = game.setGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
-        game2.getBankTradeFactor( pID, Wood ) shouldBe game.unspecifiedPortFactor
-        val vertex2 = game2.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isDefined && v.port.get.specific.get == Wood )
+        game2.getBankTradeFactor( pID, Wood ) shouldBe game.defaultBankTradeFactor
+        val vertex2 = game2.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isEmpty )
         vertex2 shouldNot be( None )
         val game3 = game2.setGameField( game2.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
-        game3.getBankTradeFactor( pID, Wood ) shouldBe game.specifiedPortFactor
+        game3.getBankTradeFactor( pID, Wood ) shouldBe game.unspecifiedPortFactor
+        val vertex3 = game3.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isDefined && v.port.get.specific.get == Wood )
+        vertex3 shouldNot be( None )
+        val game4 = game3.setGameField( game3.gameField.update( vertex3.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        game4.getBankTradeFactor( pID, Wood ) shouldBe game.specifiedPortFactor
       }
       "getNextTradePlayerInOrder" in {
         val pID1 = game.getPlayerID( 1 )
@@ -254,12 +272,5 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         game.getNextTradePlayerInOrder( Map( pID1.get -> false, pID2.get -> false ) ) shouldBe None
       }
     }
-  }
-
-  private def addCleanPlayers( game:ClassicGameImpl ):ClassicGameImpl = {
-    val nGame = game.addPlayer( Green, "A" )
-      .addPlayer( Blue, "B" )
-      .addPlayer( Yellow, "C" )
-    nGame.setTurn( nGame.turn.set( nGame.getPlayerID( 0 ).get ) )
   }
 }
