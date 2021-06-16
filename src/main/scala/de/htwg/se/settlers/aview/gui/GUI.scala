@@ -1,15 +1,8 @@
 package de.htwg.se.settlers.aview.gui
 
 import de.htwg.se.settlers.aview.gui.gamefield.{ GameFieldCanvas, GameFieldPane, PlacementOverlay }
-import de.htwg.se.settlers.aview.gui.impl.game.ClassicGameStackPaneImpl
-import de.htwg.se.settlers.aview.gui.impl.gamefield.ClassicGameFieldCanvasImpl
-import de.htwg.se.settlers.aview.gui.impl.placement.{ CityPlacementOverlayImpl, RoadPlacementOverlayImpl, RobberPlacementOverlayImpl, SettlementPlacementOverlayImpl }
 import de.htwg.se.settlers.aview.gui.util.CustomDialog
 import de.htwg.se.settlers.controller.Controller
-import de.htwg.se.settlers.model.Game
-import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
-import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
-import de.htwg.se.settlers.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import javafx.geometry.Side
 import javafx.scene.input.{ KeyCode, KeyCodeCombination, KeyCombination }
 import javafx.scene.layout.{ BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize }
@@ -28,27 +21,13 @@ import scalafx.scene.{ Node, Scene }
  */
 class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
 
-  private def gameStackPaneImpl():GameStackPane[_] = controller.game match {
-    case _:ClassicGameImpl => new ClassicGameStackPaneImpl()
-    case c => throw new NotImplementedError( "GameStackPane[" + c.getClass.getName + "]" )
-  }
-
-  //private def gameFieldCanvasImpl():GameFieldCanvas[_] =
-
-  private def placementOverlayImpls():List[PlacementOverlay] = controller.game.availablePlacements.map {
-    case RobberPlacement => RobberPlacementOverlayImpl
-    case RoadPlacement => RoadPlacementOverlayImpl
-    case SettlementPlacement => SettlementPlacementOverlayImpl
-    case CityPlacement => CityPlacementOverlayImpl
-  }
-
   var dialog:Option[CustomDialog] = None
-  val gameStackPane:GameStackPane[_] = gameStackPaneImpl()
+  val gameStackPane:GameStackPane[_] = GameStackPane.get( controller.game )
   val playerListPane:PlayerListPane = new PlayerListPane( this )
-  val gameFieldPane:GameFieldPane[_] = new GameFieldPane( controller.game.gameField match {
-    case _:ClassicGameFieldImpl => new ClassicGameFieldCanvasImpl()
-    case c => throw new NotImplementedError( "GameFieldCanvas[" + c.getClass.getName + "]" )
-  }, placementOverlayImpls() )
+  val gameFieldPane:GameFieldPane = new GameFieldPane(
+    GameFieldCanvas.get( controller.game.gameField ),
+    PlacementOverlay.get( controller.game.availablePlacements )
+  )
   val playerPane:PlayerPane = new PlayerPane( this )
   val actionPane:ActionPane = new ActionPane( this )
   val infoPane:InfoPane = new InfoPane( this )

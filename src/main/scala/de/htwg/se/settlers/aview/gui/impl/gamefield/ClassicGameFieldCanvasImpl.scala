@@ -45,7 +45,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl] {
   graphicsContext2D.textAlign = TextAlignment.Center
   graphicsContext2D.textBaseline = VPos.Center
 
-  def doUpdate( gameField:ClassicGameFieldImpl, hWidth:Double, hSize:Double ):Coords = {
+  protected def doUpdate( gameField:ClassicGameFieldImpl, hWidth:Double, hSize:Double ):Coords = {
     graphicsContext2D.clearRect( 0, 0, width.value, height.value )
     val coords = gameField.hexagons.redByKey( Map.empty:Coords, ( coords:Coords, i:Int ) => {
       val row = gameField.hexagons( i )

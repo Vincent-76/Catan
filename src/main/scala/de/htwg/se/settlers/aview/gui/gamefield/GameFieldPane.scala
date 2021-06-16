@@ -15,7 +15,7 @@ object GameFieldPane {
   type Coords = Map[Hex, (Double, Double)]
 }
 
-class GameFieldPane[T <: GameField]( val fieldPane:GameFieldCanvas[T], placements:List[PlacementOverlay] ) extends BorderPane {
+class GameFieldPane( val fieldPane:GameFieldCanvas[_], placements:List[PlacementOverlay] ) extends BorderPane {
 
   val overlayPane = new OverlayPane( placements )
   val interactionPane:InteractionPane = new InteractionPane

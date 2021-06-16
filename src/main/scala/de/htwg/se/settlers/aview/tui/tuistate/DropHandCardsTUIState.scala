@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
-import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
+import de.htwg.se.settlers.aview.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.{ PlayerID, Resources }
@@ -11,7 +11,9 @@ import de.htwg.se.settlers.util._
  */
 case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends TUIState {
 
-  override def createGameDisplay:Option[String] = Some( getGameDisplay( controller ).buildGameField )
+  override def createGameDisplay:Option[String] = Some(
+    GameFieldDisplay.get( controller.game ).buildGameField
+  )
 
   override def getActionInfo:String = {
     TUI.outln( TUI.displayName( controller.game.player( pID ) ) + ", you have to drop " +

@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
-import de.htwg.se.settlers.aview.tui.{ CommandInput, TUI, TUIState }
+import de.htwg.se.settlers.aview.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.Cards.ResourceCards
 import de.htwg.se.settlers.model.{ InvalidPlayerID, PlayerID }
@@ -10,10 +10,9 @@ import de.htwg.se.settlers.model.{ InvalidPlayerID, PlayerID }
  */
 case class PlayerTradeEndTUIState( give:ResourceCards, get:ResourceCards, decisions:Map[PlayerID, Boolean], controller:Controller ) extends TUIState {
 
-  override def createGameDisplay:Option[String] = {
-    val gameDisplay = getGameDisplay( controller )
-    Some( gameDisplay.buildGameField + gameDisplay.buildPlayerDisplay( Some( controller.game.onTurn ) ) )
-  }
+  override def createGameDisplay:Option[String] = Some(
+    GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
+  )
 
   override def getActionInfo:String = {
     TUI.outln( "Give: " + give.toString )

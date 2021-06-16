@@ -64,7 +64,7 @@ class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl] {
     )
   }
 
-  def doUpdate( game:ClassicGameImpl ):Unit = {
+  protected def doUpdate( game:ClassicGameImpl ):Unit = {
     resourceStacks.foreach( d => d._2.text = game.resourceStack( d._1 ).toString )
     devStack.text = game.developmentCards.size.toString
   }

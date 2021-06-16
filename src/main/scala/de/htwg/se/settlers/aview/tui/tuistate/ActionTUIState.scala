@@ -18,10 +18,9 @@ case class ActionTUIState( controller:Controller ) extends TUIState {
     UseDevCommand
   )
 
-  override def createGameDisplay:Option[String] = {
-    val gameDisplay = getGameDisplay( controller )
-    Some( gameDisplay.buildGameField + gameDisplay.buildPlayerDisplay( Some( controller.game.onTurn ) ) )
-  }
+  override def createGameDisplay:Option[String] = Some(
+    GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
+  )
 
   override def getActionInfo:String = {
     TUI.outln( "Available commands:" )

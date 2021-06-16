@@ -7,7 +7,7 @@ object SettlementPlacementOverlayImpl extends VertexPlacementOverlayImpl[Settlem
 
   val settlementSize:Double = 5
 
-  def doDraw( building:Building ):Boolean = building.isInstanceOf[Settlement]
+  protected def doDraw( building:Building ):Boolean = building.isInstanceOf[Settlement]
 
   def points( hSize:Double, c:(Double, Double) ):List[(Double, Double)] = {
     val l = GameFieldPane.mult( settlementSize, hSize )

@@ -11,8 +11,6 @@ import scalafx.scene.text.Font
 
 abstract class VertexPlacementOverlayImpl[T <: Building] extends PlacementOverlay {
 
-  def doDraw( building:Building ):Boolean
-
   def draw( game:Game, context:GraphicsContext, coords:Coords, hSize:Double ):Unit = {
     context.stroke = Color.Black
     context.lineWidth = 1
@@ -33,6 +31,8 @@ abstract class VertexPlacementOverlayImpl[T <: Building] extends PlacementOverla
       }
     } )
   }
+
+  protected def doDraw( building:Building ):Boolean
 
   def points( hSize:Double, c:(Double, Double) ):List[(Double, Double)]
 }

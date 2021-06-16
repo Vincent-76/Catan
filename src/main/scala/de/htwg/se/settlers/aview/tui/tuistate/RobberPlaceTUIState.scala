@@ -1,6 +1,6 @@
 package de.htwg.se.settlers.aview.tui.tuistate
 
-import de.htwg.se.settlers.aview.tui.{ CommandInput, TUIState }
+import de.htwg.se.settlers.aview.tui.{ CommandInput, GameFieldDisplay, TUIState }
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model.impl.placement.RobberPlacement
 
@@ -9,10 +9,10 @@ import de.htwg.se.settlers.model.impl.placement.RobberPlacement
  */
 case class RobberPlaceTUIState( controller:Controller ) extends TUIState {
 
-  override def createGameDisplay:Option[String] = {
-    val gameDisplay = getGameDisplay( controller, RobberPlacement.getBuildablePoints( controller.game, controller.onTurn ) )
-    Some( gameDisplay.buildGameField + gameDisplay.buildPlayerDisplay( Some( controller.game.onTurn ) ) )
-  }
+  override def createGameDisplay:Option[String] = Some(
+    GameFieldDisplay.get( controller.game, Some( RobberPlacement.getBuildablePoints( controller.game, controller.onTurn ) ) ).buildGameField
+      + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
+  )
 
   override def getActionInfo:String = "Select hex [<id>] for the robber"
 

@@ -120,7 +120,7 @@ object TUI {
 
 class TUI( val controller:Controller ) extends Observer {
 
-  var actionInfo:Option[String] = Option.empty
+  var actionInfo:Option[String] = None
 
   controller.add( this )
   onUpdate( None )
@@ -132,14 +132,14 @@ class TUI( val controller:Controller ) extends Observer {
       if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
         globalCommand.get.action( commandInput, controller )
       else
-        controller.error( InvalidFormat( commandInput.input ) )
+        onError( InvalidFormat( commandInput.input ) )
     } else {
       val tuiState = findTUIState( controller.game.state )
       val inputPattern = tuiState.inputPattern
       if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) )
         tuiState.action( commandInput )
       else
-        controller.error( InvalidFormat( commandInput.input ) )
+        onError( InvalidFormat( commandInput.input ) )
     }
   }
 

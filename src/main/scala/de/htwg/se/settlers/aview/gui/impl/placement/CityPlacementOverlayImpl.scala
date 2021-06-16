@@ -7,7 +7,7 @@ object CityPlacementOverlayImpl extends VertexPlacementOverlayImpl[City] {
 
   val citySize:Double = 6
 
-  def doDraw( building:Building ):Boolean = building.isInstanceOf[City]
+  protected def doDraw( building:Building ):Boolean = building.isInstanceOf[City]
 
   def points( hSize:Double, c:(Double, Double) ):List[(Double, Double)] = {
     val l = GameFieldPane.mult( citySize, hSize )

@@ -1,28 +1,19 @@
 package de.htwg.se.settlers.aview.tui
 
-import de.htwg.se.settlers.model._
+import de.htwg.se.settlers.aview.tui.impl.game.ClassicGameDisplayImpl
+import de.htwg.se.settlers.model.Game
+import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
 
-/**
- * @author Vincent76;
- */
+object GameDisplay {
+  def get( game:Game ):GameDisplay[_] = game match {
+    case _:ClassicGameImpl => ClassicGameDisplayImpl
+    case c => throw new NotImplementedError( "GameDisplay[" + c.getClass.getName + "]" )
+  }
+}
 
-sealed abstract class EdgeDir( val symbol:String )
+trait GameDisplay[T <: Game] {
+  def buildGameLegend( game:Game ):Vector[(String, String)] =
+    doBuildGameLegend( game.asInstanceOf[T] )
 
-case object SouthWest extends EdgeDir( "\\" )
-
-case object SouthEast extends EdgeDir( "/" )
-
-case object East extends EdgeDir( "|" )
-
-case object NorthEast extends EdgeDir( "\\" )
-
-case object NorthWest extends EdgeDir( "/" )
-
-case object West extends EdgeDir( "|" )
-
-trait GameDisplay[T <: GameField] {
-
-  def buildGameField:String
-
-  def buildPlayerDisplay( turnPlayer:Option[PlayerID] = None ):String
+  protected def doBuildGameLegend( game:T ):Vector[(String, String)]
 }
