@@ -8,7 +8,7 @@ import org.scalatest.{ Matchers, WordSpec }
 import scala.util.{ Failure, Success }
 
 class ClassicPlayerImplSpec extends WordSpec with Matchers {
-  val player:ClassicPlayerImpl = ClassicPlayerImpl( new PlayerID( 0 ), Green, "A" )
+  val player:ClassicPlayerImpl = new ClassicPlayerImpl( new PlayerID( 0 ), Green, "A" )
   "PlayerColor" when {
     "static" should {
       "be constructed with of" in {

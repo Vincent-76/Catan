@@ -84,12 +84,6 @@ class CommandSpec extends WordSpec with Matchers {
         playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A", resourcesVal = playerResources ) ),
         turnVal = ClassicTurnImpl( pID )
       )
-      "fail because of insufficient structures" in {
-        val p = game.player.asInstanceOf[ClassicPlayerImpl]
-        val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )
-        BuildCommand( 0, BuildState( RoadPlacement ) ).doStep( game2 ) shouldBe
-          Failure( InsufficientStructures( RoadPlacement) )
-      }
       "fail because of insufficient resources" in {
         BankTradeCommand(
           ResourceCards.of( wood = 6 ),
@@ -123,10 +117,17 @@ class CommandSpec extends WordSpec with Matchers {
     }
     "BuildCommand" should {
       val pID = new PlayerID( 0 )
+      val pID1 = new PlayerID( 1 )
       val game = newGame.copy(
-        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) ),
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) ) + ( pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ) ),
         turnVal = ClassicTurnImpl( pID )
       )
+      "fail because of insufficient structures" in {
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )
+        BuildCommand( 0, BuildState( RoadPlacement ) ).doStep( game2 ) shouldBe
+          Failure( InsufficientStructures( RoadPlacement) )
+      }
       "fail road because of non existent placement point" in {
         BuildCommand( -1, BuildState( RoadPlacement ) ).doStep( game ) shouldBe
           Failure( NonExistentPlacementPoint( -1 ) )
@@ -162,7 +163,7 @@ class CommandSpec extends WordSpec with Matchers {
         undoEdge shouldNot be( None )
         undoEdge.get.road shouldBe None
       }
-      "success road with new bonus card" in {
+      "success road with first bonus card" in {
         val (game2, edge) = ( 1 until LongestRoadCard.minimumRoads ).red( (game, game.gameField.edgeList.head),
           ( data:(Game, Edge), _ ) => { (
             data._1.setGameField( data._1.gameField.update( data._2.setRoad( Some( Road( pID ) ) ) ) ),
@@ -174,6 +175,21 @@ class CommandSpec extends WordSpec with Matchers {
         res.get._1.bonusCards( LongestRoadCard ) shouldBe Some( pID, LongestRoadCard.minimumRoads )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.bonusCards( LongestRoadCard ) shouldBe None
+      }
+
+      "success road with new bonus card" in {
+        val (game2, edge) = ( 0 until LongestRoadCard.minimumRoads ).red( (game, game.gameField.edgeList.head),
+          ( data:(Game, Edge), _ ) => { (
+            data._1.setGameField( data._1.gameField.update( data._2.setRoad( Some( Road( pID ) ) ) ) ),
+            data._1.gameField.adjacentEdges( data._2 ).find( e => e.road.isEmpty && (e.h1.isLand || e.h2.isLand) ).get
+          ) } )
+        val game3 = game2.setBonusCard( LongestRoadCard, Some( pID1, LongestRoadCard.minimumRoads ) )
+        val command = BuildCommand( edge.id, BuildState( RoadPlacement ) )
+        val res = command.doStep( game3 )
+        res shouldBe a [Success[_]]
+        res.get._1.bonusCards( LongestRoadCard ) shouldBe Some( pID, LongestRoadCard.minimumRoads + 1 )
+        val undoRes = command.undoStep( res.get._1 )
+        undoRes.bonusCards( LongestRoadCard ) shouldBe Some( pID1, LongestRoadCard.minimumRoads )
       }
       "fail settlement because of non existent placement point" in {
         BuildCommand( -1, BuildState( SettlementPlacement ) ).doStep( game ) shouldBe
