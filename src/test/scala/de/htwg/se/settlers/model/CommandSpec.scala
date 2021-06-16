@@ -12,11 +12,11 @@ import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
 
 import scala.collection.immutable.TreeMap
-import scala.util.{ Failure, Random, Success, Try }
+import scala.util.{ Failure, Success, Try }
 
 class CommandSpec extends WordSpec with Matchers {
   "Command" when {
-    val newGame:ClassicGameImpl = ClassicGameImpl( test = true, ClassicGameFieldImpl( new Random( 1 ) ) )
+    val newGame:ClassicGameImpl = ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
     "AbortPlayerTradeCommand" should {
       val state = PlayerTradeEndState( ResourceCards.of(), ResourceCards.of(), Map.empty )
       "success" in {

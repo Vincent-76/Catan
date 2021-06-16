@@ -8,6 +8,10 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
 
+libraryDependencies += "com.google.inject" % "guice" % "5.0.1"
+libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.0.1"
+libraryDependencies += "net.codingwell" %% "scala-guice" % "5.0.1"
+
 coverageExcludedPackages := "de.htwg.se.settlers.aview.*"
 coverageExcludedFiles := ".*Catan"
 

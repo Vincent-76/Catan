@@ -1,20 +1,26 @@
 package de.htwg.se.settlers.model.impl.player
 
+import com.google.inject.Inject
 import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model._
 import de.htwg.se.settlers.util._
+import com.google.inject.assistedinject.Assisted
 
 import scala.util.{ Failure, Random, Success, Try }
 
-case class ClassicPlayerImpl( idVal:PlayerID,
-                              colorVal:PlayerColor,
-                              nameVal:String,
-                              resourcesVal:ResourceCards = Cards.getResourceCards( 0 ),
-                              devCardsVal:Vector[DevelopmentCard] = Vector.empty,
-                              usedDevCards:Vector[DevelopmentCard] = Vector.empty,
-                              victoryPointsVal:Int = 0,
-                              structures:Map[StructurePlacement, Int] = StructurePlacement.all.map( p => (p, p.available) ).toMap
-                     ) extends Player {
+case class ClassicPlayerImpl ( idVal:PlayerID,
+                                         colorVal:PlayerColor,
+                                         nameVal:String,
+                                         resourcesVal:ResourceCards = Cards.getResourceCards( 0 ),
+                                         devCardsVal:Vector[DevelopmentCard] = Vector.empty,
+                                         usedDevCards:Vector[DevelopmentCard] = Vector.empty,
+                                         victoryPointsVal:Int = 0,
+                                         structures:Map[StructurePlacement, Int] = StructurePlacement.all.map( p => (p, p.available) ).toMap
+                                       ) extends Player {
+
+  @Inject
+  def this( @Assisted idVal:PlayerID, @Assisted colorVal:PlayerColor, @Assisted nameVal:String ) = this( idVal, colorVal, nameVal, Cards.getResourceCards( 0 ) )
+
 
   def id:PlayerID = idVal
   def name:String = nameVal

@@ -9,12 +9,11 @@ import scala.util.Random
 /**
  * @author Vincent76;
  */
-case class ClassicGameFieldImpl(
-                             hexagons:Hexagons,
-                             edges:Edges,
-                             vertices:Vertices,
-                             robber:Hex
-                           ) extends GameField {
+case class ClassicGameFieldImpl( hexagons:Hexagons,
+                                 edges:Edges,
+                                 vertices:Vertices,
+                                 robber:Hex
+                               ) extends GameField {
 
 
   def fieldWidth:Int = hexagons.map( r => r.size ).max
@@ -140,7 +139,8 @@ case class ClassicGameFieldImpl(
 
 object ClassicGameFieldImpl {
 
-  def apply( random:Random = Random ):ClassicGameFieldImpl = {
+  def apply( seed:Int ):ClassicGameFieldImpl = {
+    val random = new Random( seed )
     val hexagons = createHexagons( random )
     val edges = createEdges( hexagons, random )
     val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area == DesertArea ).get.get

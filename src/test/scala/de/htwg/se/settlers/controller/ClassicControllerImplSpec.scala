@@ -1,10 +1,16 @@
 package de.htwg.se.settlers.controller
 
+import com.google.inject.Guice
+import de.htwg.se.settlers.{ CatanModule, PlayerFactory }
 import de.htwg.se.settlers.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
+import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.settlers.model.impl.placement.RoadPlacement
-import de.htwg.se.settlers.model.{ KnightCard, Road, _ }
+import de.htwg.se.settlers.model.impl.player.ClassicPlayerImpl
+import de.htwg.se.settlers.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.settlers.model.state._
+import de.htwg.se.settlers.model.{ KnightCard, _ }
 import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
 
@@ -25,7 +31,7 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
   }
 
   "ClassicControllerImpl" when {
-    val controller = new ClassicControllerImpl( test = true )
+    val controller = new ClassicControllerImpl( ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ) )
     "new" should {
       "have game" in {
         val observer = new TestObserver()
@@ -45,7 +51,7 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
     }
     "running" should {
       "init players" in {
-        controller.initPlayers()
+        controller.initGame()
         controller.undoAction()
         controller.redoAction()
         controller.addPlayer( Green, "A" )
@@ -74,8 +80,8 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
       "call state methods" in {
         controller.addPlayer( Green, "A" )
         controller.setInitBeginnerState()
-        controller.initPlayers()
-        controller.initPlayers()
+        controller.initGame()
+        controller.initGame()
         controller.diceOutBeginner()
         controller.setBeginner()
         controller.buildInitSettlement( 0 )

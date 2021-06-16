@@ -4,17 +4,15 @@ import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
 
-import scala.util.Random
-
 /**
  * @author Vincent76;
  */
 class ClassicGameFieldImplSpec extends WordSpec with Matchers {
   "ClassicGameFieldImpl" when {
     "new" should {
-      val gameField = ClassicGameFieldImpl( new Random( 1 ) )
+      val gameField = ClassicGameFieldImpl( 1 )
       "create" in {
-        ( 2 to 10 ).foreach( seed => ClassicGameFieldImpl( new Random( seed ) ).hexagons.red( 0, (i:Int, r:Vector[Option[Hex]] ) => {
+        ( 2 to 10 ).foreach( seed => ClassicGameFieldImpl( seed ).hexagons.red( 0, (i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
         } ) should be( 37 ) )
       }

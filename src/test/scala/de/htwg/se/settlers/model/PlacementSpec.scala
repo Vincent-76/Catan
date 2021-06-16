@@ -3,10 +3,10 @@ package de.htwg.se.settlers.model
 import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
 import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.settlers.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
+import de.htwg.se.settlers.model.impl.player.ClassicPlayerImpl
+import de.htwg.se.settlers.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
-
-import scala.util.Random
 
 class PlacementSpec extends WordSpec with Matchers {
   "Placement" when {
@@ -16,7 +16,7 @@ class PlacementSpec extends WordSpec with Matchers {
         StructurePlacement.of( "Roa" ) shouldBe None
       }
     }
-    val game = ClassicGameImpl( test = true, ClassicGameFieldImpl( new Random( 1 )) ).addPlayer( Green, "A" )
+    val game = ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ).addPlayer( Green, "A" )
       .addPlayer( Blue, "B" )
       .addPlayer( Yellow, "C" )
       .use( g => g.setTurn( g.turn.set( g.getPlayerID( 0 ).get ) ) )

@@ -1,10 +1,12 @@
 package de.htwg.se.settlers.model.impl.game
 
+import com.google.inject.Inject
+import com.google.inject.name.Named
+import de.htwg.se.settlers.PlayerFactory
 import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.settlers.model.{ BonusCard, Cards, DevStackIsEmpty, DevelopmentCard, Edge, Game, GameField, GreatHallCard, Placement, Player, PlayerColor, PlayerColorIsAlreadyInUse, PlayerID, PlayerNameAlreadyExists, PlayerOrdering, Resource, State, Turn, Vertex }
 import de.htwg.se.settlers.model.impl.player.ClassicPlayerImpl
-import de.htwg.se.settlers.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.settlers.model.state.InitState
 import de.htwg.se.settlers.util._
 
@@ -16,7 +18,6 @@ import scala.util.{ Failure, Random, Success, Try }
  */
 object ClassicGameImpl {
   val stackResourceAmount:Int = 19
-  val testSeed:Int = 1
   val availablePlacements:List[Placement] = List(
     RobberPlacement,
     RoadPlacement,
@@ -24,23 +25,29 @@ object ClassicGameImpl {
     CityPlacement
   )
 
-  def apply( test:Boolean, gameField:GameField ):ClassicGameImpl = {
-    if( test ) new ClassicGameImpl( gameFieldVal = gameField, seedVal = testSeed, developmentCards = Cards.getDevStack( new Random( testSeed ) ) ) else new ClassicGameImpl( gameFieldVal = gameField )
-  }
-
 }
 
 case class ClassicGameImpl( gameFieldVal:GameField,
-                            stateVal:State = InitState(),
-                            resourceStack:ResourceCards = Cards.getResourceCards( ClassicGameImpl.stackResourceAmount ),
-                            developmentCards:List[DevelopmentCard] = Cards.getDevStack(),
-                            playersVal:SortedMap[PlayerID, Player] = TreeMap.empty[PlayerID, Player]( PlayerOrdering ),
-                            turnVal:Turn = ClassicTurnImpl( new PlayerID( -1 ) ),
-                            bonusCardsVal:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, None) ).toMap,
-                            winnerVal:Option[PlayerID] = None,
-                            roundVal:Int = 1,
-                            seedVal:Int = Random.nextInt( Int.MaxValue / 1000 )
-                       ) extends Game {
+                                       turnVal:Turn,
+                                       seedVal:Int,
+                                       playerFactory:PlayerFactory,
+                                       stateVal:State = InitState(),
+                                       resourceStack:ResourceCards = Cards.getResourceCards( ClassicGameImpl.stackResourceAmount ),
+                                       developmentCards:List[DevelopmentCard] = List.empty,
+                                       playersVal:SortedMap[PlayerID, Player] = TreeMap.empty[PlayerID, Player]( PlayerOrdering ),
+                                       bonusCardsVal:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, None) ).toMap,
+                                       winnerVal:Option[PlayerID] = None,
+                                       roundVal:Int = 1
+                                     ) extends Game {
+
+  @Inject
+  def this( gameField:GameField, turn:Turn, @Named( "seed" ) seed:Int, playerFactory:PlayerFactory ) = this(
+    gameFieldVal = gameField,
+    turnVal = turn,
+    seedVal = seed,
+    playerFactory = playerFactory,
+    developmentCards = Cards.getDevStack( new Random( seed ) ),
+  )
 
   def minPlayers:Int = 3
   def maxPlayers:Int = 4
@@ -86,7 +93,8 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
   def addPlayer( playerColor:PlayerColor, name:String ):ClassicGameImpl = {
     val pID = new PlayerID( playersVal.size )
-    val p = ClassicPlayerImpl( pID, playerColor, name )
+    //val p = ClassicPlayerImpl( pID, playerColor, name )
+    val p = playerFactory.create( pID, playerColor, name )
     copy( playersVal = playersVal + (pID -> p ) )
   }
 

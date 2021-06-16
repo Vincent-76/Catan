@@ -1,10 +1,8 @@
 package de.htwg.se.settlers.controller.controllerBaseImpl
 
+import com.google.inject.Inject
 import de.htwg.se.settlers.controller.Controller
 import de.htwg.se.settlers.model._
-import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
-import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
-import de.htwg.se.settlers.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 
 import scala.util.{ Failure, Success }
 
@@ -12,9 +10,9 @@ import scala.util.{ Failure, Success }
  * @author Vincent76;
  */
 
-class ClassicControllerImpl( test:Boolean = false /*, debug:Boolean = false*/ ) extends Controller {
+class ClassicControllerImpl @Inject() ( var gameVal:Game ) extends Controller {
   var running:Boolean = true
-  var gameVal:Game = ClassicGameImpl( test = test, gameField = ClassicGameFieldImpl() )
+  //var gameVal:Game = ClassicGameImpl( gameField = ClassicGameFieldImpl() )
   private var undoStack:List[Command] = Nil
   private var redoStack:List[Command] = Nil
 

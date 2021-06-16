@@ -89,7 +89,7 @@ class StateSpec extends WordSpec with Matchers {
     "InitState" should {
       val state = InitState()
       "initPlayers" in {
-        state.initPlayers() shouldBe a [Some[InitPlayerState]]
+        state.initGame() shouldBe a [Some[InitPlayerState]]
       }
     }
     "MonopolyState" should {

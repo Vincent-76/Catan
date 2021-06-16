@@ -7,7 +7,7 @@ import Cards.ResourceCards
  */
 trait State {
 
-  def initPlayers( ):Option[Command] = None
+  def initGame( ):Option[Command] = None
 
   def addPlayer( playerColor:PlayerColor, name:String ):Option[Command] = None
 

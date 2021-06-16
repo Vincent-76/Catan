@@ -25,7 +25,7 @@ trait Controller extends Observable {
 
   def exit( info:Option[Info] = None ):Unit
 
-  def initPlayers():Unit = action( game.state.initPlayers() )
+  def initGame():Unit = action( game.state.initGame() )
   def addPlayer( playerColor:PlayerColor, name:String ):Unit = action( game.state.addPlayer( playerColor, name ) )
   def setInitBeginnerState():Unit = action( game.state.setInitBeginnerState() )
   def diceOutBeginner():Unit = action( game.state.diceOutBeginner() )

@@ -3,6 +3,8 @@ package de.htwg.se.settlers.model
 import de.htwg.se.settlers.model.Cards._
 import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
 import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
+import de.htwg.se.settlers.model.impl.player.ClassicPlayerImpl
+import de.htwg.se.settlers.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.settlers.model.state.{ ActionState, InitState }
 import de.htwg.se.settlers.util._
 import org.scalatest.{ Matchers, WordSpec }
@@ -14,8 +16,9 @@ import scala.util.{ Failure, Random, Success }
  */
 class ClassicGameImplSpec extends WordSpec with Matchers {
   "ClassicGameImpl" when {
-    val newGame:ClassicGameImpl = ClassicGameImpl( test = true, ClassicGameFieldImpl() )
-    val randomGame:ClassicGameImpl = ClassicGameImpl( test = false, ClassicGameFieldImpl() )
+    val newGame:ClassicGameImpl = ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
+    val seed = new Random().nextInt( Int.MaxValue / 1000 )
+    val randomGame:ClassicGameImpl = ClassicGameImpl( ClassicGameFieldImpl( seed ), ClassicTurnImpl(), seedVal = seed, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
     "random new" should {
       "have state" in {
         randomGame.state shouldBe a [InitState]
@@ -82,7 +85,7 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         game.setState( ActionState() ).state shouldBe a [ActionState]
       }
       "setGameField" in {
-        val nGameField = ClassicGameFieldImpl()
+        val nGameField = ClassicGameFieldImpl( seed )
         game.setGameField( nGameField ).gameField shouldBe nGameField
       }
       "setResourceStack" in {
