@@ -20,7 +20,7 @@ case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Com
     val newPlayer = game.player.useDevCard( devCard )
     if( newPlayer.isFailure )
       return newPlayer.rethrow
-    if( game.player.devCards.count( _ == devCard ) <= game.turn.drawnDevCards( devCard ) )
+    if( game.player.devCards.count( _ == devCard ) <= game.turn.drawnDevCards.count( _ == devCard ) )
       return Failure( DevCardDrawnInTurn( devCard ) )
     val nextState = devCard match {
       case KnightCard => RobberPlaceState( state )

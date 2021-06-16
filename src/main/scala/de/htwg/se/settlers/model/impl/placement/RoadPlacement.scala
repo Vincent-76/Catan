@@ -31,16 +31,15 @@ object RoadPlacement extends StructurePlacement( "Road", 15, Map( Wood -> 1, Cla
     else if( !game.roadBuildable( edge.get, pID ) )
       Failure( NoConnectedStructures( id ) )
     else {
-      val newEdge = edge.get.setRoad( Some( Road( pID ) ) )
-      val length = game.getLongestRoadLength( pID )
+      val newGame = game.setGameField( game.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) ) )
+      val length = newGame.getLongestRoadLength( pID )
       val longestRoadCardValue =
         if( length >= LongestRoadCard.minimumRoads &&
-          (game.bonusCard( LongestRoadCard ).isEmpty || length > game.bonusCard( LongestRoadCard ).get._2)
+          (newGame.bonusCard( LongestRoadCard ).isEmpty || length > newGame.bonusCard( LongestRoadCard ).get._2)
         )
           Some( pID, length )
-        else game.bonusCard( LongestRoadCard )
-      Success( game.setGameField( game.gameField.update( newEdge ) )
-        .setBonusCard( LongestRoadCard, longestRoadCardValue )
+        else newGame.bonusCard( LongestRoadCard )
+      Success( newGame.setBonusCard( LongestRoadCard, longestRoadCardValue )
       )
     }
   }

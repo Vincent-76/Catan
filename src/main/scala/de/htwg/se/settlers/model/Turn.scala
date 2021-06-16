@@ -11,7 +11,7 @@ trait Turn {
 
   def setUsedDevCard( used:Boolean ):Turn
 
-  def drawnDevCards( devCard:DevelopmentCard ):Int
+  def drawnDevCards:List[DevelopmentCard]
 
   def addDrawnDevCard( card:DevelopmentCard ):Turn
 

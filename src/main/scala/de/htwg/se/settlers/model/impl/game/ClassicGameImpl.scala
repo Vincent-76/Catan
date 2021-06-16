@@ -63,34 +63,34 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
   def bonusCard( bonusCard:BonusCard ):Option[(PlayerID, Int)] = bonusCardsVal( bonusCard )
 
-  def setState( state:State ):Game = copy( stateVal = state )
-  def setGameField( gameField:GameField ):Game = copy( gameFieldVal = gameField )
-  def setResourceStack( resourceStack:ResourceCards ):Game = copy( resourceStack = resourceStack )
-  def setDevelopmentCards( developmentCards:List[DevelopmentCard] ):Game = copy( developmentCards = developmentCards )
-  def updatePlayer( player:Player ):Game = copy( playersVal = playersVal.updated( player.id, player ) )
-  def updatePlayers( updatePlayers:Player* ):Game = copy( playersVal = updatePlayers.red( playersVal, ( nPlayers:SortedMap[PlayerID, Player], p:Player ) => {
+  def setState( state:State ):ClassicGameImpl = copy( stateVal = state )
+  def setGameField( gameField:GameField ):ClassicGameImpl = copy( gameFieldVal = gameField )
+  def setResourceStack( resourceStack:ResourceCards ):ClassicGameImpl = copy( resourceStack = resourceStack )
+  def setDevelopmentCards( developmentCards:List[DevelopmentCard] ):ClassicGameImpl = copy( developmentCards = developmentCards )
+  def updatePlayer( player:Player ):ClassicGameImpl = copy( playersVal = playersVal.updated( player.id, player ) )
+  def updatePlayers( updatePlayers:Player* ):ClassicGameImpl = copy( playersVal = updatePlayers.red( playersVal, ( nPlayers:SortedMap[PlayerID, Player], p:Player ) => {
     nPlayers.updated( p.id, p )
   } ) )
-  def setTurn( turn:Turn ):Game = copy( turnVal = turn )
-  def setBonusCard( bonusCard:BonusCard, value:Option[(PlayerID, Int)] ):Game = copy( bonusCardsVal = bonusCardsVal.updated( bonusCard, value ) )
-  def setBonusCards( bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] ):Game = copy( bonusCardsVal = bonusCards )
-  def setWinner( winner:PlayerID ):Game = copy( winnerVal = Some( winner ) )
+  def setTurn( turn:Turn ):ClassicGameImpl = copy( turnVal = turn )
+  def setBonusCard( bonusCard:BonusCard, value:Option[(PlayerID, Int)] ):ClassicGameImpl = copy( bonusCardsVal = bonusCardsVal.updated( bonusCard, value ) )
+  def setBonusCards( bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] ):ClassicGameImpl = copy( bonusCardsVal = bonusCards )
+  def setWinner( winner:PlayerID ):ClassicGameImpl = copy( winnerVal = Some( winner ) )
 
 
-  def nextRound():Game = copy( turnVal = turnVal.set( nextTurn() ), roundVal = roundVal + 1 )
-  def previousRound( turn:Option[Turn] = None ):Game = copy( turnVal = turn.getOrElse( turnVal.set( previousTurn() ) ), roundVal = roundVal - 1 )
+  def nextRound():ClassicGameImpl = copy( turnVal = turnVal.set( nextTurn() ), roundVal = roundVal + 1 )
+  def previousRound( turn:Option[Turn] = None ):ClassicGameImpl = copy( turnVal = turn.getOrElse( turnVal.set( previousTurn() ) ), roundVal = roundVal - 1 )
   def nextTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id + 1 ).getOrElse( playersVal.firstKey )
   def previousTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id - 1 ).getOrElse( playersVal.lastKey )
 
 
 
-  def addPlayer( playerColor:PlayerColor, name:String ):Game = {
+  def addPlayer( playerColor:PlayerColor, name:String ):ClassicGameImpl = {
     val pID = new PlayerID( playersVal.size )
     val p = ClassicPlayerImpl( pID, playerColor, name )
     copy( playersVal = playersVal + (pID -> p ) )
   }
 
-  def addPlayerF( playerColor:PlayerColor, name:String ):Try[Game] = {
+  def addPlayerF( playerColor:PlayerColor, name:String ):Try[ClassicGameImpl] = {
     if( playersVal.exists( _._2.color == playerColor ) )
       Failure( PlayerColorIsAlreadyInUse( playerColor ) )
     else if( playersVal.exists( _._2.name =^ name ) )
@@ -98,7 +98,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     else Success( addPlayer( playerColor, name ) )
   }
 
-  def removeLastPlayer( ):Game = copy( playersVal = playersVal.init )
+  def removeLastPlayer( ):ClassicGameImpl = copy( playersVal = playersVal.init )
 
 
 
@@ -133,10 +133,10 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     } )
   }*/
 
-  def drawResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):(Game, ResourceCards) =
+  def drawResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):(ClassicGameImpl, ResourceCards) =
     drawResourceCards( pID, ResourceCards.ofResource( r, amount ) )
 
-  def drawResourceCards( pID:PlayerID, cards:ResourceCards ):(Game, ResourceCards) = {
+  def drawResourceCards( pID:PlayerID, cards:ResourceCards ):(ClassicGameImpl, ResourceCards) = {
     val (available, newStack) = getAvailableResourceCards( cards )
     val newGame = if( available.amount > 0 ) {
       val newPlayer = playersVal( pID ).addResourceCards( available )
@@ -148,7 +148,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     (newGame, available)
   }
 
-  def dropResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):Try[Game] =
+  def dropResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):Try[ClassicGameImpl] =
     dropResourceCards( pID, ResourceCards.ofResource( r, amount ) )
 
   def dropResourceCards( pID:PlayerID, cards:ResourceCards ):Try[ClassicGameImpl] = {
@@ -161,7 +161,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     }
   }
 
-  def drawDevCard( pID:PlayerID ):Try[Game] = {
+  def drawDevCard( pID:PlayerID ):Try[ClassicGameImpl] = {
     if( developmentCards.isEmpty )
       Failure( DevStackIsEmpty )
     else dropResourceCards( pID, Cards.developmentCardCost ) match {
@@ -176,7 +176,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     }
   }
 
-  def addDevCard( devCard:DevelopmentCard ):Game = copy( developmentCards = devCard +: developmentCards )
+  def addDevCard( devCard:DevelopmentCard ):ClassicGameImpl = copy( developmentCards = devCard +: developmentCards )
 
 
 

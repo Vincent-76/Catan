@@ -1,6 +1,8 @@
 package de.htwg.se.settlers.controller
 
+import de.htwg.se.settlers.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.settlers.model.Cards.ResourceCards
+import de.htwg.se.settlers.model.impl.placement.RoadPlacement
 import de.htwg.se.settlers.model.{ KnightCard, Road, _ }
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.util._
@@ -9,7 +11,7 @@ import org.scalatest.{ Matchers, WordSpec }
 /**
  * @author Vincent76;
  */
-class ControllerSpec extends WordSpec with Matchers {
+class ClassicControllerImplSpec extends WordSpec with Matchers {
   class TestObserver extends Observer {
     var updateInfo:Option[Info] = None
     var info:Option[Info] = None
@@ -22,8 +24,8 @@ class ControllerSpec extends WordSpec with Matchers {
     override def onError(t: Throwable): Unit = this.error = Some( t )
   }
 
-  /*"Controller" when {
-    val controller = new Controller( test = true )
+  "ClassicControllerImpl" when {
+    val controller = new ClassicControllerImpl( test = true )
     "new" should {
       "have game" in {
         val observer = new TestObserver()
@@ -58,13 +60,15 @@ class ControllerSpec extends WordSpec with Matchers {
         controller.player.id.id shouldBe 1
         controller.player( controller.onTurn ).id.id shouldBe 1
         val oldGame = controller.game
-        val p = controller.player.copy( victoryPoints = Game.requiredVictoryPoints )
-        controller.game = controller.game.updatePlayer( p )
+        val p = ( 0 until controller.game.requiredVictoryPoints - controller.player.victoryPoints ).red( controller.player,
+          ( p:Player, _ ) => p.addVictoryPoint()
+        )
+        controller.gameVal = controller.game.updatePlayer( p )
         controller.buildInitSettlement( 21 )
         controller.game.winner shouldBe Some( p.id )
         controller.running shouldBe false
         controller.undoAction()
-        controller.game = oldGame
+        controller.gameVal = oldGame
         ( 1 to 8 ).foreach( _ => controller.undoAction() )
       }
       "call state methods" in {
@@ -82,7 +86,7 @@ class ControllerSpec extends WordSpec with Matchers {
         controller.dropResourceCardsToRobber( ResourceCards.of() )
         controller.placeRobber( 0 )
         controller.robberStealFromPlayer( controller.onTurn )
-        controller.setBuildState( Road )
+        controller.setBuildState( RoadPlacement )
         controller.build( 0 )
         controller.bankTrade( ResourceCards.of(), ResourceCards.of() )
         controller.setPlayerTradeState( ResourceCards.of(), ResourceCards.of() )
@@ -97,5 +101,5 @@ class ControllerSpec extends WordSpec with Matchers {
       }
     }
 
-  }*/
+  }
 }

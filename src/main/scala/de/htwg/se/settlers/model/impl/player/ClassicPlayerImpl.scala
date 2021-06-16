@@ -28,35 +28,35 @@ case class ClassicPlayerImpl( idVal:PlayerID,
   def resourceAmount:Int = resourcesVal.amount
   def resourceAmount( resource:Resource ):Int = resourcesVal.getOrElse( resource, 0 )
 
-  def removeResourceCard( resource:Resource, amount:Int = 1 ):Try[Player] = resourcesVal.subtract( resource, amount ) match {
+  def removeResourceCard( resource:Resource, amount:Int = 1 ):Try[ClassicPlayerImpl] = resourcesVal.subtract( resource, amount ) match {
     case Success( newResources ) => Success( copy( resourcesVal = newResources ) )
     case Failure( e ) => Failure( e )
   }
 
-  def removeResourceCards( cards:ResourceCards ):Try[Player] = resourcesVal.subtract( cards ) match {
+  def removeResourceCards( cards:ResourceCards ):Try[ClassicPlayerImpl] = resourcesVal.subtract( cards ) match {
     case Success( newResources ) => Success( copy( resourcesVal = newResources ) )
     case Failure( e ) => Failure( e )
   }
 
-  def addResourceCard( resource:Resource, amount:Int = 1 ):Player = copy( resourcesVal = resourcesVal.add( resource, amount ) )
+  def addResourceCard( resource:Resource, amount:Int = 1 ):ClassicPlayerImpl = copy( resourcesVal = resourcesVal.add( resource, amount ) )
 
-  def addResourceCards( cards:ResourceCards ):Player = copy( resourcesVal = resourcesVal.add( cards ) )
+  def addResourceCards( cards:ResourceCards ):ClassicPlayerImpl = copy( resourcesVal = resourcesVal.add( cards ) )
 
-  def trade( get:ResourceCards, give:ResourceCards ):Try[Player] = addResourceCards( get ).removeResourceCards( give )
+  def trade( get:ResourceCards, give:ResourceCards ):Try[ClassicPlayerImpl] = addResourceCards( get ).removeResourceCards( give )
 
-  def addDevCard( card:DevelopmentCard, removeFromUsed:Boolean = false ):Player = if( removeFromUsed )
+  def addDevCard( card:DevelopmentCard, removeFromUsed:Boolean = false ):ClassicPlayerImpl = if( removeFromUsed )
     copy( devCardsVal = devCardsVal :+ card, usedDevCards = usedDevCards.removed( card ).toVector )
   else copy( devCardsVal = devCardsVal :+ card )
 
-  def removeDevCard( ):Player = copy( devCardsVal = devCardsVal.init )
+  def removeLastDevCard( ):ClassicPlayerImpl = copy( devCardsVal = devCardsVal.init )
 
   def usedDevCards( devCard:DevelopmentCard ):Int = usedDevCards.count( _ == devCard )
 
-  def addVictoryPoint( ):Player = copy( victoryPointsVal = victoryPointsVal + 1 )
+  def addVictoryPoint( ):ClassicPlayerImpl = copy( victoryPointsVal = victoryPointsVal + 1 )
 
   def hasStructure( structure:StructurePlacement ):Boolean = structures.getOrElse( structure, 0 ) > 0
 
-  def getStructure( structure:StructurePlacement ):Try[Player] = {
+  def getStructure( structure:StructurePlacement ):Try[ClassicPlayerImpl] = {
     val available = structures.getOrElse( structure, 0 )
     if( available > 0 ) {
       val newStructures = if( structure.replaces.isDefined )
@@ -67,7 +67,7 @@ case class ClassicPlayerImpl( idVal:PlayerID,
       Failure( InsufficientStructures( structure ) )
   }
 
-  def addStructure( structure:StructurePlacement ):Player = {
+  def addStructure( structure:StructurePlacement ):ClassicPlayerImpl = {
     val newStructures = if( structure.replaces.isDefined )
       structures.updated( structure.replaces.get, structures.getOrElse( structure.replaces.get, 0 ) - 1 )
     else structures
@@ -78,7 +78,7 @@ case class ClassicPlayerImpl( idVal:PlayerID,
 
   def randomHandResource( ):Option[Resource] = Random.element( resources.flatMap( d => ( 0 until d._2 ).map( _ => d._1 ) ).toSeq )
 
-  def useDevCard( devCard:DevelopmentCard ):Try[Player] = {
+  def useDevCard( devCard:DevelopmentCard ):Try[ClassicPlayerImpl] = {
     val index = devCardsVal.indexOf( devCard )
     if( index >= 0 )
       Success( copy(

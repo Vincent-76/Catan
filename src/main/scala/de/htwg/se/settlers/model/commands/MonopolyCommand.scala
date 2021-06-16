@@ -12,7 +12,7 @@ import scala.util.Try
  */
 case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
 
-  var robbedResources:Option[Map[PlayerID, Int]] = Option.empty
+  var robbedResources:Option[Map[PlayerID, Int]] = None
 
   override def doStep( game:Game ):Try[CommandSuccess] = {
     val newData = game.players.red( (List.empty, Map.empty[PlayerID, Int]),
@@ -23,10 +23,10 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
         } else data
       } )
     robbedResources = Some( newData._2 )
-    val amount = newData._2.red( 0, ( i:Int, _:PlayerID, a:Int ) => i + a )
+    val amount = newData._2.values.sum
     success(
       game.setState( state.nextState )
-        .updatePlayers( newData._1:_* ),
+        .updatePlayers( ( newData._1 :+ game.player.addResourceCard( r, amount ) ):_* ),
       info = Some( ResourceChangeInfo(
         playerAdd = Map( game.onTurn -> ResourceCards.ofResource( r, amount ) ),
         playerSub = newData._2.map( d => (d._1, ResourceCards.ofResource( r, d._2 )) )
@@ -37,8 +37,9 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
   override def undoStep( game:Game ):Game = (robbedResources match {
     case None => game
     case Some( playerResources ) =>
-      val amount = playerResources.red( 0, ( i:Int, _:PlayerID, a:Int ) => i + a )
-      game.updatePlayers( playerResources.map( d => game.player( d._1 ).addResourceCard( r, d._2 ) ).toSeq:_* )
+      val amount = Math.min( playerResources.values.sum, game.player.resourceAmount( r ) )
+      val nPlayer = game.player.removeResourceCard( r, amount ).get
+      game.updatePlayers( ( playerResources.map( d => game.player( d._1 ).addResourceCard( r, d._2 ) ).toSeq :+ nPlayer ):_* )
   }).setState( state )
 
   /*override def toString:String = getClass.getSimpleName + ": Resource[" + r + "], " + state +

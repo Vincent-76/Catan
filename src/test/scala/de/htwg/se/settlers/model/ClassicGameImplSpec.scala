@@ -1,20 +1,21 @@
 package de.htwg.se.settlers.model
 
-import Cards._
+import de.htwg.se.settlers.model.Cards._
+import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
 import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
-import de.htwg.se.settlers.model.state.{ActionState, InitState}
+import de.htwg.se.settlers.model.state.{ ActionState, InitState }
 import de.htwg.se.settlers.util._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
-import scala.util.{Failure, Random, Success}
+import scala.util.{ Failure, Random, Success }
 
 /**
  * @author Vincent76;
  */
-class GameSpec extends WordSpec with Matchers {
-  /*"Game" when {
-    val newGame:Game = Game( test = true )
-    val randomGame = Game( test = false )
+class ClassicGameImplSpec extends WordSpec with Matchers {
+  "ClassicGameImpl" when {
+    val newGame:ClassicGameImpl = ClassicGameImpl( test = true, ClassicGameFieldImpl() )
+    val randomGame:ClassicGameImpl = ClassicGameImpl( test = false, ClassicGameFieldImpl() )
     "random new" should {
       "have state" in {
         randomGame.state shouldBe a [InitState]
@@ -32,9 +33,6 @@ class GameSpec extends WordSpec with Matchers {
     "new" should {
       "have state" in {
         newGame.state shouldBe a [InitState]
-      }
-      "have game field" in {
-        newGame.gameField.robber.id shouldBe 20
       }
       "have no winner" in {
         newGame.winner shouldBe None
@@ -78,22 +76,22 @@ class GameSpec extends WordSpec with Matchers {
         game.previousPlayer().name shouldBe "C"
       }
       "updatePlayer" in {
-        game.updatePlayer( game.player().copy( name = "AA" ) ).player().name shouldBe "AA"
+        game.updatePlayer( game.player.addVictoryPoint() ).player.victoryPoints shouldBe 1
       }
       "updatePlayers" in {
         val player1ID = game.getPlayerID( 1 )
         player1ID shouldNot be( None )
         val player2ID = game.getPlayerID( 2 )
         player2ID shouldNot be( None )
-        val players = game.updatePlayers(
-          game.player( player1ID.get ).copy( name = "BB" ),
-          game.player( player2ID.get ).copy( name = "CC" )
+        val newGame = game.updatePlayers(
+          game.player( player1ID.get ).addVictoryPoint(),
+          game.player( player2ID.get ).addVictoryPoint()
         )
-        players should have size 3
-        players.get( player1ID.get ) shouldNot be( None )
-        players( player1ID.get ).name shouldBe "BB"
-        players.get( player2ID.get ) shouldNot be( None )
-        players( player2ID.get ).name shouldBe "CC"
+        newGame.players should have size 3
+        newGame.player( player1ID.get ) shouldNot be( None )
+        newGame.player( player1ID.get ).victoryPoints shouldBe 1
+        newGame.player( player2ID.get ) shouldNot be( None )
+        newGame.player( player2ID.get ).victoryPoints shouldBe 1
       }
       "setState" in {
         game.setState( ActionState() ).state shouldBe a [ActionState]
@@ -114,14 +112,14 @@ class GameSpec extends WordSpec with Matchers {
         )
       }
       "drawResourceCards" in {
-        Success( game.drawResourceCards( pID, Wood ).resourceStack ) shouldBe game.resourceStack.subtract( Wood )
-        Success( game.drawResourceCards( pID, Wood, 2 ).resourceStack ) shouldBe game.resourceStack.subtract( Wood, 2 )
-        Success( game.drawResourceCards( pID, ResourceCards.of( wood = 2 ) ).resourceStack ) shouldBe game.resourceStack.subtract( ResourceCards.of( wood = 2 ) )
-        val game4 = game.drawResourceCards( pID, Wood, game.resourceStack( Wood ) )
-        game4.drawResourceCards( pID, Wood ) shouldBe game4
+        Success( game.drawResourceCards( pID, Wood )._1.resourceStack ) shouldBe game.resourceStack.subtract( Wood )
+        Success( game.drawResourceCards( pID, Wood, 2 )._1.resourceStack ) shouldBe game.resourceStack.subtract( Wood, 2 )
+        Success( game.drawResourceCards( pID, ResourceCards.of( wood = 2 ) )._1.resourceStack ) shouldBe game.resourceStack.subtract( ResourceCards.of( wood = 2 ) )
+        val game4 = game.drawResourceCards( pID, Wood, game.resourceStack( Wood ) )._1
+        game4.drawResourceCards( pID, Wood )._1 shouldBe game4
       }
       "dropResourceCards" in {
-        val game2 = game.updatePlayer( game.player().addResourceCard( Wood, 3 ) )
+        val game2 = game.updatePlayer( game.player.addResourceCard( Wood, 3 ) )
         val result1 = game2.dropResourceCards( pID, Wood )
         result1 shouldBe a [Success[_]]
         result1.get.resourceStack( Wood ) shouldBe game2.resourceStack( Wood ) + 1
@@ -131,47 +129,47 @@ class GameSpec extends WordSpec with Matchers {
       }
       "drawDevCard" in {
         game.drawDevCard( pID ) shouldBe Failure( InsufficientResources )
-        val game1 = game.drawResourceCards( pID, developmentCardCost )
+        val game1 = game.drawResourceCards( pID, developmentCardCost )._1
         val game2 = game1.drawDevCard( pID )
         game2 shouldBe a [Success[_]]
-        game2.get.player().devCards should have size 1
-        game2.get.player().devCards.head shouldBe game.developmentCards.head
-        game2.get.player().resources.amount shouldBe 0
+        game2.get.player.devCards should have size 1
+        game2.get.player.devCards.head shouldBe game.developmentCards.head
+        game2.get.player.resources.amount shouldBe 0
         game2.get.resourceStack shouldBe game.resourceStack
         val game3 = game.copy( developmentCards = List.empty )
         game3.drawDevCard( pID ) shouldBe Failure( DevStackIsEmpty )
       }
       "updateGameField" in {
-        val vertex = game.gameField.vertices.values.head
+        val vertex = game.gameField.vertexList.head
         val nGameField = game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) )
-        val game2 = game.updateGameField( nGameField )
+        val game2 = game.setGameField( nGameField )
         game2.gameField shouldBe nGameField
-        game2.gameField.vertices.values.head.building shouldNot be( None )
+        game2.gameField.vertexList.head.building shouldNot be( None )
       }
       "getPlayerBonusCards" in {
         game.getPlayerBonusCards( pID ) shouldBe empty
-        val game2 = game.copy( bonusCards = game.bonusCards.updated( LongestRoadCard, Some( pID, 5 ) ) )
-        game2.getPlayerBonusCards( pID ) should contain( LongestRoadCard )
+        val nGame = game.setBonusCard( LongestRoadCard, Some( pID, 5 ) )
+        nGame.getPlayerBonusCards( pID ) should contain( LongestRoadCard )
       }
       "getPlayerVictoryPoints" in {
         game.getPlayerDisplayVictoryPoints( pID ) shouldBe 0
-        val p = game.player.copy( victoryPoints = 3 ).addDevCard( GreatHallCard ).addDevCard( GreatHallCard )
-        val nGame = game.copy( bonusCards = game.bonusCards.updated( LongestRoadCard, Some( pID, 5 ) ) ).updatePlayer( p )
+        val p = (0 until 3).red( game.player, ( p:Player, _ ) => p.addVictoryPoint() ).addDevCard( GreatHallCard ).addDevCard( GreatHallCard )
+        val nGame = game.setBonusCard( LongestRoadCard, Some( pID, 5 ) ).updatePlayer( p )
         nGame.getPlayerDisplayVictoryPoints( pID ) shouldBe 5
         nGame.getPlayerVictoryPoints( pID ) shouldBe 7
       }
       "settlementAmount" in {
         game.settlementAmount( pID ) shouldBe 0
-        val vertex = game.gameField.vertices.values.head
+        val vertex = game.gameField.vertexList.head
         val nGameField = game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) )
-        val game2 = game.updateGameField( nGameField )
+        val game2 = game.setGameField( nGameField )
         game2.settlementAmount( pID ) shouldBe 1
       }
       "roadAmount" in {
         game.roadAmount( pID ) shouldBe 0
-        val edge = game.gameField.edges.values.head
+        val edge = game.gameField.edgeList.head
         val nGameField = game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) )
-        val game2 = game.updateGameField( nGameField )
+        val game2 = game.setGameField( nGameField )
         game2.roadAmount( pID ) shouldBe 1
       }
       "noBuildingInRange" in {
@@ -180,20 +178,20 @@ class GameSpec extends WordSpec with Matchers {
         val vertex2 = game.gameField.findVertex( 11 )
         vertex2 shouldNot be( None )
         game.noBuildingInRange( vertex.get ) shouldBe true
-        val game2 = game.updateGameField( game.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
         game2.noBuildingInRange( vertex.get ) shouldBe false
       }
       "playerHasAdjacentEdge" in {
-        val edge = game.gameField.edges.values.head
+        val edge = game.gameField.edgeList.head
         game.playerHasAdjacentEdge( pID, List( edge ) ) shouldBe false
-        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
-        game2.playerHasAdjacentEdge( pID, List( game2.gameField.edges.values.head ) ) shouldBe true
+        val game2 = game.setGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+        game2.playerHasAdjacentEdge( pID, List( game2.gameField.edgeList.head ) ) shouldBe true
       }
       "playerHasAdjacentVertex" in {
-        val vertex = game.gameField.vertices.values.head
+        val vertex = game.gameField.vertexList.head
         game.playerHasAdjacentVertex( pID, List( vertex ) ) shouldBe false
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
-        game2.playerHasAdjacentVertex( pID, List( game2.gameField.vertices.values.head ) ) shouldBe true
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+        game2.playerHasAdjacentVertex( pID, List( game2.gameField.vertexList.head ) ) shouldBe true
       }
       "roadBuildable" in {
         val edge = game.gameField.findEdge( 44 )
@@ -201,9 +199,9 @@ class GameSpec extends WordSpec with Matchers {
         game.roadBuildable( edge.get, pID ) shouldBe false
         val vertex = game.gameField.findVertex( 27 )
         vertex shouldNot be( None )
-        val game2 = game.updateGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
         game2.roadBuildable( edge.get, pID ) shouldBe true
-        val game3 = game2.updateGameField( game2.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) ) )
+        val game3 = game2.setGameField( game2.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) ) )
         val edge2 = game3.gameField.findEdge( 45 )
         edge2 shouldNot be( None )
         game3.roadBuildable( edge2.get, pID ) shouldBe true
@@ -213,18 +211,18 @@ class GameSpec extends WordSpec with Matchers {
       }
       "roadLength" in {
         val edges = game.gameField.adjacentEdges( game.gameField.findHex( 19 ).get )
-        game.getRoadLength( pID, edges.head ) shouldBe 0
-        val game2 = game.updateGameField( edges.red( game.gameField,
-          ( gf:ClassicGameFieldImpl, e:Edge ) => gf.update( e.setRoad( Some( Road( pID ) ) ) ) )
+        game.getLongestRoadLength( pID ) shouldBe 0
+        val game2 = game.setGameField( edges.red( game.gameField,
+          ( gf:GameField, e:Edge ) => gf.update( e.setRoad( Some( Road( pID ) ) ) ) )
         )
-        game2.getRoadLength( pID, game2.gameField.findEdge( edges.head.id ).get ) shouldBe 6
+        game2.getLongestRoadLength( pID ) shouldBe 6
       }
       "checkHandCardsInOrder" in {
-        val game2 = game.drawResourceCards( pID, Wood, Game.maxHandCards + 1 )
+        val game2 = game.drawResourceCards( pID, Wood, game.maxHandCards + 1 )._1
         game2.checkHandCardsInOrder() shouldBe Some( game2.player )
         val pID1 = game.getPlayerID( 1 )
         pID1 shouldNot be( None )
-        val game3 = game.drawResourceCards( pID1.get, Wood, Game.maxHandCards + 1 )
+        val game3 = game.drawResourceCards( pID1.get, Wood, game.maxHandCards + 1 )._1
         game3.checkHandCardsInOrder( game3.player, List.empty ) shouldBe Some( game3.player( pID1.get ) )
       }
       "getBuildableRoadSpotsForSettlement" in {
@@ -232,19 +230,19 @@ class GameSpec extends WordSpec with Matchers {
         game.getBuildableRoadSpotsForSettlement( vID ).map( _.id ) shouldBe empty
         val vertex = game.gameField.findVertex( vID )
         vertex shouldNot be( None )
-        val game2 = game.updateGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
         game2.getBuildableRoadSpotsForSettlement( vID ).map( _.id ) should contain theSameElementsAs List( 1, 3 )
       }
       "getBankTradeFactor" in {
-        game.getBankTradeFactor( pID, Wood ) shouldBe Game.defaultBankTradeFactor
-        val vertex = game.gameField.findVertex( 8 )
+        game.getBankTradeFactor( pID, Wood ) shouldBe game.defaultBankTradeFactor
+        val vertex = game.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isEmpty )
         vertex shouldNot be( None )
-        val game2 = game.updateGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
-        game2.getBankTradeFactor( pID, Wood ) shouldBe Game.unspecifiedPortFactor
-        val vertex2 = game2.gameField.findVertex( 16 )
+        val game2 = game.setGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        game2.getBankTradeFactor( pID, Wood ) shouldBe game.unspecifiedPortFactor
+        val vertex2 = game2.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isDefined && v.port.get.specific.get == Wood )
         vertex2 shouldNot be( None )
-        val game3 = game2.updateGameField( game2.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
-        game3.getBankTradeFactor( pID, Wood ) shouldBe Game.specifiedPortFactor
+        val game3 = game2.setGameField( game2.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        game3.getBankTradeFactor( pID, Wood ) shouldBe game.specifiedPortFactor
       }
       "getNextTradePlayerInOrder" in {
         val pID1 = game.getPlayerID( 1 )
@@ -258,10 +256,10 @@ class GameSpec extends WordSpec with Matchers {
     }
   }
 
-  private def addCleanPlayers( game:Game ):Game = {
+  private def addCleanPlayers( game:ClassicGameImpl ):ClassicGameImpl = {
     val nGame = game.addPlayer( Green, "A" )
       .addPlayer( Blue, "B" )
       .addPlayer( Yellow, "C" )
-    nGame.copy( turn = Turn( nGame.getPlayerID( 0 ).get ) )
-  }*/
+    nGame.setTurn( nGame.turn.set( nGame.getPlayerID( 0 ).get ) )
+  }
 }

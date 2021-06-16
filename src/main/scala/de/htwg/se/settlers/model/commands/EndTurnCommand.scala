@@ -14,7 +14,7 @@ case class EndTurnCommand( state:State ) extends Command {
 
   override def doStep( game:Game ):Try[CommandSuccess] = {
     turn = Some( game.turn )
-    success( game.setState( NextPlayerState() ) )
+    success( game.setState( NextPlayerState() ).nextRound() )
   }
 
 

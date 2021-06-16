@@ -12,8 +12,8 @@ class ClassicTurnImplSpec extends WordSpec with Matchers {
       }
       "manage dev cards" in {
         val turn2 = turn.addDrawnDevCard( KnightCard )
-        turn2.drawnDevCards( KnightCard ) shouldBe 1
-        turn2.removeDrawnDevCard().drawnDevCards( KnightCard ) shouldBe 0
+        turn2.drawnDevCards should have size 1
+        turn2.removeDrawnDevCard().drawnDevCards shouldBe empty
         turn2.getLastDrawnDevCard shouldBe Some( KnightCard )
       }
     }

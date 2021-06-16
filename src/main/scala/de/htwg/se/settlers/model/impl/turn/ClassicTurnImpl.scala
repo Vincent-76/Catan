@@ -4,7 +4,7 @@ import de.htwg.se.settlers.model.{ DevelopmentCard, PlayerID, Turn }
 
 case class ClassicTurnImpl( playerIDVal:PlayerID,
                             usedDevCardVal:Boolean = false,
-                            drawnDevCards:List[DevelopmentCard] = List.empty ) extends Turn {
+                            drawnDevCardsVal:List[DevelopmentCard] = List.empty ) extends Turn {
 
   def playerID:PlayerID = playerIDVal
 
@@ -12,13 +12,13 @@ case class ClassicTurnImpl( playerIDVal:PlayerID,
 
   def setUsedDevCard( used:Boolean ):Turn = copy( usedDevCardVal = used )
 
-  def drawnDevCards( devCard:DevelopmentCard ):Int = drawnDevCards.count( _ == devCard )
+  def drawnDevCards:List[DevelopmentCard] = drawnDevCardsVal
 
-  def addDrawnDevCard( card:DevelopmentCard ):Turn = copy( drawnDevCards = drawnDevCards :+ card )
+  def addDrawnDevCard( card:DevelopmentCard ):Turn = copy( drawnDevCardsVal = drawnDevCardsVal :+ card )
 
-  def removeDrawnDevCard( ):Turn = copy( drawnDevCards = drawnDevCards.init )
+  def removeDrawnDevCard( ):Turn = copy( drawnDevCardsVal = drawnDevCardsVal.init )
 
-  def getLastDrawnDevCard:Option[DevelopmentCard] = drawnDevCards.lastOption
+  def getLastDrawnDevCard:Option[DevelopmentCard] = drawnDevCardsVal.lastOption
 
   def set( playerID:PlayerID ):Turn = ClassicTurnImpl( playerID )
 

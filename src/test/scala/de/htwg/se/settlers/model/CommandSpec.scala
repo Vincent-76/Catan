@@ -2,17 +2,21 @@ package de.htwg.se.settlers.model
 
 import Cards._
 import de.htwg.se.settlers.model.commands._
+import de.htwg.se.settlers.model.impl.game.ClassicGameImpl
 import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
+import de.htwg.se.settlers.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
+import de.htwg.se.settlers.model.impl.player.ClassicPlayerImpl
+import de.htwg.se.settlers.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.settlers.model.state._
 import de.htwg.se.settlers.util._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 import scala.collection.immutable.TreeMap
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Random, Success }
 
 class CommandSpec extends WordSpec with Matchers {
-  /*"Command" when {
-    val newGame = Game( test = true )
+  "Command" when {
+    val newGame:ClassicGameImpl = ClassicGameImpl( test = true, ClassicGameFieldImpl( new Random( 1 ) ) )
     "AbortPlayerTradeCommand" should {
       val state = PlayerTradeEndState( ResourceCards.of(), ResourceCards.of(), Map.empty )
       "success" in {
@@ -32,7 +36,7 @@ class CommandSpec extends WordSpec with Matchers {
           Failure( PlayerNameEmpty )
       }
       "fail because player name is too long" in {
-        val tooLongName = "".toLength( Game.maxPlayerNameLength + 1 )
+        val tooLongName = "".toLength( game.maxPlayerNameLength + 1 )
         AddPlayerCommand( Green, tooLongName, state ).doStep( game ) shouldBe
           Failure( PlayerNameTooLong( tooLongName ) )
       }
@@ -57,42 +61,43 @@ class CommandSpec extends WordSpec with Matchers {
         undoRed.players shouldBe empty
       }
       "success with set to InitBeginnerState" in {
-        val game3 = game.copy( players = TreeMap( ( 0 until Game.maxPlayers - 1 ).map( i => {
+        val game3 = game.copy( playersVal = TreeMap( ( 0 until game.maxPlayers - 1 ).map( i => {
           val pID = new PlayerID( i )
-          (pID, Player( pID, Blue, i.toString ))
+          (pID, ClassicPlayerImpl( pID, Blue, i.toString ))
         } ).toArray:_* )( PlayerOrdering ) )
         val res = command.doStep( game3 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
-        res.get._1.players should have size Game.maxPlayers
+        res.get._1.players should have size game.maxPlayers
         res.get._1.players.last._2.name shouldBe name
         res.get._1.players.last._2.color shouldBe Green
         val undoRed = command.undoStep( res.get._1 )
         undoRed.state shouldBe state
-        undoRed.players should have size Game.maxPlayers - 1
+        undoRed.players should have size game.maxPlayers - 1
       }
     }
     "BankTradeCommand" should {
       val playerResources = ResourceCards.of( wood = 5, clay = 3, sheep = 8, wheat = 9 )
       val pID = new PlayerID( 0 )
-      val game = newGame.copy( 
-        state = ActionState(),
-        players = newGame.players + ( pID -> Player( pID, Green, "A", resources = playerResources ) ),
-        turn = Turn( pID )
+      val game = newGame.copy(
+        stateVal = ActionState(),
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A", resourcesVal = playerResources ) ),
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of insufficient structures" in {
-        val game2 = game.updatePlayer( game.player.copy( structures = game.player.structures.updated( Road, 0 ) ) )
-        BuildCommand( 0, BuildState( Road ) ).doStep( game2 ) shouldBe
-          Failure( InsufficientStructures( Road ) )
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )
+        BuildCommand( 0, BuildState( RoadPlacement ) ).doStep( game2 ) shouldBe
+          Failure( InsufficientStructures( RoadPlacement) )
       }
       "fail because of insufficient resources" in {
-        BankTradeCommand( 
-          ResourceCards.of( wood = 6 ), 
-          ResourceCards.of( clay = 1 ) 
+        BankTradeCommand(
+          ResourceCards.of( wood = 6 ),
+          ResourceCards.of( clay = 1 )
         ).doStep( game ) shouldBe Failure( InsufficientResources )
-        BankTradeCommand( 
-          ResourceCards.of( wood = 1 ), 
-          ResourceCards.of( clay = 1 ) 
+        BankTradeCommand(
+          ResourceCards.of( wood = 1 ),
+          ResourceCards.of( clay = 1 )
         ).doStep( game ) shouldBe Failure( InsufficientResources )
       }
       "fail because of insufficient bank resources" in {
@@ -101,7 +106,7 @@ class CommandSpec extends WordSpec with Matchers {
           ResourceCards.of( wood = 5 ),
           ResourceCards.of( clay = 1 ),
         ).doStep( game2 ) shouldBe Failure( InsufficientBankResources )
-      } 
+      }
       "success" in {
         val command = BankTradeCommand(
           ResourceCards.of( clay = 1, sheep = 8, wheat = 9 ),
@@ -119,51 +124,51 @@ class CommandSpec extends WordSpec with Matchers {
     "BuildCommand" should {
       val pID = new PlayerID( 0 )
       val game = newGame.copy(
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
-        turn = Turn( pID )
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) ),
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail road because of non existent placement point" in {
-        BuildCommand( -1, BuildState( Road ) ).doStep( game ) shouldBe
+        BuildCommand( -1, BuildState( RoadPlacement ) ).doStep( game ) shouldBe
           Failure( NonExistentPlacementPoint( -1 ) )
       }
       "fail road because of placement point is not empty" in {
-        val edge = game.gameField.edges.head._2
-        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
-        BuildCommand( edge.id, BuildState( Road ) ).doStep( game2 ) shouldBe
+        val edge = game.gameField.edgeList.head
+        val game2 = game.setGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+        BuildCommand( edge.id, BuildState( RoadPlacement ) ).doStep( game2 ) shouldBe
           Failure( PlacementPointNotEmpty( edge.id ) )
       }
       "fail road because of no connected structures" in {
-        val edge = game.gameField.edges.head._2
-        BuildCommand( edge.id, BuildState( Road ) ).doStep( game ) shouldBe
+        val edge = game.gameField.edgeList.head
+        BuildCommand( edge.id, BuildState( RoadPlacement ) ).doStep( game ) shouldBe
           Failure( NoConnectedStructures( edge.id ) )
       }
       "success road" in {
-        val edge = game.gameField.edges.head._2
+        val edge = game.gameField.edgeList.head
         val edge2 = game.gameField.adjacentEdges( edge ).head
-        val game2 = game.updateGameField( game.gameField.update( edge2.setRoad( Some( Road( pID ) ) ) ) )
-        val command = BuildCommand( edge.id, BuildState( Road ) )
+        val game2 = game.setGameField( game.gameField.update( edge2.setRoad( Some( Road( pID ) ) ) ) )
+        val command = BuildCommand( edge.id, BuildState( RoadPlacement ) )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe a [Some[BuiltInfo]]
         res.get._1.state shouldBe a [ActionState]
-        res.get._1.player.structures( Road ) shouldBe Road.available - 1
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available - 1
         val resEdge = res.get._1.gameField.findEdge( edge.id )
         resEdge shouldNot be( None )
         resEdge.get.road shouldBe Some( Road( pID ) )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe a [BuildState]
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
         val undoEdge = undoRes.gameField.findEdge( edge.id )
         undoEdge shouldNot be( None )
         undoEdge.get.road shouldBe None
       }
       "success road with new bonus card" in {
-        val (game2, edge) = ( 1 until LongestRoadCard.minimumRoads ).red( (game, game.gameField.edges.head._2),
+        val (game2, edge) = ( 1 until LongestRoadCard.minimumRoads ).red( (game, game.gameField.edgeList.head),
           ( data:(Game, Edge), _ ) => { (
-            data._1.updateGameField( data._1.gameField.update( data._2.setRoad( Some( Road( pID ) ) ) ) ),
+            data._1.setGameField( data._1.gameField.update( data._2.setRoad( Some( Road( pID ) ) ) ) ),
             data._1.gameField.adjacentEdges( data._2 ).find( _.road.isEmpty ).get
           ) } )
-        val command = BuildCommand( edge.id, BuildState( Road ) )
+        val command = BuildCommand( edge.id, BuildState( RoadPlacement ) )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._1.bonusCards( LongestRoadCard ) shouldBe Some( pID, LongestRoadCard.minimumRoads )
@@ -171,84 +176,85 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.bonusCards( LongestRoadCard ) shouldBe None
       }
       "fail settlement because of non existent placement point" in {
-        BuildCommand( -1, BuildState( Settlement ) ).doStep( game ) shouldBe
+        BuildCommand( -1, BuildState( SettlementPlacement ) ).doStep( game ) shouldBe
           Failure( NonExistentPlacementPoint( -1 ) )
       }
       "fail settlement because of placement point is not empty" in {
-        val vertex = game.gameField.vertices.head._2
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
-        BuildCommand( vertex.id, BuildState( Settlement ) ).doStep( game2 ) shouldBe
+        val vertex = game.gameField.vertexList.head
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+        BuildCommand( vertex.id, BuildState( SettlementPlacement ) ).doStep( game2 ) shouldBe
           Failure( PlacementPointNotEmpty( vertex.id ) )
       }
       "fail settlement because of no connected structures" in {
-        val vertex = game.gameField.vertices.head._2
-        BuildCommand( vertex.id, BuildState( Settlement ) ).doStep( game ) shouldBe
+        val vertex = game.gameField.vertexList.head
+        BuildCommand( vertex.id, BuildState( SettlementPlacement ) ).doStep( game ) shouldBe
           Failure( NoConnectedStructures( vertex.id ) )
       }
       "fail settlement because of too close to building" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         val edge = game.gameField.adjacentEdges( vertex ).find( e => game.gameField.adjacentVertices( e ).size > 1 )
         edge shouldNot be( None )
         val vertex2 = game.gameField.adjacentVertices( edge.get ).filter( _ != vertex ).head
-        val game2 = game.updateGameField( game.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( edge.get.setRoad( Some( Road( pID ) ) ) )
             .update( vertex2.setBuilding( Some( Settlement( pID ) ) ) ) )
-        BuildCommand( vertex.id, BuildState( Settlement ) ).doStep( game2 ) shouldBe
+        BuildCommand( vertex.id, BuildState( SettlementPlacement ) ).doStep( game2 ) shouldBe
           Failure( TooCloseToBuilding( vertex.id ) )
       }
       "success settlement" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         val edge = game.gameField.adjacentEdges( vertex ).head
-        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
-        val command = BuildCommand( vertex.id, BuildState( Settlement ) )
+        val game2 = game.setGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+        val command = BuildCommand( vertex.id, BuildState( SettlementPlacement ) )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe a [Some[BuiltInfo]]
         res.get._1.state shouldBe a [ActionState]
-        res.get._1.player.structures( Settlement ) shouldBe Settlement.available - 1
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available - 1
         val resVertex = res.get._1.gameField.findVertex( vertex.id )
         resVertex shouldNot be( None )
         resVertex.get.building shouldBe Some( Settlement( pID ) )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe a [BuildState]
-        undoRes.player.structures( Settlement ) shouldBe Settlement.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available
         val undoVertex = undoRes.gameField.findVertex( vertex.id )
         undoVertex shouldNot be( None )
         undoVertex.get.building shouldBe None
       }
       "fail city because of non existent placement point" in {
-        BuildCommand( -1, BuildState( City ) ).doStep( game ) shouldBe
+        BuildCommand( -1, BuildState( CityPlacement ) ).doStep( game ) shouldBe
           Failure( NonExistentPlacementPoint( -1 ) )
       }
       "fail city because of settlement required" in {
-        val vertex = game.gameField.vertices.head._2
-        BuildCommand( vertex.id, BuildState( City ) ).doStep( game ) shouldBe
+        val vertex = game.gameField.vertexList.head
+        BuildCommand( vertex.id, BuildState( CityPlacement ) ).doStep( game ) shouldBe
           Failure( SettlementRequired( vertex.id ) )
       }
       "fail city because of invalid placement point" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         vertex shouldNot be( None )
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( new PlayerID( 1 ) ) ) ) ) )
-        BuildCommand( vertex.id, BuildState( City ) ).doStep( game2 ) shouldBe
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( new PlayerID( 1 ) ) ) ) ) )
+        BuildCommand( vertex.id, BuildState( CityPlacement ) ).doStep( game2 ) shouldBe
           Failure( InvalidPlacementPoint( vertex.id ) )
       }
       "success city" in {
-        val vertex = game.gameField.vertices.head._2
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
-          .updatePlayer( game.player.copy( structures = game.player.structures.updated( Settlement, Settlement.available - 1 ) ) )
-        val command = BuildCommand( vertex.id, BuildState( City ) )
+        val vertex = game.gameField.vertexList.head
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+          .updatePlayer( p.copy( structures = p.structures.updated( SettlementPlacement, SettlementPlacement.available - 1 ) ) )
+        val command = BuildCommand( vertex.id, BuildState( CityPlacement ) )
         val res = command.doStep( game2 )
         res shouldNot be( None )
         res.get._2 shouldBe a [Some[BuiltInfo]]
         res.get._1.state shouldBe a [ActionState]
-        res.get._1.player.structures( City ) shouldBe City.available - 1
-        res.get._1.player.structures( Settlement ) shouldBe Settlement.available
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( CityPlacement ) shouldBe CityPlacement.available - 1
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available
         val resVertex = res.get._1.gameField.findVertex( vertex.id )
         resVertex shouldNot be( None )
         resVertex.get.building shouldBe Some( City( pID ) )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe a [BuildState]
-        undoRes.player.structures( City ) shouldBe City.available
-        undoRes.player.structures( Settlement ) shouldBe Settlement.available - 1
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( CityPlacement ) shouldBe CityPlacement.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available - 1
         val undoVertex = undoRes.gameField.findVertex( vertex.id )
         undoVertex shouldNot be( None )
         undoVertex.get.building shouldBe Some( Settlement( pID ) )
@@ -261,21 +267,22 @@ class CommandSpec extends WordSpec with Matchers {
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
       val game = newGame.copy(
-        state = state,
-        gameField = newGame.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ),
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ),
+        stateVal = state,
+        gameFieldVal = newGame.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ),
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of invalid placement point" in {
         BuildInitRoadCommand( 16, state ).doStep( game ) shouldBe
           Failure( InvalidPlacementPoint( 16 ) )
       }
       "fail because of build failure" in {
-        val game2 = game.updatePlayer( game.player.copy( structures = game.player.structures.updated( Road, 0 ) ) )
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )
         BuildInitRoadCommand( 3, state ).doStep( game2 ) shouldBe a [Failure[_]]
       }
       "success with next turn" in {
@@ -291,7 +298,7 @@ class CommandSpec extends WordSpec with Matchers {
         undoEdge shouldNot be( None )
         undoEdge.get.road shouldBe None
         undoRes.turn.playerID shouldBe pID
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
       }
       "success with same turn" in {
         val vertex1 = game.gameField.findVertex( 2 )
@@ -300,9 +307,9 @@ class CommandSpec extends WordSpec with Matchers {
         vertex2 shouldNot be( None )
         val state2 = BuildInitRoadState( 5 )
         val game2 = game.copy(
-          turn = Turn( pID2 ),
-          state = state2,
-          gameField = game.gameField.update( vertex1.get.setBuilding( Some( Settlement( pID1 ) ) ) )
+          turnVal = ClassicTurnImpl( pID2 ),
+          stateVal = state2,
+          gameFieldVal = game.gameField.update( vertex1.get.setBuilding( Some( Settlement( pID1 ) ) ) )
             .update( vertex2.get.setBuilding( Some( Settlement( pID2 ) ) ) )
         )
         val command = BuildInitRoadCommand( 9, state2 )
@@ -314,7 +321,7 @@ class CommandSpec extends WordSpec with Matchers {
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state2
         undoRes.turn.playerID shouldBe pID2
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
       }
       "success with previous turn" in {
         val vertex1 = game.gameField.findVertex( 2 )
@@ -325,9 +332,9 @@ class CommandSpec extends WordSpec with Matchers {
         vertex3 shouldNot be( None )
         val state2 = BuildInitRoadState( 13 )
         val game2 = game.copy(
-          turn = Turn( pID2 ),
-          state = state2,
-          gameField = game.gameField.update( vertex1.get.setBuilding( Some( Settlement( pID1 ) ) ) )
+          turnVal = ClassicTurnImpl( pID2 ),
+          stateVal = state2,
+          gameFieldVal = game.gameField.update( vertex1.get.setBuilding( Some( Settlement( pID1 ) ) ) )
             .update( vertex2.get.setBuilding( Some( Settlement( pID2 ) ) ) )
             .update( vertex3.get.setBuilding( Some( Settlement( pID2 ) ) ) )
         )
@@ -340,7 +347,7 @@ class CommandSpec extends WordSpec with Matchers {
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state2
         undoRes.turn.playerID shouldBe pID2
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
       }
       "success with continue" in {
         val vertex1 = game.gameField.findVertex( 2 )
@@ -355,9 +362,9 @@ class CommandSpec extends WordSpec with Matchers {
         vertex5 shouldNot be( None )
         val state2 = BuildInitRoadState( 9 )
         val game2 = game.copy(
-          turn = Turn( pID ),
-          state = state2,
-          gameField = game.gameField.update( vertex1.get.setBuilding( Some( Settlement( pID1 ) ) ) )
+          turnVal = ClassicTurnImpl( pID ),
+          stateVal = state2,
+          gameFieldVal = game.gameField.update( vertex1.get.setBuilding( Some( Settlement( pID1 ) ) ) )
             .update( vertex2.get.setBuilding( Some( Settlement( pID2 ) ) ) )
             .update( vertex3.get.setBuilding( Some( Settlement( pID2 ) ) ) )
             .update( vertex4.get.setBuilding( Some( Settlement( pID1 ) ) ) )
@@ -372,36 +379,36 @@ class CommandSpec extends WordSpec with Matchers {
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state2
         undoRes.turn.playerID shouldBe pID
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
       }
     }
     "BuildInitSettlementCommand" should {
       val state = BuildInitSettlementState()
       val pID = new PlayerID( 0 )
       val game = newGame.copy(
-        state = state,
-        turn = Turn( pID ),
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) )
+        stateVal = state,
+        turnVal = ClassicTurnImpl( pID ),
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) )
       )
       "fail because of build failure" in {
-        val vertex = game.gameField.vertices.head._2
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val vertex = game.gameField.vertexList.head
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
         BuildInitSettlementCommand( vertex.id, state ).doStep( game2 ) shouldBe a [Failure[_]]
       }
       "success without resource cards" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         val command = BuildInitSettlementCommand( vertex.id, state )
         val res = command.doStep( game )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
         res.get._1.state shouldBe BuildInitRoadState( vertex.id )
-        res.get._1.player.structures( Settlement ) shouldBe Settlement.available - 1
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available - 1
         val resVertex = res.get._1.gameField.findVertex( vertex.id )
         resVertex shouldNot be( None )
         resVertex.get.building shouldBe Some( Settlement( pID ) )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
         val undoVertex = undoRes.gameField.findVertex( vertex.id )
         undoVertex shouldNot be( None )
         undoVertex.get.building shouldBe None
@@ -411,7 +418,7 @@ class CommandSpec extends WordSpec with Matchers {
         vertex shouldNot be( None )
         val vertex2 = game.gameField.findVertex( 3 )
         vertex2 shouldNot be( None )
-        val game2 = game.updateGameField( game.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex2.get.setBuilding( Some( Settlement( pID ) ) ) ) )
         val command = BuildInitSettlementCommand( vertex.get.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -428,9 +435,9 @@ class CommandSpec extends WordSpec with Matchers {
       val pID = new PlayerID( 0 )
       val state = ActionState()
       val game = newGame.copy(
-        state = state,
-        turn = Turn( pID ),
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) )
+        stateVal = state,
+        turnVal = ClassicTurnImpl( pID ),
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) )
       )
       "fail" in {
         BuyDevCardCommand( state ).doStep( game ) shouldBe a [Failure[_]]
@@ -444,8 +451,8 @@ class CommandSpec extends WordSpec with Matchers {
         res.get._1.player.devCards should have size 1
         res.get._1.player.resources shouldBe ResourceCards.of()
         res.get._1.turn.drawnDevCards should have size 1
-        res.get._1.developmentCards should have size game2.developmentCards.size - 1
-        val undoRes = command.undoStep( res.get._1 )
+        res.get._1.asInstanceOf[ClassicGameImpl].developmentCards should have size game2.developmentCards.size - 1
+        val undoRes = command.undoStep( res.get._1 ).asInstanceOf[ClassicGameImpl]
         undoRes.developmentCards shouldBe game2.developmentCards
         undoRes.player.devCards shouldBe empty
         undoRes.turn.drawnDevCards shouldBe empty
@@ -470,40 +477,40 @@ class CommandSpec extends WordSpec with Matchers {
       val state = DevRoadBuildingState( nextState )
       val pID = new PlayerID( 0 )
       val game = newGame.copy(
-        state = state,
-        turn = Turn( pID ),
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) )
+        stateVal = state,
+        turnVal = ClassicTurnImpl( pID ),
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) )
       )
       "fail because of build failure" in {
-        val edge = game.gameField.edges.head._2
+        val edge = game.gameField.edgeList.head
         DevBuildRoadCommand( edge.id, state ).doStep( game ) shouldBe a [Failure[_]]
       }
       "success with first road" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         val edge = game.gameField.adjacentEdges( vertex ).filter( e => e.h1.isLand || e.h2.isLand ).head
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
         val command = DevBuildRoadCommand( edge.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe a [Some[BuiltInfo]]
         res.get._1.state shouldBe DevRoadBuildingState( nextState, 1 )
-        res.get._1.player.structures( Road ) shouldBe Road.available - 1
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available - 1
         val resEdge = res.get._1.gameField.findEdge( edge.id )
         resEdge shouldNot be( None )
         resEdge.get.road shouldBe Some( Road( pID ) )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.player.structures( Road ) shouldBe Road.available
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available
         val undoEdge = undoRes.gameField.findEdge( edge.id )
         undoEdge shouldNot be( None )
         undoEdge.get.road shouldBe None
       }
       "success with second road" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         val edge = game.gameField.adjacentEdges( vertex ).filter( e => e.h1.isLand || e.h2.isLand ).head
         val state2 = DevRoadBuildingState( nextState, 1 )
         val game2 = game.setState( state2 )
-          .updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+          .setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
         val command = DevBuildRoadCommand( edge.id, state2 )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -513,25 +520,26 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.state shouldBe state2
       }
       "success with insufficient structures info" in {
-        val vertex = game.gameField.vertices.head._2
+        val vertex = game.gameField.vertexList.head
         val edge = game.gameField.adjacentEdges( vertex ).filter( e => e.h1.isLand || e.h2.isLand ).head
-        val game2 = game.updatePlayer( game.player.copy( structures = game.player.structures.updated( Road, 1 ) ) )
-          .updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 1 ) ) )
+          .setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
         val command = DevBuildRoadCommand( edge.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe a [Some[InsufficientStructuresInfo]]
         res.get._1.state shouldBe nextState
-        res.get._1.player.structures( Road ) shouldBe 0
+        res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe 0
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.player.structures( Road ) shouldBe 1
+        undoRes.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe 1
       }
       "success with no placement points info" in {
         val edge = game.gameField.findEdge( 1 )
         val vertex = game.gameField.adjacentVertices( edge.get ).head
         val pID1 = new PlayerID( 1 )
-        val game2 = game.updateGameField( game.gameField.adjacentEdges( edge.get ).red( game.gameField, ( g:ClassicGameFieldImpl, e:Edge ) =>
+        val game2 = game.setGameField( game.gameField.adjacentEdges( edge.get ).red( game.gameField, ( g:GameField, e:Edge ) =>
           g.update( e.setRoad( Some( Road( pID1 ) ) ) )
         ).update( vertex.setBuilding( Some( Settlement( pID ) ) ) ) )
         val command = DevBuildRoadCommand( edge.get.id, state )
@@ -548,10 +556,10 @@ class CommandSpec extends WordSpec with Matchers {
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
       val game = newGame.copy(
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ),
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ),
         )( PlayerOrdering )
       )
       "fail because of unique beginner exists" in {
@@ -588,13 +596,13 @@ class CommandSpec extends WordSpec with Matchers {
     "DropHandCardsCommand" should {
       val pID = new PlayerID( 0 )
       val game = newGame.copy(
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ).addResourceCards( ResourceCards.of( wood = Game.maxHandCards + 1 ) ) ),
-        turn = Turn( pID )
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ).addResourceCards( ResourceCards.of( wood = newGame.maxHandCards + 1 ) ) ),
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of invalid resource amount" in {
         val state = DropHandCardsState( pID )
         val game2 = game.setState( state )
-        val dropResources = ResourceCards.of( wood = Game.maxHandCards + 10 )
+        val dropResources = ResourceCards.of( wood = game.maxHandCards + 10 )
         DropHandCardsCommand( state, dropResources ).doStep( game2 ) shouldBe
           Failure( InvalidResourceAmount( dropResources.amount ) )
       }
@@ -602,8 +610,8 @@ class CommandSpec extends WordSpec with Matchers {
         val state = DropHandCardsState( pID )
         val pID1 = new PlayerID( 1 )
         val game2 = game.copy(
-          state = state,
-          players = game.players + ( pID1 -> Player( pID1, Blue, "B" ).addResourceCards( ResourceCards.of( clay = Game.maxHandCards + 1 ) ) )
+          stateVal = state,
+          playersVal = game.playersVal + ( pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ).addResourceCards( ResourceCards.of( clay = game.maxHandCards + 1 ) ) )
         )
         val dropResources = ResourceCards.of( wood = game.player.resources( Wood ) / 2 )
         val command = DropHandCardsCommand( state, dropResources )
@@ -633,27 +641,27 @@ class CommandSpec extends WordSpec with Matchers {
       val pID = new PlayerID( 0 )
       val pID1 = new PlayerID( 1 )
       val game = newGame.copy(
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "success" in {
         val state = ActionState()
         val game2 = game.setState( state )
         val command = EndTurnCommand( state )
         val undoRes1 = command.undoStep( game2 )
-        undoRes1.turn shouldBe Turn( pID1 )
+        undoRes1.turn shouldBe ClassicTurnImpl( pID1 )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
         res.get._1.state shouldBe a [NextPlayerState]
-        res.get._1.turn shouldBe Turn( pID1 )
+        res.get._1.turn shouldBe ClassicTurnImpl( pID1 )
         res.get._1.round shouldBe game2.round + 1
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.turn shouldBe Turn( pID )
+        undoRes.turn shouldBe ClassicTurnImpl( pID )
         undoRes.round shouldBe game2.round
       }
     }
@@ -664,13 +672,13 @@ class CommandSpec extends WordSpec with Matchers {
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
       val game = newGame.copy(
-        state = state,
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ).addResourceCards( ResourceCards.of( wood = 3 ) ),
+        stateVal = state,
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ).addResourceCards( ResourceCards.of( wood = 3 ) ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "success" in {
         val command = MonopolyCommand( Wood, state )
@@ -695,21 +703,21 @@ class CommandSpec extends WordSpec with Matchers {
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
       val game = newGame.copy(
-        state = state,
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ).addResourceCard( Wood ),
-          pID2 -> Player( pID2, Yellow, "C" ),
+        stateVal = state,
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ).addResourceCard( Wood ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of non existent placement point" in {
         PlaceRobberCommand( -1, state ).doStep( game ) shouldBe
           Failure( NonExistentPlacementPoint( -1 ) )
       }
       "fail because of placement point is not empty" in {
-        PlaceRobberCommand( game.gameField.robber.id, state ).doStep( game ) shouldBe
-          Failure( PlacementPointNotEmpty( game.gameField.robber.id ) )
+        PlaceRobberCommand( game.gameField.robberHex.id, state ).doStep( game ) shouldBe
+          Failure( PlacementPointNotEmpty( game.gameField.robberHex.id ) )
       }
       "fail because of robber is placed in water" in {
         PlaceRobberCommand( 1, state ).doStep( game ) shouldBe
@@ -724,15 +732,15 @@ class CommandSpec extends WordSpec with Matchers {
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
         res.get._1.state shouldBe nextState
-        res.get._1.gameField.robber.id shouldBe 19
+        res.get._1.gameField.robberHex.id shouldBe 19
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.gameField.robber.id shouldBe game.gameField.robber.id
+        undoRes.gameField.robberHex.id shouldBe game.gameField.robberHex.id
       }
       "success with stealing from one with resource" in {
         val hex = game.gameField.findHex( 19 )
         val vertex = game.gameField.adjacentVertices( hex.get ).head
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID1 ) ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID1 ) ) ) ) )
         val command = PlaceRobberCommand( 19, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -740,10 +748,10 @@ class CommandSpec extends WordSpec with Matchers {
         res.get._1.state shouldBe nextState
         res.get._1.player.resources shouldBe ResourceCards.of( wood = 1 )
         res.get._1.player( pID1 ).resources shouldBe ResourceCards.of()
-        res.get._1.gameField.robber.id shouldBe 19
+        res.get._1.gameField.robberHex.id shouldBe 19
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.gameField.robber.id shouldBe game.gameField.robber.id
+        undoRes.gameField.robberHex.id shouldBe game.gameField.robberHex.id
         undoRes.player.resources shouldBe ResourceCards.of()
         undoRes.player( pID1 ).resources shouldBe ResourceCards.of( wood = 1 )
       }
@@ -752,17 +760,17 @@ class CommandSpec extends WordSpec with Matchers {
         val vertices = game.gameField.adjacentVertices( hex.get )
         val vertex1 = vertices.head
         val vertex2 = vertices( 1 )
-        val game2 = game.updateGameField( game.gameField.update( vertex1.setBuilding( Some( Settlement( pID1 ) ) ) )
+        val game2 = game.setGameField( game.gameField.update( vertex1.setBuilding( Some( Settlement( pID1 ) ) ) )
           .update( vertex2.setBuilding( Some( Settlement( pID2 ) ) ) ) )
         val command = PlaceRobberCommand( 19, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
         res.get._1.state shouldBe RobberStealState( List( pID1, pID2 ), nextState )
-        res.get._1.gameField.robber.id shouldBe 19
+        res.get._1.gameField.robberHex.id shouldBe 19
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.gameField.robber.id shouldBe game.gameField.robber.id
+        undoRes.gameField.robberHex.id shouldBe game.gameField.robberHex.id
       }
     }
     "PlayerTradeCommand" should {
@@ -770,12 +778,12 @@ class CommandSpec extends WordSpec with Matchers {
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
       val game = newGame.copy(
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ).addResourceCard( Wood ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ).addResourceCard( Clay ),
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ).addResourceCard( Wood ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ).addResourceCard( Clay ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of invalid player specified" in {
         val state = PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID2 -> false ) )
@@ -816,17 +824,17 @@ class CommandSpec extends WordSpec with Matchers {
       val pID1 = new PlayerID( 1 )
       val pID2 = new PlayerID( 2 )
       val game = newGame.copy(
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ).addResourceCard( Wood ),
-          pID1 -> Player( pID1, Blue, "B" ).addResourceCard( Clay ),
-          pID2 -> Player( pID2, Yellow, "C" ).addResourceCard( Clay ),
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ).addResourceCard( Wood ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ).addResourceCard( Clay ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ).addResourceCard( Clay ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "success without next" in {
         val state = PlayerTradeState( pID2, ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map( pID1 -> false ) )
         val game2 = game.setState( state )
-        val command = PlayerTradeDecisionCommand( true, state )
+        val command = PlayerTradeDecisionCommand( decision = true, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
@@ -837,7 +845,7 @@ class CommandSpec extends WordSpec with Matchers {
       "success with next" in {
         val state = PlayerTradeState( pID1, ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty )
         val game2 = game.setState( state )
-        val command = PlayerTradeDecisionCommand( true, state )
+        val command = PlayerTradeDecisionCommand( decision = true, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
@@ -853,21 +861,21 @@ class CommandSpec extends WordSpec with Matchers {
       val nextState = ActionState()
       val state = RobberStealState( List( pID1, pID2 ), nextState )
       val game = newGame.copy(
-        state = state,
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ).addResourceCard( Wood ),
+        stateVal = state,
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ).addResourceCard( Wood ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of steal player has no adjacent structure" in {
         RobberStealCommand( pID1, state ).doStep( game ) shouldBe
           Failure( NoAdjacentStructure )
       }
       "success without stealing" in {
-        val vertex = game.gameField.adjacentVertices( game.gameField.robber ).head
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID1 ) ) ) ) )
+        val vertex = game.gameField.adjacentVertices( game.gameField.robberHex ).head
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID1 ) ) ) ) )
         val command = RobberStealCommand( pID1, state )
         val undoRes1 = command.undoStep( game2 )
         undoRes1.state shouldBe state
@@ -878,8 +886,8 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.state shouldBe state
       }
       "success with stealing" in {
-        val vertex = game.gameField.adjacentVertices( game.gameField.robber ).head
-        val game2 = game.updateGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID2 ) ) ) ) )
+        val vertex = game.gameField.adjacentVertices( game.gameField.robberHex ).head
+        val game2 = game.setGameField( game.gameField.update( vertex.setBuilding( Some( Settlement( pID2 ) ) ) ) )
         val command = RobberStealCommand( pID2, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -898,16 +906,16 @@ class CommandSpec extends WordSpec with Matchers {
       val pID2 = new PlayerID( 2 )
       val state = ActionState()
       val game = newGame.copy(
-        state = state,
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ),
+        stateVal = state,
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "success with seven with no card drop" in {
-        val game2 = game.copy( round = 9 )
+        val game2 = game.copy( roundVal = 9 )
         val command = RollDicesCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -917,7 +925,7 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.state shouldBe state
       }
       "success with seven with card drop" in {
-        val game2 = game.copy( round = 9 ).updatePlayer( game.player.addResourceCard( Wood, Game.maxHandCards + 1 ) )
+        val game2 = game.copy( roundVal = 9 ).updatePlayer( game.player.addResourceCard( Wood, game.maxHandCards + 1 ) )
         val command = RollDicesCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -930,9 +938,9 @@ class CommandSpec extends WordSpec with Matchers {
         val hex = game.gameField.findHex( 25 ).get
         val vertices = game.gameField.adjacentVertices( hex )
         val game2 = game.copy(
-          round = 1,
+          roundVal = 1,
           resourceStack = game.resourceStack.updated( Clay, 1 ),
-          gameField = game.gameField.update( vertices.head.setBuilding( Some( Settlement( pID ) ) ) )
+          gameFieldVal = game.gameField.update( vertices.head.setBuilding( Some( Settlement( pID ) ) ) )
             .update( vertices( 1 ).setBuilding( Some( City( pID1 ) ) ) )
         )
         val command = RollDicesCommand( state )
@@ -943,22 +951,22 @@ class CommandSpec extends WordSpec with Matchers {
         res.get._1.player( pID ).resources shouldBe ResourceCards.of()
         res.get._1.player( pID1 ).resources shouldBe ResourceCards.of( clay = 1 )
         res.get._1.player( pID2 ).resources shouldBe ResourceCards.of()
-        res.get._1.resourceStack shouldBe game2.resourceStack.updated( Clay, 0 )
+        res.get._1.asInstanceOf[ClassicGameImpl].resourceStack shouldBe game2.resourceStack.updated( Clay, 0 )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
         undoRes.player( pID ).resources shouldBe ResourceCards.of()
         undoRes.player( pID1 ).resources shouldBe ResourceCards.of()
         undoRes.player( pID2 ).resources shouldBe ResourceCards.of()
-        undoRes.resourceStack shouldBe game2.resourceStack
+        undoRes.asInstanceOf[ClassicGameImpl].resourceStack shouldBe game2.resourceStack
       }
     }
     "SetBeginnerCommand" should {
       val pID = new PlayerID( 0 )
       val pID1 = new PlayerID( 1 )
       val game = newGame.copy(
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
         )( PlayerOrdering ),
       )
       "fail because of no unique beginner specified" in {
@@ -975,7 +983,7 @@ class CommandSpec extends WordSpec with Matchers {
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
         res.get._1.state shouldBe BuildInitSettlementState()
-        res.get._1.turn shouldBe Turn( pID )
+        res.get._1.turn shouldBe ClassicTurnImpl( pID )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
         undoRes.turn shouldBe game.turn
@@ -985,33 +993,34 @@ class CommandSpec extends WordSpec with Matchers {
       val state = ActionState()
       val pID = new PlayerID( 0 )
       val game = newGame.copy(
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
-        turn = Turn( pID )
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) ),
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of insufficient structures" in {
-        val game2 = game.updatePlayer( game.player.copy( structures = game.player.structures.updated( Road, 0 ) ) )
-        SetBuildStateCommand( Road, state ).doStep( game2 ) shouldBe
-          Failure( InsufficientStructures( Road ) )
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )
+        SetBuildStateCommand( RoadPlacement, state ).doStep( game2 ) shouldBe
+          Failure( InsufficientStructures( RoadPlacement ) )
       }
       "fail because of no placement points" in {
-        SetBuildStateCommand( Road, state ).doStep( game ) shouldBe
-          Failure( NoPlacementPoints( Road ) )
+        SetBuildStateCommand( RoadPlacement, state ).doStep( game ) shouldBe
+          Failure( NoPlacementPoints( RoadPlacement ) )
       }
       "fail because of insufficient resources" in {
-        val edge = game.gameField.edges.head._2
-        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
-        SetBuildStateCommand( Road, state ).doStep( game2 ) shouldBe
+        val edge = game.gameField.edgeList.head
+        val game2 = game.setGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+        SetBuildStateCommand( RoadPlacement, state ).doStep( game2 ) shouldBe
           Failure( InsufficientResources )
       }
       "success" in {
-        val edge = game.gameField.edges.head._2
-        val game2 = game.updateGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
-          .updatePlayer( game.player.addResourceCards( Road.resources ) )
-        val command = SetBuildStateCommand( Road, state )
+        val edge = game.gameField.edgeList.head
+        val game2 = game.setGameField( game.gameField.update( edge.setRoad( Some( Road( pID ) ) ) ) )
+          .updatePlayer( game.player.addResourceCards( RoadPlacement.resources ) )
+        val command = SetBuildStateCommand( RoadPlacement, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe a [Some[LostResourcesInfo]]
-        res.get._1.state shouldBe BuildState( Road )
+        res.get._1.state shouldBe BuildState( RoadPlacement )
         res.get._1.player.resources shouldBe ResourceCards.of()
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
@@ -1025,9 +1034,9 @@ class CommandSpec extends WordSpec with Matchers {
           Failure( NotEnoughPlayers )
       }
       "success" in {
-        val game = ( 1 to Game.minPlayers ).red( newGame, ( g:Game, i ) => {
+        val game = ( 1 to newGame.minPlayers ).red( newGame, ( g:ClassicGameImpl, i ) => {
           val pID = new PlayerID( i )
-          g.copy( players = g.players + ( pID -> Player( pID, Green, i.toString ) ) )
+          g.copy( playersVal = g.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, i.toString ) ) )
         } )
         val command = SetInitBeginnerStateCommand( state )
         val res = command.doStep( game )
@@ -1044,13 +1053,13 @@ class CommandSpec extends WordSpec with Matchers {
       val pID2 = new PlayerID( 2 )
       val state = ActionState()
       val game = newGame.copy(
-        state = state,
-        players = TreeMap(
-          pID -> Player( pID, Green, "A" ),
-          pID1 -> Player( pID1, Blue, "B" ),
-          pID2 -> Player( pID2, Yellow, "C" ),
+        stateVal = state,
+        playersVal = TreeMap(
+          pID -> ClassicPlayerImpl( pID, Green, "A" ),
+          pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ),
+          pID2 -> ClassicPlayerImpl( pID2, Yellow, "C" ),
         )( PlayerOrdering ),
-        turn = Turn( pID )
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of insufficient resources" in {
         SetPlayerTradeStateCommand( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), state ).doStep( game ) shouldBe
@@ -1082,11 +1091,11 @@ class CommandSpec extends WordSpec with Matchers {
       val pID = new PlayerID( 0 )
       val pID1 = new PlayerID( 1 )
       val game = newGame.copy(
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ), pID1 -> Player( pID1, Blue, "B" ) ),
-        turn = Turn( pID )
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ), pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ) ),
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because a dev card has already used in this turn" in {
-        val game2 = game.copy( turn = game.turn.copy( usedDevCard = true ) )
+        val game2 = game.setTurn( game.turn.setUsedDevCard( true ) )
         UseDevCardCommand( KnightCard, state ).doStep( game2 ) shouldBe
           Failure( AlreadyUsedDevCardInTurn )
       }
@@ -1095,7 +1104,7 @@ class CommandSpec extends WordSpec with Matchers {
           Failure( InsufficientDevCards( KnightCard ) )
       }
       "fail because this dev card was drawn in this turn" in {
-        val game2 = game.copy( turn = game.turn.copy( drawnDevCards = List( KnightCard ) ) )
+        val game2 = game.setTurn( game.turn.addDrawnDevCard( KnightCard ) )
           .updatePlayer( game.player.addDevCard( KnightCard ) )
         UseDevCardCommand( KnightCard, state ).doStep( game2 ) shouldBe
           Failure( DevCardDrawnInTurn( KnightCard ) )
@@ -1122,9 +1131,10 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.bonusCards shouldBe game2.bonusCards
       }
       "success with knight card with new largest army from empty" in {
-        val game2 = game.updatePlayer( game.player.copy(
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy(
           usedDevCards = ( 1 until LargestArmyCard.required ).map( _ => KnightCard ).toVector,
-          devCards = Vector( KnightCard )
+          devCardsVal = Vector( KnightCard )
         ) )
         val command = UseDevCardCommand( KnightCard, state )
         val res = command.doStep( game2 )
@@ -1143,13 +1153,11 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.bonusCards shouldBe game2.bonusCards
       }
       "success with knight card with new largest army from defined" in {
-        val game2 = game.updatePlayer( game.player.copy(
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.copy(
           usedDevCards = ( 0 until LargestArmyCard.required ).map( _ => KnightCard ).toVector,
-          devCards = Vector( KnightCard )
-        ) )
-          .copy(
-            bonusCards = game.bonusCards.updated( LargestArmyCard, Some( pID1, LargestArmyCard.required ) )
-          )
+          devCardsVal = Vector( KnightCard )
+        ) ).setBonusCard( LargestArmyCard, Some( pID1, LargestArmyCard.required ) )
         val command = UseDevCardCommand( KnightCard, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -1177,19 +1185,20 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.state shouldBe state
       }
       "fail with road building card because of insufficient structures" in {
-        val game2 = game.updatePlayer( game.player.addDevCard( RoadBuildingCard )
-          .copy( structures = game.player.structures.updated( Road, 0 ) ) )
+        val p = game.player.asInstanceOf[ClassicPlayerImpl]
+        val game2 = game.updatePlayer( p.addDevCard( RoadBuildingCard )
+          .copy( structures = p.structures.updated( RoadPlacement, 0 ) ) )
         UseDevCardCommand( RoadBuildingCard, state ).doStep( game2 ) shouldBe
-          Failure( InsufficientStructures( Road ) )
+          Failure( InsufficientStructures( RoadPlacement ) )
       }
       "fail with road building card because there are no placement points" in {
         val game2 = game.updatePlayer( game.player.addDevCard( RoadBuildingCard ) )
         UseDevCardCommand( RoadBuildingCard, state ).doStep( game2 ) shouldBe
-          Failure( NoPlacementPoints( Road ) )
+          Failure( NoPlacementPoints( RoadPlacement ) )
       }
       "success with road building card" in {
         val game2 = game.updatePlayer( game.player.addDevCard( RoadBuildingCard ) )
-          .updateGameField( game.gameField.update( game.gameField.edges.head._2.setRoad( Some( Road( pID ) ) ) ) )
+          .setGameField( game.gameField.update( game.gameField.edgeList.head.setRoad( Some( Road( pID ) ) ) ) )
         val command = UseDevCardCommand( RoadBuildingCard, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -1214,8 +1223,8 @@ class CommandSpec extends WordSpec with Matchers {
       val state = YearOfPlentyState( nextState )
       val pID = new PlayerID( 0 )
       val game = newGame.copy(
-        players = newGame.players + ( pID -> Player( pID, Green, "A" ) ),
-        turn = Turn( pID )
+        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ) ),
+        turnVal = ClassicTurnImpl( pID )
       )
       "fail because of invalid resource amount" in {
         YearOfPlentyCommand( ResourceCards.of(), state ).doStep( game ) shouldBe
@@ -1230,13 +1239,13 @@ class CommandSpec extends WordSpec with Matchers {
         res shouldBe a [Success[_]]
         res.get._2 shouldBe a [Some[GotResourcesInfo]]
         res.get._1.state shouldBe nextState
-        Success( res.get._1.resourceStack ) shouldBe game.resourceStack.subtract( resources )
+        Success( res.get._1.asInstanceOf[ClassicGameImpl].resourceStack ) shouldBe game.resourceStack.subtract( resources )
         res.get._1.player.resources shouldBe resources
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
-        undoRes.resourceStack shouldBe game.resourceStack
+        undoRes.asInstanceOf[ClassicGameImpl].resourceStack shouldBe game.resourceStack
         undoRes.player.resources shouldBe game.player.resources
       }
     }
-  }*/
+  }
 }

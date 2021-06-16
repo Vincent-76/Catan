@@ -66,7 +66,7 @@ trait Player {
   def addResourceCards( cards:ResourceCards ):Player
   def trade( get:ResourceCards, give:ResourceCards ):Try[Player]
   def addDevCard( card:DevelopmentCard, removeFromUsed:Boolean = false ):Player
-  def removeDevCard( ):Player
+  def removeLastDevCard( ):Player
   def usedDevCards( devCard:DevelopmentCard ):Int
   def addVictoryPoint( ):Player
   def hasStructure( structure:StructurePlacement ):Boolean

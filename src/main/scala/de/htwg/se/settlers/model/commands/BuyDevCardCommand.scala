@@ -20,6 +20,7 @@ case class BuyDevCardCommand( state:State ) extends Command {
     newGame.setState( state )
       .setTurn( newGame.turn.removeDrawnDevCard() )
       .addDevCard( devCard )
+      .updatePlayer( newGame.player.removeLastDevCard() )
   }
 
   //override def toString:String = getClass.getSimpleName + ": " + state

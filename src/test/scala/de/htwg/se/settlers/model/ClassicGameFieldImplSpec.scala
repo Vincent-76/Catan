@@ -1,19 +1,20 @@
 package de.htwg.se.settlers.model
 
+import de.htwg.se.settlers.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.settlers.util._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 import scala.util.Random
 
 /**
  * @author Vincent76;
  */
-class ClassicGameImplFieldSpec extends WordSpec with Matchers {
-  /*"GameField" when {
+class ClassicGameFieldImplSpec extends WordSpec with Matchers {
+  "ClassicGameFieldImpl" when {
     "new" should {
-      val gameField = ClassicGameField( new Random( 1 ) )
+      val gameField = ClassicGameFieldImpl( new Random( 1 ) )
       "create" in {
-        ( 2 to 10 ).foreach( seed => ClassicGameField( new Random( seed ) ).hexagons.red( 0, (i:Int, r:Vector[Option[Hex]] ) => {
+        ( 2 to 10 ).foreach( seed => ClassicGameFieldImpl( new Random( seed ) ).hexagons.red( 0, (i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
         } ) should be( 37 ) )
       }
@@ -91,7 +92,7 @@ class ClassicGameImplFieldSpec extends WordSpec with Matchers {
       val e2 = edge2.get
       "not find edge" in {
         gameField.findEdge( 90 ) shouldBe None
-        gameField.findEdge( h1, gamefield.Hex( 100, 0, 0, DesertArea ) ) shouldBe None
+        gameField.findEdge( h1, Hex( 100, 0, 0, DesertArea ) ) shouldBe None
       }
       "update edge" in {
         val pID = new PlayerID( 0 )
@@ -129,7 +130,7 @@ class ClassicGameImplFieldSpec extends WordSpec with Matchers {
       val v2 = vertex2.get
       "not find vertex" in {
         gameField.findVertex( 54 ) shouldBe None
-        gameField.findVertex( h1, h2, gamefield.Hex( 100, 0, 0, DesertArea ) ) shouldBe None
+        gameField.findVertex( h1, h2, Hex( 100, 0, 0, DesertArea ) ) shouldBe None
       }
       "update vertex" in {
         val pID = new PlayerID( 0 )
@@ -170,5 +171,5 @@ class ClassicGameImplFieldSpec extends WordSpec with Matchers {
 
   def edgeTuple( e:Edge ):(Hex, Hex) = (e.h1, e.h2)
 
-  def vertexTuple( v:Vertex ):(Hex, Hex, Hex) = (v.h1, v.h2, v.h3)*/
+  def vertexTuple( v:Vertex ):(Hex, Hex, Hex) = (v.h1, v.h2, v.h3)
 }
