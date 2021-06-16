@@ -1,7 +1,5 @@
 package de.htwg.se.catan.controller
 
-import com.google.inject.Guice
-import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model.Cards.ResourceCards
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
@@ -31,7 +29,7 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
   }
 
   "ClassicControllerImpl" when {
-    val controller = new ClassicControllerImpl( ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ) )
+    val controller = new ClassicControllerImpl( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ) )
     "new" should {
       "have game" in {
         val observer = new TestObserver()

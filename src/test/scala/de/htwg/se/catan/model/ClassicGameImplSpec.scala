@@ -16,9 +16,9 @@ import scala.util.{ Failure, Random, Success }
  */
 class ClassicGameImplSpec extends WordSpec with Matchers {
   "ClassicGameImpl" when {
-    val newGame:ClassicGameImpl = ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
+    val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
     val seed = new Random().nextInt( Int.MaxValue / 1000 )
-    val randomGame:ClassicGameImpl = ClassicGameImpl( ClassicGameFieldImpl( seed ), ClassicTurnImpl(), seedVal = seed, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
+    val randomGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( seed ), ClassicTurnImpl(), seed, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
     "random new" should {
       "have state" in {
         randomGame.state shouldBe a [InitState]

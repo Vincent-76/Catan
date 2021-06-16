@@ -29,7 +29,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
                             turnVal:Turn,
                             seedVal:Int,
                             playerFactory:PlayerFactory,
-                            availablePlacementsVal:List[Placement] = ClassicGameImpl.availablePlacements,
+                            availablePlacementsVal:List[Placement],
                             stateVal:State = InitState(),
                             resourceStack:ResourceCards = Cards.getResourceCards( ClassicGameImpl.stackResourceAmount ),
                             developmentCards:List[DevelopmentCard] = List.empty,
@@ -48,6 +48,9 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.contains ),
     developmentCards = Cards.getDevStack( new Random( seed ) ),
   )
+
+  def this( gameField:GameField, turn:Turn, seed:Int, playerFactory:PlayerFactory ) =
+    this( gameField, turn, seed, playerFactory, ClassicGameImpl.availablePlacements )
 
   def minPlayers:Int = 3
   def maxPlayers:Int = 4

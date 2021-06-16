@@ -16,7 +16,7 @@ class PlacementSpec extends WordSpec with Matchers {
         StructurePlacement.of( "Roa" ) shouldBe None
       }
     }
-    val game = ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), seedVal = 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ).addPlayer( Green, "A" )
+    val game = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ).addPlayer( Green, "A" )
       .addPlayer( Blue, "B" )
       .addPlayer( Yellow, "C" )
       .use( g => g.setTurn( g.turn.set( g.getPlayerID( 0 ).get ) ) )
