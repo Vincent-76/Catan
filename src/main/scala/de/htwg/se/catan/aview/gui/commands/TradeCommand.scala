@@ -3,7 +3,7 @@ package de.htwg.se.catan.aview.gui.commands
 import de.htwg.se.catan.aview.gui.GUI
 import de.htwg.se.catan.aview.gui.util.{ CustomDialog, ResourceSelector }
 import de.htwg.se.catan.model.Cards.ResourceCards
-import scalafx.geometry.Pos
+import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.{ Button, ButtonType }
 import scalafx.scene.layout.{ BorderPane, VBox }
 import scalafx.scene.text.{ Text, TextAlignment }
@@ -24,6 +24,7 @@ abstract class TradeCommand( title:String ) extends SimpleGUICommand( title ) {
           alignment = Pos.Center
           children = List(
             new Text( "Give resources" ) {
+              style = "-fx-font-size: 18"
               textAlignment = TextAlignment.Center
               underline = true
             },
@@ -31,9 +32,11 @@ abstract class TradeCommand( title:String ) extends SimpleGUICommand( title ) {
           )
         },
         new VBox {
+          margin = Insets.apply( 16, 0, 0, 0 )
           alignment = Pos.Center
           children = List(
             new Text( "Get resources" ) {
+              style = "-fx-font-size: 18"
               textAlignment = TextAlignment.Center
               underline = true
             },

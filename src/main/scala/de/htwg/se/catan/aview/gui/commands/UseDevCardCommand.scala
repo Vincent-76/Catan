@@ -5,6 +5,7 @@ import de.htwg.se.catan.aview.gui.util.CustomDialog
 import de.htwg.se.catan.model.Cards
 import de.htwg.se.catan.util._
 import scalafx.geometry.Pos
+import scalafx.scene.Node
 import scalafx.scene.control.{ Button, ButtonType }
 import scalafx.scene.layout.{ HBox, Pane, VBox }
 
@@ -31,7 +32,7 @@ case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" )
       }
     }.show()
 
-  override def getPane( gui:GUI ):Pane = super.getPane( gui ).use( n => {
+  override def getNode( gui:GUI ):Node = super.getNode( gui ).use( n => {
     n.disable = !gui.controller.player.devCards.exists( _.usable )
     n
   } )

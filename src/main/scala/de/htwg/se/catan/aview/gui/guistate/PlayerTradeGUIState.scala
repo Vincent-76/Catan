@@ -1,13 +1,14 @@
 package de.htwg.se.catan.aview.gui.guistate
 
 import de.htwg.se.catan.aview.gui.util.{ ActionHeader, FlowGridPane }
-import de.htwg.se.catan.aview.gui.{ GUI, GUICommand, GUIState }
+import de.htwg.se.catan.aview.gui.{ GUI, GUIApp, GUICommand, GUIState }
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Cards._
 import de.htwg.se.catan.model.Player
 import de.htwg.se.catan.model.state.PlayerTradeState
-import scalafx.geometry.Pos
+import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.Button
+import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{ BorderPane, HBox, Priority, VBox }
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
@@ -31,7 +32,10 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
           style = "-fx-font-size: 16; -fx-font-weight: bold;"
         },
         resourceDisplay( state.get ),
-        new Text( "Get" ),
+        new Text( "Get" ) {
+          fill = Color.White
+          style = "-fx-font-size: 16; -fx-font-weight: bold;"
+        },
         resourceDisplay( state.give )
       )
     }
@@ -49,16 +53,24 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
     }
   } )
 
-  private def resourceDisplay( resources:ResourceCards ):FlowGridPane = new FlowGridPane( 2 ) {
-    hgap = 16
-    vgap = 6
-    addAll( resources.sort.filter( _._2 > 0 ).map( d => new BorderPane {
-      left = new Text( d._1.title ) {
-        style = "-fx-font-size: 10"
-      }
-      right = new Text( d._2.toString ) {
-        style = "-fx-font-size: 10"
-      }
+  private def resourceDisplay( resources:ResourceCards ):FlowGridPane = new FlowGridPane( 3 ) {
+    padding = Insets( 10, 10, 10, 10 )
+    hgrow = Priority.Always
+    vgap = 10
+    hgap = 10
+    addAll( resources.sort.filter( _._2 > 0 ).map( d => new VBox {
+      hgrow = Priority.Always
+      alignment = Pos.Center
+      children = List(
+        new ImageView( GUIApp.resourceIcons( d._1 ) ) {
+          fitWidth = 40
+          preserveRatio = true
+        },
+        new Text( d._2.toString ) {
+          styleClass.add( "resourceCounter" )
+          fill = Color.White
+        }
+      )
     } ) )
   }
 

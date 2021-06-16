@@ -32,7 +32,7 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
       alignment = Pos.Center
       children = List(
         new Text( if( maximum.contains( d._1 ) ) "Max: " + maximum( d._1 ) else "" ) {
-          style = "-fx-font-size: 12"
+          style = "-fx-font-size: 14"
           fill = GUIApp.colorOf( d._1 ).darker.darker
         },
         new ImageView( GUIApp.resourceIcons( d._1 ) ) {
@@ -58,7 +58,7 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
   } )
 
   class ResourceCounter( r:Resource, i:Int = 0 ) extends Text( i.toString ) {
-    style = "-fx-font-size: 12"
+    style = "-fx-font-size: 14"
 
     def value:Int = Try( text.value.toInt ).getOrElse( 0 )
 

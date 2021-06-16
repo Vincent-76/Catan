@@ -1,10 +1,10 @@
 package de.htwg.se.catan.aview.gui
 
-import scalafx.scene.layout.Pane
+import scalafx.scene.Node
 
 /**
  * @author Vincent76;
  */
 trait GUICommand {
-  def getPane( gui:GUI ):Pane
+  def getNode( gui:GUI ):Node
 }

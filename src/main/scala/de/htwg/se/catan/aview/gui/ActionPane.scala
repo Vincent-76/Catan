@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview.gui
 
 import scalafx.geometry.Insets
 import scalafx.scene.Node
-import scalafx.scene.layout.{ AnchorPane, Priority, VBox }
+import scalafx.scene.layout.{ AnchorPane, Pane, Priority, VBox }
 
 /**
  * @author Vincent76;
@@ -20,8 +20,8 @@ class ActionPane( gui:GUI ) extends VBox {
       maxWidth = ActionPane.this.width.value - 20
       hgrow = Priority.Always
       vgrow = Priority.Always
-      val node:Node = s.getPane( gui )
-      children = node
+      val node:Node = s.getNode( gui )
+      children.add( node )
       AnchorPane.setAnchors( node, 0, 0, 0, 0 )
     } )
 

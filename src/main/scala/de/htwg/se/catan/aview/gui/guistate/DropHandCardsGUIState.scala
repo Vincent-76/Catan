@@ -7,6 +7,7 @@ import de.htwg.se.catan.model.Cards._
 import de.htwg.se.catan.model.Player
 import de.htwg.se.catan.model.state.DropHandCardsState
 import scalafx.geometry.{ Insets, Pos }
+import scalafx.scene.Node
 import scalafx.scene.control.Button
 import scalafx.scene.layout.{ BorderPane, Pane, Priority }
 import scalafx.scene.text.{ Text, TextAlignment }
@@ -17,7 +18,7 @@ import scalafx.scene.text.{ Text, TextAlignment }
 case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controller ) extends GUIState {
 
   override def getActions:List[GUICommand] = List( new GUICommand() {
-    override def getPane( gui:GUI ):Pane = new BorderPane {
+    override def getNode( gui:GUI ):Node = new BorderPane {
       vgrow = Priority.Always
       val p:Player = controller.player( state.pID )
       val selector:ResourceSelector = new ResourceSelector( p.resources, maxAmount = Some( p.resources.amount / 2 ) ) {
