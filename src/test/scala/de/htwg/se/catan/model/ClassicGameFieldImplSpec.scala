@@ -143,6 +143,8 @@ class ClassicGameFieldImplSpec extends WordSpec with Matchers {
       "have hex adjacent edges" in {
         val adjacentF = gameField.adjacentEdge( h, ClassicGameFieldImpl.adjacentOffset.size )
         adjacentF shouldBe None
+        val adjacentN = gameField.adjacentEdge( h, 2 )
+        adjacentN shouldBe None
         val adjacent0 = gameField.adjacentEdge( h, 0 )
         adjacent0 shouldNot be( None )
         edgeTuple( adjacent0.get ) shouldBe (h, h1)

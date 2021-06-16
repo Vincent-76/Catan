@@ -1,4 +1,4 @@
-name := "SE-Project"
+name := "Catan"
 
 version := "0.1"
 
