@@ -252,7 +252,7 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
         game2.getBuildableRoadSpotsForSettlement( vID ).map( _.id ) should contain theSameElementsAs List( 1, 3 )
       }
       "getBankTradeFactor" in {
-        val vertex = game.gameField.vertexList.find( v => v.port.isEmpty )
+        val vertex = game.gameField.vertexList.find( v => v.port.isDefined && v.port.get.specific.isDefined && v.port.get.specific.get == Clay )
         vertex shouldNot be( None )
         val game2 = game.setGameField( game.gameField.update( vertex.get.setBuilding( Some( Settlement( pID ) ) ) ) )
         game2.getBankTradeFactor( pID, Wood ) shouldBe game.defaultBankTradeFactor

@@ -12,7 +12,7 @@ libraryDependencies += "com.google.inject" % "guice" % "5.0.1"
 libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.0.1"
 libraryDependencies += "net.codingwell" %% "scala-guice" % "5.0.1"
 
-coverageExcludedPackages := "de.htwg.se.settlers.aview.*"
+coverageExcludedPackages := "de.htwg.se.catan.aview.*"
 coverageExcludedFiles := ".*(Catan|CatanModule)"
 
 lazy val osName = System.getProperty("os.name") match {

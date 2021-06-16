@@ -3,12 +3,12 @@ package de.htwg.se.catan.model.impl.turn
 import com.google.inject.Inject
 import de.htwg.se.catan.model.{ DevelopmentCard, PlayerID, Turn }
 
-case class ClassicTurnImpl ( playerIDVal:PlayerID = new PlayerID( -1 ),
-                                      usedDevCardVal:Boolean = false,
-                                      drawnDevCardsVal:List[DevelopmentCard] = List.empty ) extends Turn {
+case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
+                            usedDevCardVal:Boolean = false,
+                            drawnDevCardsVal:List[DevelopmentCard] = List.empty ) extends Turn {
 
   @Inject
-  def this() = this( new PlayerID( -1 ) )
+  def this( ) = this( new PlayerID( -1 ) )
 
   def playerID:PlayerID = playerIDVal
 
