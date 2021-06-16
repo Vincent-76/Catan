@@ -59,7 +59,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl] {
       } )
     } )
     coords.foreach( d => drawWater( gameField, coords, hWidth, hSize, d._1, d._2 ) )
-    //coords.foreach( d => drawWater( gameField, coords, hSize, d._1, d._2 ) )
+    //coords.foreach( d => drawWater( gameField, coords, hSize, d._1, d._2 ) ) TEST
     coords.red( ResourceCards.of(), ( tileNumbers:ResourceCards, h:Hex, center:(Double, Double) ) => h.area match {
       case a:LandArea => a.f match {
         case r:Resource if tileNumbers.contains( r ) =>
