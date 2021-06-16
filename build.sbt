@@ -13,7 +13,7 @@ libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" %
 libraryDependencies += "net.codingwell" %% "scala-guice" % "5.0.1"
 
 coverageExcludedPackages := "de.htwg.se.settlers.aview.*"
-coverageExcludedFiles := ".*Catan"
+coverageExcludedFiles := ".*(Catan|CatanModule)"
 
 lazy val osName = System.getProperty("os.name") match {
   case n if n.startsWith("Linux") => "linux"

@@ -1,0 +1,20 @@
+package de.htwg.se.catan.model.state
+
+import de.htwg.se.catan.model.commands.{ AddPlayerCommand, SetInitBeginnerStateCommand }
+import de.htwg.se.catan.model.{ Command, PlayerColor, State }
+
+/**
+ * @author Vincent76;
+ */
+case class InitPlayerState( ) extends State {
+
+  override def addPlayer( playerColor:PlayerColor, name:String ):Option[Command] = Some(
+    AddPlayerCommand( playerColor, name, this )
+  )
+
+  override def setInitBeginnerState( ):Option[Command] = Some(
+    SetInitBeginnerStateCommand( this )
+  )
+
+  //override def toString:String = getClass.getSimpleName
+}
