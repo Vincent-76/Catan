@@ -11,7 +11,6 @@ import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, Rob
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model._
-import de.htwg.se.catan.util.PlayerFactory
 import net.codingwell.scalaguice.ScalaModule
 
 import scala.util.Random

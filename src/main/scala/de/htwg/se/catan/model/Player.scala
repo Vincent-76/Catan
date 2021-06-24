@@ -41,6 +41,11 @@ case object Yellow extends PlayerColor( "Yellow" )
 
 case object Red extends PlayerColor( "Red" )
 
+
+trait PlayerFactory {
+  def create( pID:PlayerID, color:PlayerColor, name:String ):Player
+}
+
 object Player {
 
 }

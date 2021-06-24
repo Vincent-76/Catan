@@ -6,7 +6,7 @@ import de.htwg.se.catan.model.Cards._
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.state.InitState
-import de.htwg.se.catan.util.{ PlayerFactory, _ }
+import de.htwg.se.catan.util._
 
 import scala.collection.immutable.{ List, SortedMap, TreeMap }
 import scala.util.{ Failure, Random, Success, Try }
