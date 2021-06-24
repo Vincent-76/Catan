@@ -45,7 +45,7 @@ package object util {
 
     def removeSpaces( ):String = s.replaceAll( "\\s+", "" )
 
-    def =^( c:String ):Boolean = s.toLowerCase == c.toLowerCase
+    def ^=( c:String ):Boolean = s.toLowerCase == c.toLowerCase
   }
 
   implicit class RichRandom( r:Random ) {

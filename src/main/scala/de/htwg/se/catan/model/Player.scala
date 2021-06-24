@@ -1,15 +1,26 @@
 package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNodeSeq
+import de.htwg.se.catan.model.impl.fileio.XMLSerializable
 import de.htwg.se.catan.util._
 
 import scala.util.Try
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
 
-class PlayerID /*private[Game]*/ ( val id:Int ) {
+object PlayerID {
+  def fromXML( node:Node ):PlayerID = PlayerID(
+    id = ( node \ "@id" ).content.toInt
+  )
+}
+
+case class PlayerID /*private[Game]*/ ( id:Int ) extends XMLSerializable {
+
+  def toXML:Node = <PlayerID id={ id.toString } />
 
   override def toString:String = id.toString;
 }
@@ -50,7 +61,7 @@ object Player {
 
 }
 
-trait Player {
+trait Player extends XMLSerializable {
 
   def id:PlayerID
   def name:String

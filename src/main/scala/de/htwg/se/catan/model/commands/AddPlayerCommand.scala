@@ -16,7 +16,7 @@ case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPla
       Failure( PlayerNameEmpty )
     else if( name.length > game.maxPlayerNameLength )
       Failure( PlayerNameTooLong( name ) )
-    else if ( game.players.exists( _._2.name =^ name ) )
+    else if ( game.players.exists( _._2.name ^= name ) )
       Failure( PlayerNameAlreadyExists( name ) )
     else if ( game.players.exists( _._2.color == playerColor ) )
       Failure( PlayerColorIsAlreadyInUse( playerColor ) )

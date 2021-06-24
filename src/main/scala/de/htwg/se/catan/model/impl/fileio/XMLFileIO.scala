@@ -1,0 +1,179 @@
+package de.htwg.se.catan.model.impl.fileio
+
+import de.htwg.se.catan.CatanModule
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
+import de.htwg.se.catan.model.{ FileIO, Game }
+
+import java.io
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import scala.reflect.io.File
+import scala.xml.{ Elem, Node, NodeSeq }
+
+trait XMLSerializable {
+  def toXML:Node
+}
+
+case class XMLParseError( expected:String, got:String ) extends RuntimeException {
+  override def toString:String = "XMLParseError: Expected -> '" + expected + "', Got -> '" + got + "'"
+}
+
+object XMLFileIO {
+
+  private def wrap( data:io.Serializable ):io.Serializable = data match {
+    case n:Node => n
+    case s => <v>
+      {s}
+    </v>
+  }
+
+  /*implicit class XMLAnyVal[T]( val e:T ) {
+    def toXML:io.Serializable = e match {
+      case e:XMLSerializable => e.toXML
+      case _ => e.toString
+    }
+  }*/
+
+  implicit class XMLOption[T]( val option:Option[T] ) {
+    def toXML( valBuilder:T => io.Serializable ):Node = option match {
+      case Some( e ) => <Some>
+        {wrap( valBuilder( e ) )}
+      </Some>
+      case _ => <None/>
+    }
+  }
+
+  implicit class XMLMap[K, V]( val map:Map[K, V] ) {
+    def toXML( keyBuilder:K => io.Serializable, valBuilder:V => io.Serializable ):Node = <Map>
+      {map.map( d =>
+        <entry>
+          <key>
+            {wrap( keyBuilder( d._1 ) )}
+          </key>
+          <value>
+            {wrap( valBuilder( d._2 ) )}
+          </value>
+        </entry>
+      ).toSeq}
+    </Map>
+  }
+
+  implicit class XMLSequence[E]( val list:Seq[E] ) {
+    def toXML( valBuilder:E => io.Serializable ):Node = <List>
+      {list.map( e =>
+        <entry>
+          {wrap( valBuilder( e ) )}
+        </entry>
+      )}
+    </List>
+  }
+
+  implicit class XMLTuple2[T1, T2]( val tuple:(T1, T2) ) {
+    def toXML( builder1:T1 => io.Serializable, builder2:T2 => io.Serializable ):Node = <Tuple2>
+      <value1>
+        {wrap( builder1( tuple._1 ) )}
+      </value1>
+      <value2>
+        {wrap( builder2( tuple._2 ) )}
+      </value2>
+    </Tuple2>
+  }
+
+  implicit class XMLTuple3[T1, T2, T3]( val tuple:(T1, T2, T3) ) {
+    def toXML( builder1:T1 => io.Serializable, builder2:T2 => io.Serializable, builder3:T3 => io.Serializable ):Node = <Tuple3>
+      <value1>
+        {wrap( builder1( tuple._1 ) )}
+      </value1>
+      <value2>
+        {wrap( builder2( tuple._2 ) )}
+      </value2>
+      <value3>
+        {wrap( builder3( tuple._3 ) )}
+      </value3>
+    </Tuple3>
+  }
+
+  implicit class XMLNodeSeq( nodeSeq:NodeSeq ) {
+    def content:String = nodeSeq.text.trim
+  }
+
+  implicit class XMLNode( node:Node ) {
+    def firstChild( ):Option[Node] = {
+      val r = node.child.collectFirst {
+        case e:Elem => e
+      }
+      if( r.isEmpty ) {
+        val n = Some( node )
+        println( "T" )
+      }
+      r
+    }
+
+    def childOf( tag:String ):Node = {
+      val child = (node \ tag).headOption
+      if( child.isEmpty )
+        throw XMLParseError( expected = tag, got = "Nothing" )
+      val c = child.get.firstChild()
+      c match {
+        case Some( c ) => c
+        case None => throw XMLParseError( expected = "Content in tag[" + tag + "]", got = "Nothing" )
+      }
+    }
+
+    def convertToSeq[E]( builder:Node => E ):Seq[E] = node.label match {
+      case "List" => (node \ "entry").map( n => builder( n.firstChild().get ) )
+      case e => throw XMLParseError( expected = "List", got = e )
+    }
+
+    def convertToList[E]( builder:Node => E ):List[E] = convertToSeq( builder ).toList
+
+    def convertToVector[E]( builder:Node => E ):Vector[E] = convertToSeq( builder ).toVector
+
+    def toOption[E]( builder:Node => E ):Option[E] = node.label match {
+      case "Some" => Some( builder( node.firstChild().get ) )
+      case "None" => None
+      case e => throw XMLParseError( expected = "Option", got = e )
+    }
+
+    def convertToMap[K, V]( keyBuilder:Node => K, valBuilder:Node => V ):Map[K, V] =
+      convertToMap2( ( keyNode, valNode ) => (keyBuilder( keyNode ), valBuilder( valNode )) )
+
+    def convertToMap2[K, V]( builder:(Node, Node) => (K, V) ):Map[K, V] = node.label match {
+      case "Map" => (node \ "entry").map( n => builder( n.childOf( "key" ), n.childOf( "value" ) ) ).toMap
+      case e => throw XMLParseError( expected = "Map", got = e )
+    }
+
+    def toTuple2[T1, T2]( builder1:Node => T1, builder2:Node => T2 ):(T1, T2) = node.label match {
+      case "Tuple2" => (
+        builder1( node.childOf( "value1" ) ),
+        builder2( node.childOf( "value2" ) )
+      )
+      case e => throw XMLParseError( expected = "Tuple2", got = e )
+    }
+
+    def toTuple3[T1, T2, T3]( builder1:Node => T1, builder2:Node => T2, builder3:Node => T3 ):(T1, T2, T3) = node.label match {
+      case "Tuple3" => (
+        builder1( node.childOf( "value1" ) ),
+        builder2( node.childOf( "value2" ) ),
+        builder3( node.childOf( "value3" ) )
+      )
+      case e => throw XMLParseError( expected = "Tuple3", got = e )
+    }
+  }
+
+}
+
+class XMLFileIO extends FileIO {
+
+  override def load( path:String ):Game = {
+    val file = scala.xml.XML.loadFile( path )
+    CatanModule.gameFromXML( file )
+  }
+
+  override def save( game:Game ):String = {
+    val c = Calendar.getInstance().getTime
+    val file = File( "Catan_" + new SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" ).format( c ) + "_savegame.xml" )
+    scala.xml.XML.save( file.toAbsolute.path, game.toXML );
+    file.toAbsolute.path
+  }
+}

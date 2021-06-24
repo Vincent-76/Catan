@@ -1,8 +1,10 @@
 package de.htwg.se.catan.controller.controllerBaseImpl
 
 import com.google.inject.Inject
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 
 import scala.util.{ Failure, Success }
 
@@ -10,7 +12,7 @@ import scala.util.{ Failure, Success }
  * @author Vincent76;
  */
 
-class ClassicControllerImpl @Inject() ( var gameVal:Game ) extends Controller {
+class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) extends Controller {
   var running:Boolean = true
   //var gameVal:Game = ClassicGameImpl( gameField = ClassicGameFieldImpl() )
   private var undoStack:List[Command] = Nil
@@ -65,6 +67,22 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game ) extends Controller {
     case head :: stack =>
       val (game, info) = head.doStep( this.game ).get
       actionDone( game, head, stack, info )
+  }
+
+  def saveGame():Unit = {
+    val s = game
+    val xml = s.toXML
+    val s2 = CatanModule.gameFromXML( xml )
+    println( "Same: " + ( s.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) == s2.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) ).toString )
+    val path = fileIO.save( game )
+    update( info = Some( GameSavedInfo( path ) ) )
+  }
+
+  def loadGame( path:String ):Unit = {
+    gameVal = fileIO.load( path )
+    undoStack = Nil
+    redoStack = Nil
+    update( info = Some( GameLoadedInfo( path ) ) )
   }
 
   def exit( info:Option[Info] = None ):Unit = {

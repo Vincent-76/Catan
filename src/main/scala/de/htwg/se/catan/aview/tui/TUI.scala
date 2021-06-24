@@ -3,9 +3,9 @@ package de.htwg.se.catan.aview.tui
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Cards._
 import de.htwg.se.catan.model.state._
-import de.htwg.se.catan.model.{PlacementPointNotEmpty, Player, _}
+import de.htwg.se.catan.model.{ PlacementPointNotEmpty, Player, _ }
 import de.htwg.se.catan.aview.tui.TUI.InvalidFormat
-import de.htwg.se.catan.aview.tui.command.{ExitCommand, HelpCommand, RedoCommand, UndoCommand}
+import de.htwg.se.catan.aview.tui.command.{ ExitCommand, HelpCommand, LoadCommand, RedoCommand, SaveCommand, UndoCommand }
 import de.htwg.se.catan.aview.tui.tuistate._
 import de.htwg.se.catan.util._
 
@@ -33,7 +33,9 @@ object TUI {
     HelpCommand,
     ExitCommand,
     UndoCommand,
-    RedoCommand
+    RedoCommand,
+    SaveCommand,
+    LoadCommand
   )
 
   case class InvalidFormat( input:String ) extends ControllerError
@@ -213,6 +215,8 @@ class TUI( val controller:Controller ) extends Observer {
       case GameEndInfo( winner ) =>
         val p = controller.player( winner )
         TUI.out( TUI.displayName( p ) + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" )
+      case GameSavedInfo( path ) => TUI.outln( "Game was saved to: " + path )
+      case GameLoadedInfo( path ) => TUI.outln( "Game was loaded from: " + path )
       case _ =>
     }
   }

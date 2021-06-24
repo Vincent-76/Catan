@@ -16,7 +16,7 @@ import scala.util.{ Failure, Success, Try }
 
 class CommandSpec extends WordSpec with Matchers {
   "Command" when {
-    val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
+    val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" )
     "AbortPlayerTradeCommand" should {
       val state = PlayerTradeEndState( ResourceCards.of(), ResourceCards.of(), Map.empty )
       "success" in {

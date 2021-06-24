@@ -4,10 +4,19 @@ import de.htwg.se.catan.model.Cards.ResourceCards
 import de.htwg.se.catan.model.commands.{ BankTradeCommand, BuyDevCardCommand, EndTurnCommand, SetBuildStateCommand, SetPlayerTradeStateCommand, UseDevCardCommand }
 import de.htwg.se.catan.model.{ Command, DevelopmentCard, State, StructurePlacement }
 
+import scala.xml.Node
+
 /**
  * @author Vincent76;
  */
+
+object ActionState {
+  def fromXML( node:Node ):ActionState = ActionState()
+}
+
 case class ActionState() extends State {
+
+  def toXML:Node = <ActionState />
 
   override def setBuildState( structure:StructurePlacement ):Option[Command] = Some(
     SetBuildStateCommand( structure, this )

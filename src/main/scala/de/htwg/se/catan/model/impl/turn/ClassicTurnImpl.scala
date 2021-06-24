@@ -1,7 +1,18 @@
 package de.htwg.se.catan.model.impl.turn
 
 import com.google.inject.Inject
-import de.htwg.se.catan.model.{ DevelopmentCard, PlayerID, Turn }
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLSequence }
+import de.htwg.se.catan.model.{ Cards, DevelopmentCard, PlayerID, Turn }
+
+import scala.xml.Node
+
+object ClassicTurnImpl {
+  def fromXML( node:Node ):ClassicTurnImpl = ClassicTurnImpl(
+    playerIDVal = PlayerID.fromXML( node.childOf( "playerID" ) ),
+    usedDevCardVal = ( node \ "@usedDevCard" ).content.toBoolean,
+    drawnDevCardsVal = node.childOf( "drawnDevCards" ).convertToList( n => Cards.devCardOf( n.content ).get )
+  )
+}
 
 case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
                             usedDevCardVal:Boolean = false,
@@ -9,6 +20,11 @@ case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
 
   @Inject
   def this( ) = this( new PlayerID( -1 ) )
+
+  def toXML:Node = <ClassicTurnImpl usedDevCard={ usedDevCardVal.toString }>
+    <playerID>{ playerIDVal.toXML }</playerID>
+    <drawnDevCards>{ drawnDevCardsVal.toXML( _.title ) }</drawnDevCards>
+  </ClassicTurnImpl>
 
   def playerID:PlayerID = playerIDVal
 

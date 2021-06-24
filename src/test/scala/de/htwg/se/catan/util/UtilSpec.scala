@@ -46,8 +46,8 @@ class UtilSpec extends WordSpec with Matchers {
         " Test  ".removeSpaces() shouldBe "Test"
       }
       "=^" in {
-        ( "test" =^ "TeSt" ) shouldBe true
-        ( "Test" =^ "tEEst" ) shouldBe false
+        ( "test" ^= "TeSt" ) shouldBe true
+        ( "Test" ^= "tEEst" ) shouldBe false
       }
     }
     "RichRandom" should {

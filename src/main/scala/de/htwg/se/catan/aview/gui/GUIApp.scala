@@ -154,6 +154,8 @@ class GUIApp( val controller:Controller ) extends Observer {
         Some( p.name + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" ),
         centered = true
       )
+    case GameSavedInfo( path ) => gui.showInfoDialog( "Game saved", text = Some( path ) )
+    case GameLoadedInfo( path ) => gui.showInfoDialog( "Game loaded", text = Some( path ) )
     case _ =>
   }
 

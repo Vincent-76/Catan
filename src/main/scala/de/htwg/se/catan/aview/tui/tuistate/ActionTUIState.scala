@@ -33,9 +33,9 @@ case class ActionTUIState( controller:Controller ) extends TUIState {
     Some( "(" + TUI.regexIgnoreCase( "end" ) + "|" + availableCommands.map( _.inputPattern ).mkString( "|" ) + ")" )
   }
 
-  override def action( commandInput:CommandInput ):Unit = availableCommands.find( c => c.command =^ commandInput.command.get ) match {
+  override def action( commandInput:CommandInput ):Unit = availableCommands.find( c => c.command ^= commandInput.command.get ) match {
     case Some( c ) => c.action( commandInput, controller )
-    case _ if commandInput.input =^ "end" => controller.endTurn()
+    case _ if commandInput.input ^= "end" => controller.endTurn()
     case _ =>
   }
 }

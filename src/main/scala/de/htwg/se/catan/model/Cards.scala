@@ -1,8 +1,10 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.util._
 
-import scala.util.{Failure, Random, Success, Try}
+import scala.util.{ Failure, Random, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
@@ -31,6 +33,8 @@ object Cards {
 
     def of( wood:Int = 0, clay:Int = 0, sheep:Int = 0, wheat:Int = 0, ore:Int = 0 ):ResourceCards =
       Map( Wood -> wood, Clay -> clay, Sheep -> sheep, Wheat -> wheat, Ore -> ore )
+
+    def fromXML( node:Node ):ResourceCards = node.convertToMap( n => Resources.of( n.content ).get, _.content.toInt )
   }
 
   implicit class RichResourceCards( resources:ResourceCards ) {
@@ -82,6 +86,9 @@ object Cards {
   def usableDevCardOf( s:String ):Option[DevelopmentCard] =
     devCards.filter( _.usable ).find( _.title.toLowerCase == s.toLowerCase )
 
+  def devCardOf( s:String ):Option[DevelopmentCard] = devCards.find( _.title.toLowerCase ^= s.toLowerCase )
+
+  def bonusCardOf( s:String ):Option[BonusCard] = bonusCards.find( _.title.toLowerCase ^= s.toLowerCase )
 }
 
 abstract class Card

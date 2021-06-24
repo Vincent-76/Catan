@@ -2,14 +2,17 @@ package de.htwg.se.catan.model.impl.game
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Cards._
-import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2 }
+import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.state.InitState
 import de.htwg.se.catan.util._
 
 import scala.collection.immutable.{ List, SortedMap, TreeMap }
 import scala.util.{ Failure, Random, Success, Try }
+import scala.xml.{ Node, NodeSeq }
 
 /**
  * @author Vincent76;
@@ -23,12 +26,39 @@ object ClassicGameImpl {
     CityPlacement
   )
 
+  def fromXML( node:Node ):ClassicGameImpl = ClassicGameImpl(
+    gameFieldVal = CatanModule.gameFieldFromXML( node.childOf( "gameField" ) ),
+    turnVal = CatanModule.turnFromXML( node.childOf( "turn" ) ),
+    seedVal = (node \ "@seed").content.toInt,
+    playerFactory = CatanModule.playerFactoryFromXML( (node \ "@playerFactoryClass").content ),
+    playerFactoryClass = (node \ "@playerFactoryClass").content,
+    availablePlacementsVal = node.childOf( "availablePlacements" ).convertToList( n => Placement.of( n.content ).get ),
+    stateVal = State.fromXML( node.childOf( "state" ) ),
+    resourceStack = ResourceCards.fromXML( node.childOf( "resourceStack" ) ),
+    developmentCards = node.childOf( "developmentCards" ).convertToList( n => Cards.devCardOf( n.content ).get ),
+    playersVal = TreeMap(
+      node.childOf( "players" ).convertToMap(
+        n => PlayerID.fromXML( n ),
+        n => CatanModule.playerFromXML( n )
+      ).toArray:_*
+    )( PlayerOrdering ),
+    bonusCardsVal = node.childOf( "bonusCards" ).convertToMap(
+      n => Cards.bonusCardOf( n.content ).get,
+      _.toOption( _.toTuple2(
+        n => PlayerID.fromXML( n ),
+        _.content.toInt
+      ) )
+    ),
+    winnerVal = node.childOf( "winner" ).toOption( n => PlayerID.fromXML( n ) ),
+    roundVal = (node \ "@round").content.toInt
+  )
 }
 
 case class ClassicGameImpl( gameFieldVal:GameField,
                             turnVal:Turn,
                             seedVal:Int,
                             playerFactory:PlayerFactory,
+                            playerFactoryClass:String,
                             availablePlacementsVal:List[Placement],
                             stateVal:State = InitState(),
                             resourceStack:ResourceCards = Cards.getResourceCards( ClassicGameImpl.stackResourceAmount ),
@@ -40,77 +70,142 @@ case class ClassicGameImpl( gameFieldVal:GameField,
                           ) extends Game {
 
   @Inject
-  def this( gameField:GameField, turn:Turn, @Named( "seed" ) seed:Int, playerFactory:PlayerFactory, @Named( "availablePlacements" ) availablePlacements:List[Placement] ) = this(
+  def this(
+            gameField:GameField,
+            turn:Turn,
+            @Named( "seed" ) seed:Int,
+            playerFactory:PlayerFactory,
+            @Named( "playerFactoryClass" ) playerFactoryClass:String,
+            @Named( "availablePlacements" ) availablePlacements:List[Placement]
+          ) = this(
     gameFieldVal = gameField,
     turnVal = turn,
     seedVal = seed,
     playerFactory = playerFactory,
+    playerFactoryClass = playerFactoryClass,
     availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.contains ),
     developmentCards = Cards.getDevStack( new Random( seed ) ),
   )
 
-  def this( gameField:GameField, turn:Turn, seed:Int, playerFactory:PlayerFactory ) =
-    this( gameField, turn, seed, playerFactory, ClassicGameImpl.availablePlacements )
+  def this( gameField:GameField, turn:Turn, seed:Int, playerFactory:PlayerFactory, playerFactoryClass:String ) =
+    this( gameField, turn, seed, playerFactory, playerFactoryClass, ClassicGameImpl.availablePlacements )
+
+
+  def toXML:Node = <ClassicGameImpl seed={seedVal.toString} round={roundVal.toString} playerFactoryClass={playerFactoryClass}>
+    <turn>
+      {turnVal.toXML}
+    </turn>
+    <availablePlacements>
+      {availablePlacementsVal.toXML( _.title )}
+    </availablePlacements>
+    <state>
+      {stateVal.toXML}
+    </state>
+    <resourceStack>
+      {resourceStack.toXML( _.title, _.toString )}
+    </resourceStack>
+    <developmentCards>
+      {developmentCards.toXML( _.title )}
+    </developmentCards>
+    <players>
+      {playersVal.toXML( _.toXML, _.toXML )}
+    </players>
+    <bonusCards>
+      {bonusCardsVal.toXML( _.title, _.toXML( _.toXML( _.toXML, _.toString ) ) )}
+    </bonusCards>
+    <winner>
+      {winnerVal.toXML( _.toXML )}
+    </winner>
+    <gameField>
+      {gameFieldVal.toXML}
+    </gameField>
+  </ClassicGameImpl>
+
 
   def minPlayers:Int = 3
+
   def maxPlayers:Int = 4
+
   def requiredVictoryPoints:Int = 10
+
   def maxHandCards:Int = 7
+
   def defaultBankTradeFactor:Int = 4
+
   def unspecifiedPortFactor:Int = 3
+
   def specifiedPortFactor:Int = 2
+
   def maxPlayerNameLength:Int = 10
+
   def availablePlacements:List[Placement] = availablePlacementsVal
 
   def gameField:GameField = gameFieldVal
+
   def state:State = stateVal
+
   def players:Map[PlayerID, Player] = playersVal
+
   def turn:Turn = turnVal
+
   def bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] = bonusCardsVal
+
   def round:Int = roundVal
+
   def winner:Option[PlayerID] = winnerVal
+
   def seed:Int = seedVal
 
   def bonusCard( bonusCard:BonusCard ):Option[(PlayerID, Int)] = bonusCardsVal( bonusCard )
 
   def setState( state:State ):ClassicGameImpl = copy( stateVal = state )
+
   def setGameField( gameField:GameField ):ClassicGameImpl = copy( gameFieldVal = gameField )
+
   def setResourceStack( resourceStack:ResourceCards ):ClassicGameImpl = copy( resourceStack = resourceStack )
+
   def setDevelopmentCards( developmentCards:List[DevelopmentCard] ):ClassicGameImpl = copy( developmentCards = developmentCards )
+
   def updatePlayer( player:Player ):ClassicGameImpl = copy( playersVal = playersVal.updated( player.id, player ) )
+
   def updatePlayers( updatePlayers:Player* ):ClassicGameImpl = copy( playersVal = updatePlayers.red( playersVal, ( nPlayers:SortedMap[PlayerID, Player], p:Player ) => {
     nPlayers.updated( p.id, p )
   } ) )
+
   def setTurn( turn:Turn ):ClassicGameImpl = copy( turnVal = turn )
+
   def setBonusCard( bonusCard:BonusCard, value:Option[(PlayerID, Int)] ):ClassicGameImpl = copy( bonusCardsVal = bonusCardsVal.updated( bonusCard, value ) )
+
   def setBonusCards( bonusCards:Map[BonusCard, Option[(PlayerID, Int)]] ):ClassicGameImpl = copy( bonusCardsVal = bonusCards )
+
   def setWinner( winner:PlayerID ):ClassicGameImpl = copy( winnerVal = Some( winner ) )
 
 
-  def nextRound():ClassicGameImpl = copy( turnVal = turnVal.set( nextTurn() ), roundVal = roundVal + 1 )
-  def previousRound( turn:Option[Turn] = None ):ClassicGameImpl = copy( turnVal = turn.getOrElse( turnVal.set( previousTurn() ) ), roundVal = roundVal - 1 )
-  def nextTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id + 1 ).getOrElse( playersVal.firstKey )
-  def previousTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id - 1 ).getOrElse( playersVal.lastKey )
+  def nextRound( ):ClassicGameImpl = copy( turnVal = turnVal.set( nextTurn() ), roundVal = roundVal + 1 )
 
+  def previousRound( turn:Option[Turn] = None ):ClassicGameImpl = copy( turnVal = turn.getOrElse( turnVal.set( previousTurn() ) ), roundVal = roundVal - 1 )
+
+  def nextTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id + 1 ).getOrElse( playersVal.firstKey )
+
+  def previousTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id - 1 ).getOrElse( playersVal.lastKey )
 
 
   def addPlayer( playerColor:PlayerColor, name:String ):ClassicGameImpl = {
     val pID = new PlayerID( playersVal.size )
     //val p = ClassicPlayerImpl( pID, playerColor, name )
     val p = playerFactory.create( pID, playerColor, name )
-    copy( playersVal = playersVal + (pID -> p ) )
+    copy( playersVal = playersVal + (pID -> p) )
   }
 
   def addPlayerF( playerColor:PlayerColor, name:String ):Try[ClassicGameImpl] = {
     if( playersVal.exists( _._2.color == playerColor ) )
       Failure( PlayerColorIsAlreadyInUse( playerColor ) )
-    else if( playersVal.exists( _._2.name =^ name ) )
+    else if( playersVal.exists( _._2.name ^= name ) )
       Failure( PlayerNameAlreadyExists( name ) )
     else Success( addPlayer( playerColor, name ) )
   }
 
   def removeLastPlayer( ):ClassicGameImpl = copy( playersVal = playersVal.init )
-
 
 
   def rollDice( r:Random ):Int = r.nextInt( 6 ) + 1
@@ -119,7 +214,6 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     val r = new Random( seedVal * round )
     (rollDice( r ), rollDice( r ))
   }
-
 
 
   def hasStackResources( resources:ResourceCards ):Boolean = resourceStack.has( resources )
@@ -190,7 +284,6 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def addDevCard( devCard:DevelopmentCard ):ClassicGameImpl = copy( developmentCards = devCard +: developmentCards )
 
 
-
   def getPlayerBonusCards( pID:PlayerID ):Iterable[BonusCard] =
     bonusCardsVal.filter( d => d._2.isDefined && d._2.get._1 == pID ).keys
 
@@ -211,7 +304,6 @@ case class ClassicGameImpl( gameFieldVal:GameField,
         else factor
       else factor
     } )
-
 
 
   def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = (playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
@@ -237,7 +329,6 @@ case class ClassicGameImpl( gameFieldVal:GameField,
       gameField.adjacentEdges( vertex.get ).filter( e => (e.h1.isLand || e.h2.isLand) && e.road.isEmpty )
     else List.empty
   }
-
 
 
   def noBuildingInRange( v:Vertex ):Boolean = {

@@ -1,7 +1,8 @@
 package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.Cards.ResourceCards
-import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
+import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
+import de.htwg.se.catan.util.RichString
 
 import scala.util.{ Failure, Success, Try }
 
@@ -9,6 +10,13 @@ import scala.util.{ Failure, Success, Try }
  * @author Vincent76;
  */
 
+object Placement {
+  def all:List[Placement] = StructurePlacement.all ++ List(
+    RobberPlacement
+  )
+
+  def of( title:String ):Option[Placement] = all.find( _.title.toLowerCase ^= title.toLowerCase )
+}
 
 abstract class Placement( val title:String ) {
   def getBuildablePoints( game:Game, pID:PlayerID, any:Boolean = false ):List[PlacementPoint]

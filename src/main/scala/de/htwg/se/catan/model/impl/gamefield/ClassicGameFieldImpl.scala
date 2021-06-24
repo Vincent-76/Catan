@@ -2,9 +2,11 @@ package de.htwg.se.catan.model.impl.gamefield
 
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl._
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2, XMLTuple3 }
 import de.htwg.se.catan.util._
 
 import scala.util.Random
+import scala.xml.Node
 
 /**
  * @author Vincent76;
@@ -15,6 +17,11 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
                                  robber:Hex
                                ) extends GameField {
 
+  def toXML:Node = <ClassicGameFieldImpl robber={ robber.id.toString }>
+    <hexagons>{ hexagons.toXML( _.toXML( _.toXML( _.toXML ) ) ) }</hexagons>
+    <edges>{ edges.toXML( _.toXML( _.id.toString, _.id.toString ), _.toXML ) }</edges>
+    <vertices>{ vertices.toXML( _.toXML( _.id.toString, _.id.toString, _.id.toString ), _.toXML ) }</vertices>
+  </ClassicGameFieldImpl>
 
   def fieldWidth:Int = hexagons.map( r => r.size ).max
   def fieldHeight:Int = hexagons.size
@@ -138,6 +145,24 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
 }
 
 object ClassicGameFieldImpl {
+
+  def fromXML( node:Node ):ClassicGameFieldImpl = {
+    val hexagons = node.childOf( "hexagons" ).convertToVector( _.convertToVector( _.toOption( n => Hex.fromXML( n ) ) ) )
+    val hexList = hexagons.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
+    ClassicGameFieldImpl(
+      hexagons = hexagons,
+      edges = node.childOf( "edges" ).convertToMap2( ( keyNode, valNode ) => {
+        val edge = Edge.fromXML( valNode, hexList )
+        ((edge.h1, edge.h2), edge)
+      } ),
+      vertices = node.childOf( "vertices" ).convertToMap2( ( keyNode, valNode ) => {
+        val vertex = Vertex.fromXML( valNode, hexList )
+        ((vertex.h1, vertex.h2, vertex.h3), vertex)
+      } ),
+      robber = hexList.find( _.id == ( node \ "@robber" ).content.toInt ).get
+    )
+  }
+
 
   def apply( seed:Int ):ClassicGameFieldImpl = {
     val random = new Random( seed )

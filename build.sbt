@@ -12,6 +12,9 @@ libraryDependencies += "com.google.inject" % "guice" % "5.0.1"
 libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.0.1"
 libraryDependencies += "net.codingwell" %% "scala-guice" % "5.0.1"
 
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2"
+
 coverageExcludedPackages := "de.htwg.se.catan.aview.*"
 coverageExcludedFiles := ".*(Catan|CatanModule)"
 

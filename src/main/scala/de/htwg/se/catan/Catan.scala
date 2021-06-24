@@ -4,6 +4,10 @@ import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.aview.gui.GUIApp
 import de.htwg.se.catan.aview.tui.TUI
 import de.htwg.se.catan.controller.Controller
+import de.htwg.se.catan.model.PlayerID
+import de.htwg.se.catan.model.impl.game
+import de.htwg.se.catan.model.impl.game.ClassicGameImpl
+import de.htwg.se.catan.model.state.InitBeginnerState
 
 import scala.io.StdIn
 

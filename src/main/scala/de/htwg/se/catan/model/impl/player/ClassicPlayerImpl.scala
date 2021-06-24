@@ -5,8 +5,23 @@ import de.htwg.se.catan.model.Cards._
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.util._
 import com.google.inject.assistedinject.Assisted
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLSequence }
 
 import scala.util.{ Failure, Random, Success, Try }
+import scala.xml.Node
+
+object ClassicPlayerImpl {
+  def fromXML( node:Node ):ClassicPlayerImpl = ClassicPlayerImpl(
+    idVal = PlayerID.fromXML( node.childOf( "id" ) ),
+    colorVal = PlayerColor.colorOf( ( node \ "@color" ).content ).get,
+    nameVal = ( node \ "@name" ).content,
+    resourcesVal = ResourceCards.fromXML( node.childOf( "resources" ) ),
+    devCardsVal = node.childOf( "devCards" ).convertToVector( n => Cards.devCardOf( n.content ).get ),
+    usedDevCards = node.childOf( "usedDevCards" ).convertToVector( n => Cards.devCardOf( n.content ).get ),
+    victoryPointsVal = ( node \ "@victoryPoints" ).content.toInt,
+    structures = node.childOf( "structures" ).convertToMap( n => StructurePlacement.of( n.content ).get, _.content.toInt )
+  )
+}
 
 case class ClassicPlayerImpl( idVal:PlayerID,
                               colorVal:PlayerColor,
@@ -24,6 +39,15 @@ case class ClassicPlayerImpl( idVal:PlayerID,
     colorVal = color,
     nameVal = name
   )
+
+
+  def toXML:Node = <ClassicPlayerImpl color={ colorVal.name } name={ nameVal } victoryPoints={ victoryPointsVal.toString }>
+    <id>{ idVal.toXML }</id>
+    <resources>{ resourcesVal.toXML( _.title, _.toString ) }</resources>
+    <devCards>{ devCardsVal.toXML( _.title ) }</devCards>
+    <usedDevCards>{ usedDevCards.toXML( _.title ) }</usedDevCards>
+    <structures>{ structures.toXML( _.title, _.toString ) }</structures>
+  </ClassicPlayerImpl>
 
 
   def id:PlayerID = idVal

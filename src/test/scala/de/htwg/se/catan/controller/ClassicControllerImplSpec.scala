@@ -2,6 +2,7 @@ package de.htwg.se.catan.controller
 
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model.Cards.ResourceCards
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
@@ -29,7 +30,7 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
   }
 
   "ClassicControllerImpl" when {
-    val controller = new ClassicControllerImpl( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) ) )
+    val controller = new ClassicControllerImpl( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" ), new XMLFileIO() )
     "new" should {
       "have game" in {
         val observer = new TestObserver()

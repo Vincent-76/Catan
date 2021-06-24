@@ -1,7 +1,9 @@
 package de.htwg.se.catan.controller
 
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Cards.ResourceCards
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.util.Observable
 
 /**
@@ -22,6 +24,10 @@ trait Controller extends Observable {
   def action( command:Option[Command] ):Unit
   def undoAction():Unit
   def redoAction():Unit
+
+  def saveGame():Unit
+
+  def loadGame( path:String ):Unit
 
   def exit( info:Option[Info] = None ):Unit
 

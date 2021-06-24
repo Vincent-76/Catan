@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.impl.fileio.XMLSerializable
 import de.htwg.se.catan.util._
 
 import scala.collection.immutable.List
@@ -14,7 +15,7 @@ object PlayerOrdering extends Ordering[PlayerID] {
   override def compare( x:PlayerID, y:PlayerID ):Int = x.id.compareTo( y.id )
 }
 
-trait Game {
+trait Game extends XMLSerializable {
 
   def minPlayers:Int
   def maxPlayers:Int

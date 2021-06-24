@@ -1,11 +1,38 @@
 package de.htwg.se.catan.model
 
 import Cards.ResourceCards
+import de.htwg.se.catan.model.impl.fileio.{ XMLParseError, XMLSerializable }
+import de.htwg.se.catan.model.state._
+
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
-trait State {
+object State {
+  def fromXML( node:Node ):State = node.label match {
+    case "ActionState" => ActionState.fromXML( node )
+    case "BuildInitRoadState" => BuildInitRoadState.fromXML( node )
+    case "BuildInitSettlementState" => BuildInitSettlementState.fromXML( node )
+    case "BuildState" => BuildState.fromXML( node )
+    case "DevRoadBuildingState" => DevRoadBuildingState.fromXML( node )
+    case "DiceState" => DiceState.fromXML( node )
+    case "DropHandCardsState" => DropHandCardsState.fromXML( node )
+    case "InitBeginnerState" => InitBeginnerState.fromXML( node )
+    case "InitPlayerState" => InitPlayerState.fromXML( node )
+    case "InitState" => InitState.fromXML( node )
+    case "MonopolyState" => MonopolyState.fromXML( node )
+    case "NextPlayerState" => NextPlayerState.fromXML( node )
+    case "PlayerTradeEndState" => PlayerTradeEndState.fromXML( node )
+    case "PlayerTradeState" => PlayerTradeState.fromXML( node )
+    case "RobberPlaceState" => RobberPlaceState.fromXML( node )
+    case "RobberStealState" => RobberStealState.fromXML( node )
+    case "YearOfPlentyState" => YearOfPlentyState.fromXML( node )
+    case e => throw XMLParseError( expected = "State", got = e )
+  }
+}
+
+trait State extends XMLSerializable {
 
   def initGame( ):Option[Command] = None
 

@@ -28,3 +28,7 @@ case class InsufficientStructuresInfo( pID:PlayerID, structure:StructurePlacemen
 case class NoPlacementPointsInfo( pID:PlayerID, structure:StructurePlacement ) extends Info
 
 case class GameEndInfo( winner:PlayerID ) extends Info
+
+case class GameSavedInfo( path:String ) extends Info
+
+case class GameLoadedInfo( path:String ) extends Info

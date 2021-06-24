@@ -1,9 +1,11 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.model.impl.fileio.XMLSerializable
+
 /**
  * @author Vincent76;
  */
-trait Turn {
+trait Turn extends XMLSerializable {
 
   def playerID:PlayerID
 
