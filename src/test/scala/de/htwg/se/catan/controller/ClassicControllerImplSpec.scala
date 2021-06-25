@@ -30,7 +30,7 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
   }
 
   "ClassicControllerImpl" when {
-    val controller = new ClassicControllerImpl( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" ), new XMLFileIO() )
+    val controller = new ClassicControllerImpl( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" ), XMLFileIO )
     "new" should {
       "have game" in {
         val observer = new TestObserver()

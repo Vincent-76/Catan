@@ -37,7 +37,8 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
       children = List(
         new Text( "Enter a name and choose a color to add a player,\n or continue to dice out the beginner." ) {
           fill = Color.White
-          style = "-fx-font-size: 20;"
+
+          style = "-fx-font-size: 20; -fx-text-alignment: center;"
         },
         textField,
         comboBox,
