@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model
 
-import Cards.ResourceCards
+import Card.ResourceCards
 import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state._

@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview.gui
 
 import de.htwg.se.catan.aview.gui.guistate._
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.state._
 import de.htwg.se.catan.util.{ Observer, _ }
@@ -21,7 +21,7 @@ import scalafx.scene.paint.Color
 object GUIApp {
   val stoneBackground:Background = getBackground( "/stone_background.png" )
   val woodBackground:Background = getBackground( "/wood_background.png" )
-  val resourceIcons:Map[Resource, Image] = Resources.get.map( r => (r, new Image( "/resources/" + r.title.toLowerCase + ".png" )) ).toMap
+  val resourceIcons:Map[Resource, Image] = Resource.impls.map( r => (r, new Image( "/resources/" + r.title.toLowerCase + ".png" )) ).toMap
   val devCardIcon:Image = new Image( "/resources/dev.png" )
 
 
@@ -196,7 +196,7 @@ class GUIApp( val controller:Controller ) extends Observer {
       case PlayerNameTooLong( name ) =>
         "Player name [" + name + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
       case PlayerColorIsAlreadyInUse( playerColor ) =>
-        "Player color: [" + playerColor.name + "] is already in use!"
+        "Player color: [" + playerColor.title + "] is already in use!"
       case InvalidPlayerID( id ) => "Invalid player id: [" + id + "]!"
       case InvalidPlayer( playerID ) => "Invalid player with id: " + playerID + "!"
       case NothingToUndo => "Nothing to undo!"

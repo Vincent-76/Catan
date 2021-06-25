@@ -2,8 +2,8 @@ package de.htwg.se.catan.aview.tui.tuistate
 
 import de.htwg.se.catan.aview.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.Cards._
-import de.htwg.se.catan.model.{ PlayerID, Resources }
+import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.{ PlayerID, Resource }
 import de.htwg.se.catan.util._
 
 /**
@@ -19,7 +19,7 @@ case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends 
     TUI.outln( TUI.displayName( controller.game.player( pID ) ) + ", you have to drop " +
       (controller.game.player( pID ).resources.amount / 2) + " cards!" )
     TUI.outln( "Resources:" )
-    val resourceNameLength = Resources.get.map( _.title.length ).max
+    val resourceNameLength = Resource.impls.map( _.title.length ).max
     TUI.outln( controller.game.player( pID ).resources.sort.map( d =>
       "  " + d._1.title.toLength( resourceNameLength ) + " " + d._2 ).mkString( "\n" )
     )

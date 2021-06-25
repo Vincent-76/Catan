@@ -1,7 +1,7 @@
 package de.htwg.se.catan.aview.gui
 
 import de.htwg.se.catan.model.{Game, KnightCard, Player}
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.aview.gui.GUIApp._
 import scalafx.geometry.Insets
 import scalafx.scene.control.Label

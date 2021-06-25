@@ -1,7 +1,7 @@
 package de.htwg.se.catan.aview.tui
 
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.state._
 import de.htwg.se.catan.model.{ PlacementPointNotEmpty, Player, _ }
 import de.htwg.se.catan.aview.tui.TUI.InvalidFormat
@@ -25,9 +25,9 @@ object TUI {
 
   val errorColor:String = Console.RED
 
-  val resourcePattern:String = "(\\s*(" + Resources.get.map( r => regexIgnoreCase( r.title ) ).mkString( "|" ) + ")\\s*[1-9][0-9]*\\s*)"
+  val resourcePattern:String = "(\\s*(" + Resource.impls.map( r => regexIgnoreCase( r.title ) ).mkString( "|" ) + ")\\s*[1-9][0-9]*\\s*)"
 
-  val resourcePatternInfo:String = "<" + Resources.get.map( _.title ).mkString( "|" ) + "> <amount>"
+  val resourcePatternInfo:String = "<" + Resource.impls.map( _.title ).mkString( "|" ) + "> <amount>"
 
   val commands = List(
     HelpCommand,
@@ -112,7 +112,7 @@ object TUI {
   def parseResource( resourceString:String ):Option[(Resource, Int)] = {
 
     val data = resourceString.splitAt( "[0-9]".r.findFirstMatchIn( resourceString ).map( _.start ).getOrElse( 0 ) )
-    val resource = Resources.of( data._1.removeSpaces() )
+    val resource = Resource.of( data._1.removeSpaces() )
     if ( resource.isDefined && Try( data._2.toInt ).isSuccess )
       Some( resource.get, data._2.toInt )
     else Option.empty
@@ -258,7 +258,7 @@ class TUI( val controller:Controller ) extends Observer {
       case PlayerNameTooLong( name ) =>
         "Player name [" + TUI.errorHighlight( name ) + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
       case PlayerColorIsAlreadyInUse( playerColor ) =>
-        "Player color " + TUI.colorOf( playerColor ) + playerColor.name + TUI.reset + " is already in use!"
+        "Player color " + TUI.colorOf( playerColor ) + playerColor.title + TUI.reset + " is already in use!"
       case InvalidPlayerID( id ) => "Invalid player id: [" + TUI.errorHighlight( id ) + "]!"
       case InvalidPlayer( playerID ) => "Invalid player with id: " + TUI.errorHighlight( playerID ) + "!"
       case NothingToUndo => "Nothing to undo!"

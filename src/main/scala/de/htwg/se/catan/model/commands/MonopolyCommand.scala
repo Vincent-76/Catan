@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model.commands
 
-import de.htwg.se.catan.model.Cards.ResourceCards
+import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.state.MonopolyState
 import de.htwg.se.catan.model.{ Player, _ }
 import de.htwg.se.catan.util._

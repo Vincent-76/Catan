@@ -1,7 +1,7 @@
 package de.htwg.se.catan.controller
 
 import de.htwg.se.catan.CatanModule
-import de.htwg.se.catan.model.Cards.ResourceCards
+import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.util.Observable

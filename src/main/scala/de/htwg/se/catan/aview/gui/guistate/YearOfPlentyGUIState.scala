@@ -3,7 +3,7 @@ package de.htwg.se.catan.aview.gui.guistate
 import de.htwg.se.catan.aview.gui.util.ResourceSelector
 import de.htwg.se.catan.aview.gui.{ GUICommand, GUIState }
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.Player
 import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.Button

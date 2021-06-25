@@ -3,21 +3,25 @@ package de.htwg.se.catan.model.impl.game
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import de.htwg.se.catan.CatanModule
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
+import de.htwg.se.catan.model.impl.fileio.JsonSerializable
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2 }
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.state.InitState
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsResult, JsSuccess, JsValue, Json, Reads, Writes }
 
 import scala.collection.immutable.{ List, SortedMap, TreeMap }
 import scala.util.{ Failure, Random, Success, Try }
-import scala.xml.{ Node, NodeSeq }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
-object ClassicGameImpl {
+object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
+
   val stackResourceAmount:Int = 19
   val availablePlacements:List[Placement] = List(
     RobberPlacement,
@@ -27,30 +31,46 @@ object ClassicGameImpl {
   )
 
   def fromXML( node:Node ):ClassicGameImpl = ClassicGameImpl(
-    gameFieldVal = CatanModule.gameFieldFromXML( node.childOf( "gameField" ) ),
-    turnVal = CatanModule.turnFromXML( node.childOf( "turn" ) ),
+    gameFieldVal = GameField.fromXML( node.childOf( "gameField" ) ),
+    turnVal = Turn.fromXML( node.childOf( "turn" ) ),
     seedVal = (node \ "@seed").content.toInt,
-    playerFactory = CatanModule.playerFactoryFromXML( (node \ "@playerFactoryClass").content ),
+    playerFactory = CatanModule.playerFactoryFromString( (node \ "@playerFactoryClass").content ).get,
     playerFactoryClass = (node \ "@playerFactoryClass").content,
-    availablePlacementsVal = node.childOf( "availablePlacements" ).convertToList( n => Placement.of( n.content ).get ),
+    availablePlacementsVal = node.childOf( "availablePlacements" ).asList( n => Placement.of( n.content ).get ),
     stateVal = State.fromXML( node.childOf( "state" ) ),
     resourceStack = ResourceCards.fromXML( node.childOf( "resourceStack" ) ),
-    developmentCards = node.childOf( "developmentCards" ).convertToList( n => Cards.devCardOf( n.content ).get ),
+    developmentCards = node.childOf( "developmentCards" ).asList( n => DevelopmentCard.of( n.content ).get ),
     playersVal = TreeMap(
-      node.childOf( "players" ).convertToMap(
+      node.childOf( "players" ).asMap(
         n => PlayerID.fromXML( n ),
-        n => CatanModule.playerFromXML( n )
+        n => Player.fromXML( n )
       ).toArray:_*
     )( PlayerOrdering ),
-    bonusCardsVal = node.childOf( "bonusCards" ).convertToMap(
-      n => Cards.bonusCardOf( n.content ).get,
-      _.toOption( _.toTuple2(
+    bonusCardsVal = node.childOf( "bonusCards" ).asMap(
+      n => BonusCard.of( n.content ).get,
+      _.asOption( _.asTuple(
         n => PlayerID.fromXML( n ),
         _.content.toInt
       ) )
     ),
-    winnerVal = node.childOf( "winner" ).toOption( n => PlayerID.fromXML( n ) ),
+    winnerVal = node.childOf( "winner" ).asOption( n => PlayerID.fromXML( n ) ),
     roundVal = (node \ "@round").content.toInt
+  )
+
+  def fromJson( json:JsValue ):ClassicGameImpl = ClassicGameImpl(
+    gameFieldVal = ( json \ "gameField" ).as[GameField],
+    turnVal = ( json \ "turn" ).as[Turn],
+    seedVal = ( json \ "seed" ).as[Int],
+    playerFactory = CatanModule.playerFactoryFromString( ( json \ "playerFactoryClass" ).as[String] ).get,
+    playerFactoryClass = ( json \ "playerFactoryClass" ).as[String],
+    availablePlacementsVal = ( json \ "availablePlacements" ).asList[Placement],
+    stateVal = ( json \ "state" ).as[State],
+    resourceStack = ( json \ "resourceStack" ).as[ResourceCards],
+    developmentCards = ( json \ "developmentCards"  ).asList[DevelopmentCard],
+    playersVal = TreeMap( ( json \ "players" ).asMap[PlayerID, Player].toArray:_* )( PlayerOrdering ),
+    bonusCardsVal = ( json \ "bonusCards" ).asMapC( _.as[BonusCard], _.asOptionC( _.asTuple[PlayerID, Int] ) ),
+    winnerVal = ( json \ "winner" ).asOpt[PlayerID],
+    roundVal = ( json \ "round" ).as[Int]
   )
 }
 
@@ -61,10 +81,10 @@ case class ClassicGameImpl( gameFieldVal:GameField,
                             playerFactoryClass:String,
                             availablePlacementsVal:List[Placement],
                             stateVal:State = InitState(),
-                            resourceStack:ResourceCards = Cards.getResourceCards( ClassicGameImpl.stackResourceAmount ),
+                            resourceStack:ResourceCards = Card.getResourceCards( ClassicGameImpl.stackResourceAmount ),
                             developmentCards:List[DevelopmentCard] = List.empty,
                             playersVal:SortedMap[PlayerID, Player] = TreeMap.empty[PlayerID, Player]( PlayerOrdering ),
-                            bonusCardsVal:Map[BonusCard, Option[(PlayerID, Int)]] = Cards.bonusCards.map( (_, None) ).toMap,
+                            bonusCardsVal:Map[BonusCard, Option[(PlayerID, Int)]] = BonusCard.impls.map( (_, None) ).toMap,
                             winnerVal:Option[PlayerID] = None,
                             roundVal:Int = 1
                           ) extends Game {
@@ -84,7 +104,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     playerFactory = playerFactory,
     playerFactoryClass = playerFactoryClass,
     availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.contains ),
-    developmentCards = Cards.getDevStack( new Random( seed ) ),
+    developmentCards = DevelopmentCard.getStack( new Random( seed ) ),
   )
 
   def this( gameField:GameField, turn:Turn, seed:Int, playerFactory:PlayerFactory, playerFactoryClass:String ) =
@@ -92,34 +112,32 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
 
   def toXML:Node = <ClassicGameImpl seed={seedVal.toString} round={roundVal.toString} playerFactoryClass={playerFactoryClass}>
-    <turn>
-      {turnVal.toXML}
-    </turn>
-    <availablePlacements>
-      {availablePlacementsVal.toXML( _.title )}
-    </availablePlacements>
-    <state>
-      {stateVal.toXML}
-    </state>
-    <resourceStack>
-      {resourceStack.toXML( _.title, _.toString )}
-    </resourceStack>
-    <developmentCards>
-      {developmentCards.toXML( _.title )}
-    </developmentCards>
-    <players>
-      {playersVal.toXML( _.toXML, _.toXML )}
-    </players>
-    <bonusCards>
-      {bonusCardsVal.toXML( _.title, _.toXML( _.toXML( _.toXML, _.toString ) ) )}
-    </bonusCards>
-    <winner>
-      {winnerVal.toXML( _.toXML )}
-    </winner>
-    <gameField>
-      {gameFieldVal.toXML}
-    </gameField>
-  </ClassicGameImpl>
+    <turn>{turnVal.toXML}</turn>
+    <availablePlacements>{availablePlacementsVal.toXML( _.title )}</availablePlacements>
+    <state>{stateVal.toXML}</state>
+    <resourceStack>{resourceStack.toXML( _.title, _.toString )}</resourceStack>
+    <developmentCards>{developmentCards.toXML( _.title )}</developmentCards>
+    <players>{playersVal.toXML( _.toXML, _.toXML )}</players>
+    <bonusCards>{bonusCardsVal.toXML( _.title, _.toXML( _.toXML( _.toXML, _.toString ) ) )}</bonusCards>
+    <winner>{winnerVal.toXML( _.toXML )}</winner>
+    <gameField>{gameFieldVal.toXML}</gameField>
+  </ClassicGameImpl>.copy( label = ClassicGameImpl.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( ClassicGameImpl.name ),
+    "gameField" -> Json.toJson( gameFieldVal.asInstanceOf[JsonSerializable] ),
+    "turn" -> Json.toJson( turnVal.asInstanceOf[JsonSerializable] ),
+    "seed" -> Json.toJson( seedVal ),
+    "playerFactoryClass" -> Json.toJson( playerFactoryClass ),
+    "availablePlacements" -> Json.toJson( availablePlacements ),
+    "state" -> Json.toJson( stateVal.asInstanceOf[JsonSerializable] ),
+    "resourceStack" -> Json.toJson( resourceStack ),
+    "developmentCards" -> Json.toJson( developmentCards ),
+    "players" -> Json.toJson( playersVal.asInstanceOf[Map[PlayerID, JsonSerializable]] ),
+    "bonusCards" ->  Json.toJson( bonusCardsVal ),
+    "winner" -> Json.toJson( winnerVal ),
+    "round" -> Json.toJson( roundVal )
+  )
 
 
   def minPlayers:Int = 3
@@ -269,7 +287,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def drawDevCard( pID:PlayerID ):Try[ClassicGameImpl] = {
     if( developmentCards.isEmpty )
       Failure( DevStackIsEmpty )
-    else dropResourceCards( pID, Cards.developmentCardCost ) match {
+    else dropResourceCards( pID, DevelopmentCard.cardCost ) match {
       case Success( newGame ) =>
         val newPlayer = newGame.playersVal( pID ).addDevCard( developmentCards.head )
         Success( newGame.copy(

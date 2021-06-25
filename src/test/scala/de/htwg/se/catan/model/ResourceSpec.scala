@@ -6,8 +6,8 @@ class ResourceSpec extends WordSpec with Matchers{
   "Resources" when {
     "static" should {
       "be constructed with of" in {
-        Resources.of( "wOoD" ) shouldBe Some( Wood )
-        Resources.of( "Woo" ) shouldBe None
+        Resource.of( "wOoD" ) shouldBe Some( Wood )
+        Resource.of( "Woo" ) shouldBe None
       }
     }
     "new" should {

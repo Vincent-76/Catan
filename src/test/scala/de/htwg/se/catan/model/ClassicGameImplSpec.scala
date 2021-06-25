@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
@@ -147,7 +147,7 @@ class ClassicGameImplSpec extends WordSpec with Matchers {
       }
       "drawDevCard" in {
         game.drawDevCard( pID ) shouldBe Failure( InsufficientResources )
-        val game1 = game.drawResourceCards( pID, developmentCardCost )._1
+        val game1 = game.drawResourceCards( pID, DevelopmentCard.cardCost )._1
         val game2 = game1.drawDevCard( pID )
         game2 shouldBe a [Success[_]]
         game2.get.player.devCards should have size 1

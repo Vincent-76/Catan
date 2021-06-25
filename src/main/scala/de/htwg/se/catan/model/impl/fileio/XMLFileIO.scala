@@ -1,7 +1,6 @@
 package de.htwg.se.catan.model.impl.fileio
 
 import de.htwg.se.catan.CatanModule
-import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
 import de.htwg.se.catan.model.{ FileIO, Game }
 
 import java.io
@@ -12,6 +11,10 @@ import scala.xml.{ Elem, Node, NodeSeq }
 
 trait XMLSerializable {
   def toXML:Node
+}
+
+trait XMLDeserializer[+T] {
+  def fromXML( node:Node ):T
 }
 
 case class XMLParseError( expected:String, got:String ) extends RuntimeException {
@@ -120,30 +123,30 @@ object XMLFileIO {
       }
     }
 
-    def convertToSeq[E]( builder:Node => E ):Seq[E] = node.label match {
+    def asSeq[E]( builder:Node => E ):Seq[E] = node.label match {
       case "List" => (node \ "entry").map( n => builder( n.firstChild().get ) )
       case e => throw XMLParseError( expected = "List", got = e )
     }
 
-    def convertToList[E]( builder:Node => E ):List[E] = convertToSeq( builder ).toList
+    def asList[E]( builder:Node => E ):List[E] = asSeq( builder ).toList
 
-    def convertToVector[E]( builder:Node => E ):Vector[E] = convertToSeq( builder ).toVector
+    def asVector[E]( builder:Node => E ):Vector[E] = asSeq( builder ).toVector
 
-    def toOption[E]( builder:Node => E ):Option[E] = node.label match {
+    def asOption[E]( builder:Node => E ):Option[E] = node.label match {
       case "Some" => Some( builder( node.firstChild().get ) )
       case "None" => None
       case e => throw XMLParseError( expected = "Option", got = e )
     }
 
-    def convertToMap[K, V]( keyBuilder:Node => K, valBuilder:Node => V ):Map[K, V] =
-      convertToMap2( ( keyNode, valNode ) => (keyBuilder( keyNode ), valBuilder( valNode )) )
+    def asMap[K, V]( keyBuilder:Node => K, valBuilder:Node => V ):Map[K, V] =
+      asMapC( ( keyNode, valNode ) => (keyBuilder( keyNode ), valBuilder( valNode )) )
 
-    def convertToMap2[K, V]( builder:(Node, Node) => (K, V) ):Map[K, V] = node.label match {
+    def asMapC[K, V]( builder:(Node, Node) => (K, V) ):Map[K, V] = node.label match {
       case "Map" => (node \ "entry").map( n => builder( n.childOf( "key" ), n.childOf( "value" ) ) ).toMap
       case e => throw XMLParseError( expected = "Map", got = e )
     }
 
-    def toTuple2[T1, T2]( builder1:Node => T1, builder2:Node => T2 ):(T1, T2) = node.label match {
+    def asTuple[T1, T2]( builder1:Node => T1, builder2:Node => T2 ):(T1, T2) = node.label match {
       case "Tuple2" => (
         builder1( node.childOf( "value1" ) ),
         builder2( node.childOf( "value2" ) )
@@ -151,7 +154,7 @@ object XMLFileIO {
       case e => throw XMLParseError( expected = "Tuple2", got = e )
     }
 
-    def toTuple3[T1, T2, T3]( builder1:Node => T1, builder2:Node => T2, builder3:Node => T3 ):(T1, T2, T3) = node.label match {
+    def asTuple[T1, T2, T3]( builder1:Node => T1, builder2:Node => T2, builder3:Node => T3 ):(T1, T2, T3) = node.label match {
       case "Tuple3" => (
         builder1( node.childOf( "value1" ) ),
         builder2( node.childOf( "value2" ) ),
@@ -167,12 +170,11 @@ class XMLFileIO extends FileIO {
 
   override def load( path:String ):Game = {
     val file = scala.xml.XML.loadFile( path )
-    CatanModule.gameFromXML( file )
+    Game.fromXML( file )
   }
 
   override def save( game:Game ):String = {
-    val c = Calendar.getInstance().getTime
-    val file = File( "Catan_" + new SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" ).format( c ) + "_savegame.xml" )
+    val file = File( getFileName + ".xml" )
     scala.xml.XML.save( file.toAbsolute.path, game.toXML );
     file.toAbsolute.path
   }

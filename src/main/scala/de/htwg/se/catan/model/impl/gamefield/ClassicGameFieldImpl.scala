@@ -1,9 +1,11 @@
 package de.htwg.se.catan.model.impl.gamefield
 
-import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl._
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.{ JsonLookupResult, JsonMap, JsonSeq, JsonTuple2, JsonTuple3, JsonValue }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2, XMLTuple3 }
+import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl.{ Edges, Hexagons, Vertices }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.Random
 import scala.xml.Node
@@ -21,7 +23,16 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
     <hexagons>{ hexagons.toXML( _.toXML( _.toXML( _.toXML ) ) ) }</hexagons>
     <edges>{ edges.toXML( _.toXML( _.id.toString, _.id.toString ), _.toXML ) }</edges>
     <vertices>{ vertices.toXML( _.toXML( _.id.toString, _.id.toString, _.id.toString ), _.toXML ) }</vertices>
-  </ClassicGameFieldImpl>
+  </ClassicGameFieldImpl>.copy( label = ClassicGameFieldImpl.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( ClassicGameFieldImpl.name ),
+    "hexagons" -> hexagons.toJsonC( _.toJsonC( o => Json.toJson( o ) ) ),
+    "edges" -> edges.toJsonC( _.toJsonC( h1 => Json.toJson( h1.id ), h2 => Json.toJson( h2.id ) ), e => Json.toJson( e ) ),
+    "vertices" -> vertices.toJsonC( _.toJsonC( h1 => Json.toJson( h1.id ), h2 => Json.toJson( h2.id ), h3 => Json.toJson( h3.id ) ), v => Json.toJson( v ) ),
+    "robber" -> Json.toJson( robber.id )
+  )
+
 
   def fieldWidth:Int = hexagons.map( r => r.size ).max
   def fieldHeight:Int = hexagons.size
@@ -41,15 +52,15 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
   def adjacentHexes( h:Hex ):List[Hex] = ClassicGameFieldImpl.adjacentHexes( h, hexagons )
 
   def adjacentHex( h:Hex, ai:Int ):Option[Hex] = {
-    if( ai < adjacentOffset.size ) {
-      val o = adjacentOffset( ai )
+    if( ai < ClassicGameFieldImpl.adjacentOffset.size ) {
+      val o = ClassicGameFieldImpl.adjacentOffset( ai )
       findHex( h.r + o._1, h.c + o._2 )
     } else None
   }
 
   def adjacentEdges( h:Hex ):List[Edge] = {
-    adjacentOffset.redByKey( List.empty, ( edges:List[Edge], i:Int ) => {
-      val hex1 = findHex( h.r + adjacentOffset( i )._1, h.c + adjacentOffset( i )._2 )
+    ClassicGameFieldImpl.adjacentOffset.redByKey( List.empty, ( edges:List[Edge], i:Int ) => {
+      val hex1 = findHex( h.r + ClassicGameFieldImpl.adjacentOffset( i )._1, h.c + ClassicGameFieldImpl.adjacentOffset( i )._2 )
       val edge = if( hex1.isDefined ) findEdge( h, hex1.get ) else Option.empty
       if( edge.isDefined )
         edges :+ edge.get
@@ -59,17 +70,17 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
   }
 
   def adjacentEdge( h:Hex, ai:Int ):Option[Edge] = {
-    if( ai < adjacentOffset.size ) {
-      val o = adjacentOffset( ai )
+    if( ai < ClassicGameFieldImpl.adjacentOffset.size ) {
+      val o = ClassicGameFieldImpl.adjacentOffset( ai )
       val hex1 = findHex( h.r + o._1, h.c + o._2 )
       if( hex1.isDefined ) findEdge( h, hex1.get ) else None
     } else None
   }
 
   def adjacentVertices( h:Hex ):List[Vertex] = {
-    adjacentOffset.redByKey( List.empty, ( vertices:List[Vertex], i:Int ) => {
-      val o1 = adjacentOffset( i )
-      val o2 = nextAdjacentOffset( i )
+    ClassicGameFieldImpl.adjacentOffset.redByKey( List.empty, ( vertices:List[Vertex], i:Int ) => {
+      val o1 = ClassicGameFieldImpl.adjacentOffset( i )
+      val o2 = ClassicGameFieldImpl.nextAdjacentOffset( i )
       val vertex = getVertex( h, (h.r + o1._1, h.c + o1._2), (h.r + o2._1, h.c + o2._2) )
       if( vertex.isDefined )
         vertices :+ vertex.get
@@ -144,22 +155,40 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
   def update( v:Vertex ):GameField = copy( vertices = vertices.updated( (v.h1, v.h2, v.h3), v ) )
 }
 
-object ClassicGameFieldImpl {
+object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
 
   def fromXML( node:Node ):ClassicGameFieldImpl = {
-    val hexagons = node.childOf( "hexagons" ).convertToVector( _.convertToVector( _.toOption( n => Hex.fromXML( n ) ) ) )
+    val hexagons = node.childOf( "hexagons" ).asVector( _.asVector( _.asOption( n => Hex.fromXML( n ) ) ) )
     val hexList = hexagons.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
     ClassicGameFieldImpl(
       hexagons = hexagons,
-      edges = node.childOf( "edges" ).convertToMap2( ( keyNode, valNode ) => {
+      edges = node.childOf( "edges" ).asMapC( ( keyNode, valNode ) => {
         val edge = Edge.fromXML( valNode, hexList )
         ((edge.h1, edge.h2), edge)
       } ),
-      vertices = node.childOf( "vertices" ).convertToMap2( ( keyNode, valNode ) => {
+      vertices = node.childOf( "vertices" ).asMapC( ( keyNode, valNode ) => {
         val vertex = Vertex.fromXML( valNode, hexList )
         ((vertex.h1, vertex.h2, vertex.h3), vertex)
       } ),
       robber = hexList.find( _.id == ( node \ "@robber" ).content.toInt ).get
+    )
+  }
+
+  def fromJson( json:JsValue ):ClassicGameFieldImpl = {
+    val hexagons = ( json \ "hexagons" ).asVectorC( _.asVectorC( _.asOption[Hex] ) )
+    val hexList = hexagons.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
+    ClassicGameFieldImpl(
+      hexagons = hexagons,
+      edges = ( json \ "edges" ).asMapC( _.asTupleC(
+        v1 => hexList.find( _.id == v1.as[Int] ).get,
+        v2 => hexList.find( _.id == v2.as[Int] ).get
+      ), v => Edge.fromJson( v, hexList ) ),
+      vertices = ( json \ "vertices" ).asMapC( _.asTupleC(
+        v1 => hexList.find( _.id == v1.as[Int] ).get,
+        v2 => hexList.find( _.id == v2.as[Int] ).get,
+        v3 => hexList.find( _.id == v3.as[Int] ).get
+      ), v => Vertex.fromJson( v, hexList ) ),
+      robber = hexList.find( _.id == ( json \ "robber" ).as[Int] ).get
     )
   }
 
@@ -168,7 +197,7 @@ object ClassicGameFieldImpl {
     val random = new Random( seed )
     val hexagons = createHexagons( random )
     val edges = createEdges( hexagons, random )
-    val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area == DesertArea ).get.get
+    val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area.isInstanceOf[DesertArea] ).get.get
     ClassicGameFieldImpl( hexagons, edges, createVertices( hexagons, edges ), robber )
   }
 
@@ -217,7 +246,7 @@ object ClassicGameFieldImpl {
         val data = hexData( i )( j )
         val res1 = if( i >= res._1.size ) res._1 :+ Vector.empty else res._1
         if( data.isDefined ) {
-          val (adjacent, maxFrequency, port) = adjacentOffset.redByKey( (0, DiceValues.maxFrequency, true), ( adjacency:(Int, Int, Boolean), ai:Int ) => {
+          val (adjacent, maxFrequency, port) = adjacentOffset.redByKey( (0, DiceValue.maxFrequency, true), ( adjacency:(Int, Int, Boolean), ai:Int ) => {
             val o1 = adjacentOffset( ai )
             val o2 = nextAdjacentOffset( ai )
             val data1 = findHex( i + o1._1, j + o1._2, hexData )
@@ -246,7 +275,7 @@ object ClassicGameFieldImpl {
             } )
             val (area, numbers) = res._2._3.head match {
               case Some( x ) => (ResourceArea( x, res._2._4( numberIndex ) ), res._2._4.removeAt( numberIndex ))
-              case _ => (DesertArea, res._2._4)
+              case _ => (DesertArea(), res._2._4)
             }
             val hex = Some( new Hex( data.get._1, data.get._2, data.get._3, area ) )
             (res1.updated( i, res1( i ) :+ hex ), (res._2._1, res._2._2, res._2._3.tail, numbers))
@@ -268,9 +297,9 @@ object ClassicGameFieldImpl {
   }
 
   private def getMaxFrequency( freq1:Int, freq2:Int ):Int = {
-    val max = DiceValues.maxSum - freq1 - freq2
-    if( max >= DiceValues.maxFrequency && (freq1 >= DiceValues.maxFrequency || freq2 >= DiceValues.maxFrequency) )
-      return DiceValues.maxFrequency - 1
+    val max = DiceValue.maxSum - freq1 - freq2
+    if( max >= DiceValue.maxFrequency && (freq1 >= DiceValue.maxFrequency || freq2 >= DiceValue.maxFrequency) )
+      return DiceValue.maxFrequency - 1
     max
   }
 

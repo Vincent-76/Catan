@@ -4,7 +4,7 @@ import de.htwg.se.catan.Catan
 import de.htwg.se.catan.aview.gui.gamefield.GameFieldPane.Coords
 import de.htwg.se.catan.aview.gui.gamefield.{ GameFieldCanvas, GameFieldPane }
 import de.htwg.se.catan.aview.gui.impl.gamefield.ClassicGameFieldCanvasImpl._
-import de.htwg.se.catan.model.Cards.ResourceCards
+import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.util._
@@ -28,8 +28,8 @@ object ClassicGameFieldCanvasImpl {
     Wheat -> shuffledImageList( Wheat, 4 ),
     Ore -> shuffledImageList( Ore, 3 ),
   )
-  val numberImages:Map[DiceValue, Image] = DiceValues.all.filter( _.frequency > 0 ).map( n => (n, new Image( "/numbers/" + n.value + ".png" )) ).toMap
-  val portImages:Map[Option[Resource], List[Image]] = (Resources.get.map( Some( _ ) ) :+ None).map( r =>
+  val numberImages:Map[DiceValue, Image] = DiceValue.impls.filter( _.frequency > 0 ).map( n => (n, new Image( "/numbers/" + n.value + ".png" )) ).toMap
+  val portImages:Map[Option[Resource], List[Image]] = (Resource.impls.map( Some( _ ) ).toList :+ None).map( r =>
     (r, ClassicGameFieldImpl.adjacentOffset.indices.map( i =>
       new Image( "/ports/" + (if( r.isDefined ) r.get.title.toLowerCase else "unspecific") + "/" + i + ".png" )
     ).toList)

@@ -1,8 +1,8 @@
 package de.htwg.se.catan.model.commands
 
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
-import de.htwg.se.catan.model.{ Cards, _ }
+import de.htwg.se.catan.model.{ Card, _ }
 import de.htwg.se.catan.util._
 
 import scala.util.{ Success, Try }
@@ -17,7 +17,7 @@ case class RollDicesCommand( state:State ) extends Command {
   override def doStep( game:Game ):Try[CommandSuccess] = {
     val dices = game.rollDices()
     println( "Dices[" + dices._1 + " + " + dices._2 + " = " + (dices._1 + dices._2) + "]" )
-    DiceValues.of( dices._1 + dices._2 ) match {
+    DiceValue.of( dices._1 + dices._2 ) match {
       //case None => Failure( Fail )
       case Some( Seven ) => game.checkHandCardsInOrder() match {
         case Some( p ) => Success( game.setState( DropHandCardsState( p.id ) ), Some( DiceInfo( dices ) ) )
@@ -30,9 +30,9 @@ case class RollDicesCommand( state:State ) extends Command {
               game.gameField.adjacentVertices( h ).red( resources, ( resources:Map[PlayerID, ResourceCards], v:Vertex ) =>
                 v.building match {
                   case Some( v:Settlement ) =>
-                    resources.updated( v.owner, resources.getOrElse( v.owner, Cards.getResourceCards( 0 ) ).add( r.resource ) )
+                    resources.updated( v.owner, resources.getOrElse( v.owner, Card.getResourceCards( 0 ) ).add( r.resource ) )
                   case Some( c:City ) =>
-                    resources.updated( c.owner, resources.getOrElse( c.owner, Cards.getResourceCards( 0 ) ).add( r.resource, 2 ) )
+                    resources.updated( c.owner, resources.getOrElse( c.owner, Card.getResourceCards( 0 ) ).add( r.resource, 2 ) )
                   case _ => resources
                 } )
             case _ => resources

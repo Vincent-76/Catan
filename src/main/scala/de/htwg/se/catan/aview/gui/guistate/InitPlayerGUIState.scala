@@ -26,13 +26,13 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
         promptText = "Name"
         alignment = Pos.Center
       }
-      val comboBox:ComboBox[String] = new ComboBox[String]( PlayerColor.availableColors( controller.game.players.values.map( _.color ) ).map( _.name ) ) {
+      val comboBox:ComboBox[String] = new ComboBox[String]( PlayerColor.availableColors( controller.game.players.values.map( _.color ) ).map( _.title ) ) {
         selectionModel.value.selectFirst()
         styleClass.add( "button" )
       }
       onKeyPressed = ( e:KeyEvent ) => {
         if( e.getCode == KeyCode.ENTER )
-          controller.addPlayer( PlayerColor.colorOf( comboBox.getValue ).get, textField.getText() )
+          controller.addPlayer( PlayerColor.of( comboBox.getValue ).get, textField.getText() )
       }
       children = List(
         new Text( "Enter a name and choose a color to add a player,\n or continue to dice out the beginner." ) {
@@ -47,13 +47,13 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
           children = List(
             new Button( "Add Player" ) {
               styleClass.add( "button" )
-              onAction = _ => controller.addPlayer( PlayerColor.colorOf( comboBox.getValue ).get, textField.getText() )
+              onAction = _ => controller.addPlayer( PlayerColor.of( comboBox.getValue ).get, textField.getText() )
             },
             new Button( "Continue" ) {
               styleClass.add( "button" )
               onAction = _ => {
                 if( textField.getText.nonEmpty )
-                  controller.addPlayer( PlayerColor.colorOf( comboBox.getValue ).get, textField.getText() )
+                  controller.addPlayer( PlayerColor.of( comboBox.getValue ).get, textField.getText() )
                 controller.setInitBeginnerState()
               }
             }

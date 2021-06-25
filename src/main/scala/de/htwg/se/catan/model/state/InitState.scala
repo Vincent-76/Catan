@@ -1,7 +1,8 @@
 package de.htwg.se.catan.model.state
 
 import de.htwg.se.catan.model.commands.InitGameCommand
-import de.htwg.se.catan.model.{ Command, State }
+import de.htwg.se.catan.model.{ Command, State, StateImpl }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
 
@@ -9,13 +10,19 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object InitState {
+object InitState extends StateImpl( "InitState" ) {
   def fromXML( node:Node ):InitState = InitState()
+
+  def fromJson( json:JsValue ):State = InitState()
 }
 
 case class InitState( ) extends State {
 
-  def toXML:Node = <InitState />
+  def toXML:Node = <InitState />.copy( label = InitState.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( InitState.name )
+  )
 
   override def initGame( ):Option[Command] = Some(
     InitGameCommand()

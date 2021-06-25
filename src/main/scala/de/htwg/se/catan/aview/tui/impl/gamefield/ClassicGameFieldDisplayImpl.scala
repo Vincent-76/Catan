@@ -96,10 +96,10 @@ case class ClassicGameFieldDisplayImpl(
         }) + ClassicGameFieldDisplayImpl.robber
       else " ") )
     val f1 = h.area match {
-      case DesertArea => (if( buildableIDs.isDefined && buildableIDs.get.contains( h ) )
+      case d:DesertArea => (if( buildableIDs.isDefined && buildableIDs.get.contains( h ) )
         base.showID( h.id, i + 3, j + 4 )
       else
-        base).showOnFields( DesertArea.f.title, i + 4, j + 4, TUI.text )
+        base).showOnFields( d.f.title, i + 4, j + 4, TUI.text )
       case a:WaterArea => if( a.port.isDefined )
         if( a.port.get.specific.isDefined )
           base.showOnFields( a.port.get.specific.get.title, i + 3, j + 4, TUI.textOnColor + ClassicGameFieldDisplayImpl.colorOf( a.port.get.specific.get ) )

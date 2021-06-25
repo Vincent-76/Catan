@@ -1,7 +1,7 @@
 package de.htwg.se.catan.aview.tui.command
 
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.Resources
+import de.htwg.se.catan.model.Resource
 import de.htwg.se.catan.aview.tui.{ CommandAction, CommandInput, TUI }
 
 /**
@@ -21,5 +21,5 @@ case object BankTradeCommand
 
   override def getSyntax:String = "[" + command + " " +
     parameter.map( p => "<" + p + ">" ).mkString( " - " ) +
-    "] with resource: [<" + Resources.get.map( _.title ).mkString( "|" ) + "> <amount>]"
+    "] with resource: [<" + Resource.impls.map( _.title ).mkString( "|" ) + "> <amount>]"
 }

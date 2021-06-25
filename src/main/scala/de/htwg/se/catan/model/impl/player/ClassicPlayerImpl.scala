@@ -1,36 +1,49 @@
 package de.htwg.se.catan.model.impl.player
 
 import com.google.inject.Inject
-import de.htwg.se.catan.model.Cards._
-import de.htwg.se.catan.model._
-import de.htwg.se.catan.util._
 import com.google.inject.assistedinject.Assisted
+import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLSequence }
+import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Random, Success, Try }
 import scala.xml.Node
 
-object ClassicPlayerImpl {
+object ClassicPlayerImpl extends PlayerImpl( "ClassicPlayerImpl" ) {
   def fromXML( node:Node ):ClassicPlayerImpl = ClassicPlayerImpl(
     idVal = PlayerID.fromXML( node.childOf( "id" ) ),
-    colorVal = PlayerColor.colorOf( ( node \ "@color" ).content ).get,
+    colorVal = PlayerColor.of( ( node \ "@color" ).content ).get,
     nameVal = ( node \ "@name" ).content,
     resourcesVal = ResourceCards.fromXML( node.childOf( "resources" ) ),
-    devCardsVal = node.childOf( "devCards" ).convertToVector( n => Cards.devCardOf( n.content ).get ),
-    usedDevCards = node.childOf( "usedDevCards" ).convertToVector( n => Cards.devCardOf( n.content ).get ),
+    devCardsVal = node.childOf( "devCards" ).asVector( n => DevelopmentCard.of( n.content ).get ),
+    usedDevCards = node.childOf( "usedDevCards" ).asVector( n => DevelopmentCard.of( n.content ).get ),
     victoryPointsVal = ( node \ "@victoryPoints" ).content.toInt,
-    structures = node.childOf( "structures" ).convertToMap( n => StructurePlacement.of( n.content ).get, _.content.toInt )
+    structures = node.childOf( "structures" ).asMap( n => StructurePlacement.of( n.content ).get, _.content.toInt )
+  )
+
+  def fromJson( json:JsValue ):ClassicPlayerImpl = ClassicPlayerImpl(
+    idVal = ( json \ "id" ).as[PlayerID],
+    colorVal = ( json \ "color" ).as[PlayerColor],
+    nameVal = ( json \ "name" ).as[String],
+    resourcesVal = ( json \ "resources" ).as[ResourceCards],
+    devCardsVal = ( json \ "devCards" ).as[Vector[DevelopmentCard]],
+    usedDevCards = ( json \ "usedDevCards" ).as[Vector[DevelopmentCard]],
+    victoryPointsVal = ( json \ "victoryPoints" ).as[Int],
+    structures = ( json \ "structures" ).asMap[StructurePlacement, Int]
   )
 }
 
 case class ClassicPlayerImpl( idVal:PlayerID,
                               colorVal:PlayerColor,
                               nameVal:String,
-                              resourcesVal:ResourceCards = Cards.getResourceCards( 0 ),
+                              resourcesVal:ResourceCards = Card.getResourceCards( 0 ),
                               devCardsVal:Vector[DevelopmentCard] = Vector.empty,
                               usedDevCards:Vector[DevelopmentCard] = Vector.empty,
                               victoryPointsVal:Int = 0,
-                              structures:Map[StructurePlacement, Int] = StructurePlacement.all.map( p => (p, p.available) ).toMap
+                              structures:Map[StructurePlacement, Int] = StructurePlacement.impls.map( p => (p, p.available) ).toMap
                             ) extends Player {
 
   @Inject
@@ -41,13 +54,25 @@ case class ClassicPlayerImpl( idVal:PlayerID,
   )
 
 
-  def toXML:Node = <ClassicPlayerImpl color={ colorVal.name } name={ nameVal } victoryPoints={ victoryPointsVal.toString }>
+  def toXML:Node = <ClassicPlayerImpl color={ colorVal.title } name={ nameVal } victoryPoints={ victoryPointsVal.toString }>
     <id>{ idVal.toXML }</id>
     <resources>{ resourcesVal.toXML( _.title, _.toString ) }</resources>
     <devCards>{ devCardsVal.toXML( _.title ) }</devCards>
     <usedDevCards>{ usedDevCards.toXML( _.title ) }</usedDevCards>
     <structures>{ structures.toXML( _.title, _.toString ) }</structures>
-  </ClassicPlayerImpl>
+  </ClassicPlayerImpl>.copy( label = ClassicPlayerImpl.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( ClassicPlayerImpl.name ),
+    "id" -> Json.toJson( idVal ),
+    "color" -> Json.toJson( colorVal ),
+    "name" -> Json.toJson( nameVal ),
+    "resources" -> Json.toJson( resourcesVal ),
+    "devCards" -> Json.toJson( devCardsVal ),
+    "usedDevCards" -> Json.toJson( usedDevCards ),
+    "victoryPoints" -> Json.toJson( victoryPointsVal ),
+    "structures" -> Json.toJson( structures )
+  )
 
 
   def id:PlayerID = idVal

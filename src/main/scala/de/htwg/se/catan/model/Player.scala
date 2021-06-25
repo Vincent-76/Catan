@@ -1,9 +1,10 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNodeSeq
-import de.htwg.se.catan.model.impl.fileio.XMLSerializable
+import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLDeserializer, XMLSerializable }
 import de.htwg.se.catan.util._
+import play.api.libs.json._
 
 import scala.util.Try
 import scala.xml.Node
@@ -12,10 +13,14 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object PlayerID {
+object PlayerID extends XMLDeserializer[PlayerID] {
   def fromXML( node:Node ):PlayerID = PlayerID(
     id = ( node \ "@id" ).content.toInt
   )
+
+  implicit val playerIDWrites:Writes[PlayerID] = Json.writes[PlayerID]
+
+  implicit val playerIDReads:Reads[PlayerID] = Json.reads[PlayerID]
 }
 
 case class PlayerID /*private[Game]*/ ( id:Int ) extends XMLSerializable {
@@ -25,24 +30,28 @@ case class PlayerID /*private[Game]*/ ( id:Int ) extends XMLSerializable {
   override def toString:String = id.toString;
 }
 
-object PlayerColor {
-  val all = List(
-    Green,
-    Blue,
-    Yellow,
-    Red
-  )
+object PlayerColor extends ObjectComponent[PlayerColor] {
+  implicit val playerColorWrites:Writes[PlayerColor] = ( playerColor:PlayerColor ) => Json.toJson( playerColor.title )
+  implicit val playerColorReads:Reads[PlayerColor] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
-  def colorOf( cString:String ):Option[PlayerColor] = all.find( _.name.toLowerCase == cString.toLowerCase() )
+  Green.init()
+  Blue.init()
+  Yellow.init()
+  Red.init()
+
+  def of( cString:String ):Option[PlayerColor] = impls.find( _.title ^= cString )
 
   def availableColors( players:Iterable[PlayerColor] = Vector.empty ):Seq[PlayerColor] = {
-    players.red( all, ( c:Seq[PlayerColor], p:PlayerColor ) => {
+    players.red( impls.toList.sortBy( _.title ), ( c:Seq[PlayerColor], p:PlayerColor ) => {
       c.removed( p )
     } )
   }
+
 }
 
-sealed abstract class PlayerColor( val name:String )
+sealed abstract class PlayerColor( val title:String ) extends ComponentImpl {
+  override def init():Unit = PlayerColor.addImpl( this )
+}
 
 case object Green extends PlayerColor( "Green" )
 
@@ -57,11 +66,17 @@ trait PlayerFactory {
   def create( pID:PlayerID, color:PlayerColor, name:String ):Player
 }
 
-object Player {
-
+abstract class PlayerImpl( name:String ) extends DeserializerComponentImpl[Player]( name ) {
+  override def init():Unit = Player.addImpl( this )
 }
 
-trait Player extends XMLSerializable {
+object Player extends ClassComponent[Player, PlayerImpl] {
+  implicit val turnWrites:Writes[Player] = ( o:Player ) => o.toJson
+
+  implicit val turnReads:Reads[Player] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+}
+
+trait Player extends XMLSerializable with JsonSerializable {
 
   def id:PlayerID
   def name:String

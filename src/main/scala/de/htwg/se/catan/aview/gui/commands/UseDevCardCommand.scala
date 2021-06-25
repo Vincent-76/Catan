@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview.gui.commands
 
 import de.htwg.se.catan.aview.gui.GUI
 import de.htwg.se.catan.aview.gui.util.CustomDialog
-import de.htwg.se.catan.model.Cards
+import de.htwg.se.catan.model.{ Card, DevelopmentCard }
 import de.htwg.se.catan.util._
 import scalafx.geometry.Pos
 import scalafx.scene.Node
@@ -20,7 +20,7 @@ case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" )
       content = new VBox {
         spacing = 10
         alignment = Pos.Center
-        children = gui.controller.player.devCards.filter( _.usable ).sortBySeq( Cards.devCards ).grouped( 4 ).toList.map( d => {
+        children = gui.controller.player.devCards.filter( _.usable ).sortBy( _.title ).grouped( 4 ).toList.map( d => {
           new HBox {
             spacing = 10
             alignment = Pos.Center

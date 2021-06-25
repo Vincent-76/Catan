@@ -1,36 +1,43 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.model.Cards.ResourceCards
+import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.util.RichString
+import play.api.libs.json._
 
+import scala.collection.immutable.List
 import scala.util.{ Failure, Success, Try }
 
 /**
  * @author Vincent76;
  */
 
-object Placement {
-  def all:List[Placement] = StructurePlacement.all ++ List(
-    RobberPlacement
-  )
+object Placement extends ObjectComponent[Placement] {
+  implicit val placementWrites:Writes[Placement] = ( o:Placement ) => Json.toJson( o.title )
+  implicit val placementReads:Reads[Placement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
-  def of( title:String ):Option[Placement] = all.find( _.title.toLowerCase ^= title.toLowerCase )
+  CityPlacement.init()
+  RoadPlacement.init()
+  RobberPlacement.init()
+  SettlementPlacement.init()
+
+  def of( title:String ):Option[Placement] = impls.find( _.title ^= title )
 }
 
-abstract class Placement( val title:String ) {
+abstract class Placement( val title:String ) extends ComponentImpl {
+  override def init() = Placement.addImpl( this )
+
   def getBuildablePoints( game:Game, pID:PlayerID, any:Boolean = false ):List[PlacementPoint]
 }
 
 
-object StructurePlacement {
-  def all:List[StructurePlacement] = List(
-    RoadPlacement,
-    SettlementPlacement,
-    CityPlacement
-  )
 
-  def of( s:String ):Option[StructurePlacement] = all.find( _.title.toLowerCase == s.toLowerCase )
+object StructurePlacement extends ObjectComponent[StructurePlacement] {
+  def of( s:String ):Option[StructurePlacement] = impls.find( _.title ^= s )
+
+  implicit val structurePlacementWrites:Writes[StructurePlacement] = ( o:StructurePlacement ) => Json.toJson( o.title )
+
+  implicit val structurePlacementReads:Reads[StructurePlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 }
 
 abstract class StructurePlacement( title:String,
@@ -38,6 +45,7 @@ abstract class StructurePlacement( title:String,
                                    val resources:ResourceCards,
                                    val replaces:Option[StructurePlacement] = None
                                  ) extends Placement( title ) {
+  StructurePlacement.addImpl( this )
 
   def build( game:Game, pID:PlayerID, id:Int, anywhere:Boolean = false ):Try[Game] = game.player( pID ).getStructure( this ) match {
     case Success( newPlayer ) => doBuild( game.updatePlayer( newPlayer ), pID, id, anywhere )
@@ -47,9 +55,22 @@ abstract class StructurePlacement( title:String,
   protected def doBuild( game:Game, pID:PlayerID, id:Int, anywhere:Boolean = false ):Try[Game]
 }
 
+
+
+object VertexPlacement extends ObjectComponent[VertexPlacement] {
+  def of( s:String ):Option[VertexPlacement] = impls.find( _.title ^= s )
+
+  implicit val vertexPlacementWrites:Writes[VertexPlacement] = ( o:VertexPlacement ) => Json.toJson( o.title )
+
+  implicit val vertexPlacementReads:Reads[VertexPlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+}
+
 abstract class VertexPlacement( title:String,
                                 available:Int,
                                 resources:ResourceCards,
                                 replaces:Option[StructurePlacement] = None
-                              ) extends StructurePlacement( title, available, resources, replaces )
+                              ) extends StructurePlacement( title, available, resources, replaces ) {
+
+  VertexPlacement.addImpl( this )
+}
 

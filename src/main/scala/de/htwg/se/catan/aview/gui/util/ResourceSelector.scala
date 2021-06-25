@@ -1,8 +1,8 @@
 package de.htwg.se.catan.aview.gui.util
 
 import de.htwg.se.catan.aview.gui.GUIApp
-import de.htwg.se.catan.model.Cards.ResourceCards
-import de.htwg.se.catan.model.{ Resource, Resources }
+import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.Resource
 import scalafx.geometry.{ Orientation, Pos }
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout._
@@ -17,7 +17,7 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
                         initial:ResourceCards = Map.empty,
                         maxAmount:Option[Int] = Option.empty ) extends TilePane {
 
-  val counter:List[(Resource, ResourceCounter)] = Resources.get.map( r => (r, new ResourceCounter( r, initial.getOrElse( r, 0 ) )) )
+  val counter:List[(Resource, ResourceCounter)] = Resource.impls.toList.sortBy( _.index ).map( r => (r, new ResourceCounter( r, initial.getOrElse( r, 0 ) )) )
 
   def values:ResourceCards = counter.map( d => (d._1, d._2.value) ).toMap
 

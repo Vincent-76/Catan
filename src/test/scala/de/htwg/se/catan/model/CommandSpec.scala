@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model
 
-import Cards._
+import Card._
 import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
@@ -459,7 +459,7 @@ class CommandSpec extends WordSpec with Matchers {
         BuyDevCardCommand( state ).doStep( game ) shouldBe a [Failure[_]]
       }
       "success" in {
-        val game2 = game.updatePlayer( game.player.addResourceCards( Cards.developmentCardCost ) )
+        val game2 = game.updatePlayer( game.player.addResourceCards( DevelopmentCard.cardCost ) )
         val command = BuyDevCardCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
@@ -472,7 +472,7 @@ class CommandSpec extends WordSpec with Matchers {
         undoRes.developmentCards shouldBe game2.developmentCards
         undoRes.player.devCards shouldBe empty
         undoRes.turn.drawnDevCards shouldBe empty
-        undoRes.player.resources.filter( _._2 > 0 ) shouldBe Cards.developmentCardCost
+        undoRes.player.resources.filter( _._2 > 0 ) shouldBe DevelopmentCard.cardCost
       }
     }
     "ChangeStateCommand" should {

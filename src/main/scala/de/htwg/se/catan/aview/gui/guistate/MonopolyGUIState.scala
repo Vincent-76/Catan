@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview.gui.guistate
 
 import de.htwg.se.catan.aview.gui.{ GUICommand, GUIState }
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.{ Player, Resources }
+import de.htwg.se.catan.model.{ Player, Resource }
 import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.Label
 import scalafx.scene.effect.Glow
@@ -25,7 +25,7 @@ case class MonopolyGUIState( controller:Controller ) extends GUIState {
       alignment = Pos.Center
       vgrow = Priority.Always
       spacing = 10
-      children = Resources.get.map( r => new StackPane {
+      children = Resource.impls.map( r => new StackPane {
         style = "-fx-font-size: 12; -fx-border-color: #353535; -fx-background-color: #FFFFFF; -fx-cursor: hand"
         padding = Insets( 2 )
         minWidth = 60

@@ -1,7 +1,10 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonValue
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.util._
+import play.api.libs.json._
 
 import scala.util.{ Failure, Random, Success, Try }
 import scala.xml.Node
@@ -9,22 +12,7 @@ import scala.xml.Node
 /**
  * @author Vincent76;
  */
-object Cards {
-
-  val developmentCardCost:ResourceCards = Map( Sheep -> 1, Wheat -> 1, Ore -> 1 )
-
-  val devCards:List[DevelopmentCard] = List(
-    KnightCard,
-    GreatHallCard,
-    YearOfPlentyCard,
-    RoadBuildingCard,
-    MonopolyCard
-  )
-
-  val bonusCards:List[BonusCard] = List(
-    LongestRoadCard,
-    LargestArmyCard
-  )
+object Card extends ObjectComponent[Card] {
 
   type ResourceCards = Map[Resource, Int]
 
@@ -34,14 +22,16 @@ object Cards {
     def of( wood:Int = 0, clay:Int = 0, sheep:Int = 0, wheat:Int = 0, ore:Int = 0 ):ResourceCards =
       Map( Wood -> wood, Clay -> clay, Sheep -> sheep, Wheat -> wheat, Ore -> ore )
 
-    def fromXML( node:Node ):ResourceCards = node.convertToMap( n => Resources.of( n.content ).get, _.content.toInt )
+    def fromXML( node:Node ):ResourceCards = node.asMap( n => Resource.of( n.content ).get, _.content.toInt )
   }
+
+  implicit val resourceCardsReads:Reads[ResourceCards] = ( json:JsValue ) => JsSuccess( json.asMap[Resource, Int] )
 
   implicit class RichResourceCards( resources:ResourceCards ) {
 
     def add( r:Resource, amount:Int = 1 ):ResourceCards = resources.updated( r, resources.getOrElse( r, 0 ) + amount )
 
-    def add( toAdd:ResourceCards ):ResourceCards = Resources.get.red( resources, ( cards:ResourceCards, r:Resource ) => {
+    def add( toAdd:ResourceCards ):ResourceCards = Resource.impls.red( resources, ( cards:ResourceCards, r:Resource ) => {
       cards.updated( r, cards.getOrElse( r, 0 ) + toAdd.getOrElse( r, 0 ) )
     } )
 
@@ -53,7 +43,7 @@ object Cards {
         Failure( InsufficientResources )
     }
 
-    def subtract( toRemove:ResourceCards ):Try[ResourceCards] = Success( Resources.get.red( resources, ( cards:ResourceCards, r:Resource ) => {
+    def subtract( toRemove:ResourceCards ):Try[ResourceCards] = Success( Resource.impls.red( resources, ( cards:ResourceCards, r:Resource ) => {
       val n = cards.getOrElse( r, 0 ) - toRemove.getOrElse( r, 0 )
       if ( n < 0 )
         return Failure( InsufficientResources )
@@ -67,34 +57,55 @@ object Cards {
       true
     }
 
-    def sort:Seq[(Resource, Int)] = resources.sortBySeq( Resources.get )
+    def sort:Seq[(Resource, Int)] = resources.toList.sortBy( _._1.index )
 
     def toString( prefix:String ):String =
       resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.title ).mkString( ", " )
   }
 
   def getResourceCards( amount:Int ):ResourceCards = {
-    Resources.get.map( r => r -> amount ).toMap
+    Resource.impls.map( r => r -> amount ).toMap
   }
+}
 
-  def getDevStack( random:Random = Random ):List[DevelopmentCard] = {
-    random.shuffle( devCards.red( List.empty, ( l:List[DevelopmentCard], d:DevelopmentCard ) => {
+abstract class Card extends ComponentImpl {
+  override def init() = Card.addImpl( this )
+}
+
+
+
+
+object DevelopmentCard extends ObjectComponent[DevelopmentCard] {
+  val cardCost:ResourceCards = Map( Sheep -> 1, Wheat -> 1, Ore -> 1 )
+
+  implicit val devCardWrites:Writes[DevelopmentCard] = ( developmentCard:DevelopmentCard ) => Json.toJson( developmentCard.title )
+
+  implicit val devCardsReads:Reads[DevelopmentCard] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+
+  KnightCard.init()
+  GreatHallCard.init()
+  YearOfPlentyCard.init()
+  RoadBuildingCard.init()
+  MonopolyCard.init()
+
+  def of( s:String ):Option[DevelopmentCard] = impls.find( _.title ^= s )
+
+  def getStack( random:Random = Random ):List[DevelopmentCard] = {
+    random.shuffle( impls.red( List.empty, ( l:List[DevelopmentCard], d:DevelopmentCard ) => {
       l ++ ( 1 to d.amount ).map( _ => d ).toList
     } ) )
   }
 
-  def usableDevCardOf( s:String ):Option[DevelopmentCard] =
-    devCards.filter( _.usable ).find( _.title.toLowerCase == s.toLowerCase )
-
-  def devCardOf( s:String ):Option[DevelopmentCard] = devCards.find( _.title.toLowerCase ^= s.toLowerCase )
-
-  def bonusCardOf( s:String ):Option[BonusCard] = bonusCards.find( _.title.toLowerCase ^= s.toLowerCase )
+  def usableOf( s:String ):Option[DevelopmentCard] =
+    impls.filter( _.usable ).find( _.title ^= s )
 }
 
-abstract class Card
-
-
 abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val title:String, val desc:String ) extends Card {
+  override def init() = {
+    super.init()
+    DevelopmentCard.addImpl( this )
+  }
+
   override def toString:String = title
 }
 
@@ -114,7 +125,23 @@ case object MonopolyCard extends DevelopmentCard( 2, true, "Monopoly",
   "When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type." )
 
 
-abstract class BonusCard( val bonus:Int, val required:Int, val title:String, desc:String ) extends Card
+object BonusCard extends ObjectComponent[BonusCard] {
+  implicit val bonusCardWrites:Writes[BonusCard] = ( bonusCard:BonusCard ) => Json.toJson( bonusCard.title )
+
+  implicit val bonusCardReads:Reads[BonusCard] = ( json:JsValue ) => JsSuccess( BonusCard.of( json.as[String] ).get )
+
+  LargestArmyCard.init()
+  LongestRoadCard.init()
+
+  def of( s:String ):Option[BonusCard] = impls.find( _.title ^= s )
+}
+
+abstract class BonusCard( val bonus:Int, val required:Int, val title:String, desc:String ) extends Card {
+  override def init() = {
+    super.init()
+    BonusCard.addImpl( this )
+  }
+}
 
 case object LargestArmyCard extends BonusCard( 2, 3, "Largest Army",
   "2 Victory Points!\nThe first player to play 3 knight cards gets this card. Another player who plays more knight cards takes this card." ) {

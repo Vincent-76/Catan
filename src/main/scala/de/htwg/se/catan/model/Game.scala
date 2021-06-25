@@ -1,8 +1,9 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.model.Cards._
-import de.htwg.se.catan.model.impl.fileio.XMLSerializable
+import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.impl.fileio.{ JsonDeserializer, JsonSerializable, XMLDeserializer, XMLSerializable }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsSuccess, JsValue, Reads, Writes }
 
 import scala.collection.immutable.List
 import scala.util.{ Random, Try }
@@ -15,7 +16,16 @@ object PlayerOrdering extends Ordering[PlayerID] {
   override def compare( x:PlayerID, y:PlayerID ):Int = x.id.compareTo( y.id )
 }
 
-trait Game extends XMLSerializable {
+abstract class GameImpl( name:String ) extends DeserializerComponentImpl[Game]( name ) {
+  override def init():Unit = Game.addImpl( this )
+}
+
+object Game extends ClassComponent[Game, GameImpl] {
+  implicit val turnWrites:Writes[Game] = ( o:Game ) => o.toJson
+  implicit val turnReads:Reads[Game] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+}
+
+trait Game extends XMLSerializable with JsonSerializable {
 
   def minPlayers:Int
   def maxPlayers:Int

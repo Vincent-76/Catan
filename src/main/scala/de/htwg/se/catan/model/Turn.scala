@@ -1,11 +1,22 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.model.impl.fileio.XMLSerializable
+import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
+import play.api.libs.json.{ JsSuccess, JsValue, Reads, Writes }
 
 /**
  * @author Vincent76;
  */
-trait Turn extends XMLSerializable {
+abstract class TurnImpl( name:String ) extends DeserializerComponentImpl[Turn]( name ) {
+  override def init() = Turn.addImpl( this )
+}
+
+object Turn extends ClassComponent[Turn, TurnImpl] {
+  implicit val turnWrites:Writes[Turn] = ( o:Turn ) => o.toJson
+
+  implicit val turnReads:Reads[Turn] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+}
+
+trait Turn extends XMLSerializable with JsonSerializable {
 
   def playerID:PlayerID
 

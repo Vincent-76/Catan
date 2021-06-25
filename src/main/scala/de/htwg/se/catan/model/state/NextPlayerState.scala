@@ -1,7 +1,8 @@
 package de.htwg.se.catan.model.state
 
-import de.htwg.se.catan.model.{ Command, State }
+import de.htwg.se.catan.model.{ Command, State, StateImpl }
 import de.htwg.se.catan.model.commands.ChangeStateCommand
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
 
@@ -9,13 +10,19 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object NextPlayerState {
+object NextPlayerState extends StateImpl( "NextPlayerState" ) {
   def fromXML( node:Node ):NextPlayerState = NextPlayerState()
+
+  def fromJson( json:JsValue ):State = NextPlayerState()
 }
 
 case class NextPlayerState( ) extends State {
 
-  def toXML:Node = <NextPlayerState />
+  def toXML:Node = <NextPlayerState />.copy( label = NextPlayerState.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( NextPlayerState.name )
+  )
 
   override def startTurn( ):Option[Command] = Some(
     ChangeStateCommand( this, DiceState() )

@@ -92,7 +92,7 @@ class ClassicGameFieldImplSpec extends WordSpec with Matchers {
       val e2 = edge2.get
       "not find edge" in {
         gameField.findEdge( 90 ) shouldBe None
-        gameField.findEdge( h1, Hex( 100, 0, 0, DesertArea ) ) shouldBe None
+        gameField.findEdge( h1, Hex( 100, 0, 0, DesertArea() ) ) shouldBe None
       }
       "update edge" in {
         val pID = new PlayerID( 0 )
@@ -130,7 +130,7 @@ class ClassicGameFieldImplSpec extends WordSpec with Matchers {
       val v2 = vertex2.get
       "not find vertex" in {
         gameField.findVertex( 54 ) shouldBe None
-        gameField.findVertex( h1, h2, Hex( 100, 0, 0, DesertArea ) ) shouldBe None
+        gameField.findVertex( h1, h2, Hex( 100, 0, 0, DesertArea() ) ) shouldBe None
       }
       "update vertex" in {
         val pID = new PlayerID( 0 )

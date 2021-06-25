@@ -1,10 +1,10 @@
 package de.htwg.se.catan.util
 
-import de.htwg.se.catan.model.Cards.ResourceCards
-import de.htwg.se.catan.model.{Clay, Ore, Resource, Resources, Sheep, Wheat, Wood}
-import org.scalatest.{Matchers, WordSpec}
+import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model._
+import org.scalatest.{ Matchers, WordSpec }
 
-import scala.util.{Failure, Random, Success, Try}
+import scala.util.{ Failure, Random, Success, Try }
 
 /**
  * @author Vincent76;
@@ -95,7 +95,7 @@ class UtilSpec extends WordSpec with Matchers {
       }
       "sortBySeq" in {
         val seq:Seq[Resource] = Seq( Wheat, Wood, Sheep )
-        val sortSeq:Seq[Resource] = Resources.get
+        val sortSeq:Seq[Resource] = Resource.impls.toList.sortBy( _.index )
         seq.sortBySeq( sortSeq ) shouldBe Seq( Wood, Sheep, Wheat )
       }
     }
@@ -105,7 +105,7 @@ class UtilSpec extends WordSpec with Matchers {
       }
       "sortBySeq" in {
         val resources:ResourceCards = Map( Ore -> 5, Clay -> 2, Wheat -> 4, Sheep -> 3, Wood -> 1 )
-        resources.sortBySeq( Resources.get ) shouldBe Seq( (Wood, 1), (Clay, 2), (Sheep, 3), (Wheat, 4), (Ore, 5) )
+        resources.sortBySeq( Resource.impls.toList.sortBy( _.index ) ) shouldBe Seq( (Wood, 1), (Clay, 2), (Sheep, 3), (Wheat, 4), (Ore, 5) )
       }
     }
     "RichMatrix" should {

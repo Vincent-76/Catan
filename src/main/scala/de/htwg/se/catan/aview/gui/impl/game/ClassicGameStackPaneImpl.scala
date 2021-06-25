@@ -11,7 +11,7 @@ import scalafx.scene.text.{ Text, TextAlignment }
 
 class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl] {
 
-  val resourceStacks:Map[Resource, Text] = Resources.get.map( r => {
+  val resourceStacks:Map[Resource, Text] = Resource.impls.map( r => {
     (r, new Text( "0" ) {
       fill = Color.White
       styleClass.add( "resourceCounter" )

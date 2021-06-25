@@ -3,8 +3,8 @@ package de.htwg.se.catan.aview.gui.impl.player
 import de.htwg.se.catan.aview.gui.util.{ CustomDialog, FlowGridPane, GlowButton }
 import de.htwg.se.catan.aview.gui.{ GUI, GUIApp, PlayerDisplay }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
-import de.htwg.se.catan.model.Cards._
-import de.htwg.se.catan.model.{ Cards, Game }
+import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.{ Card, DevelopmentCard, Game }
 import de.htwg.se.catan.util._
 import scalafx.geometry.{ Insets, Orientation, Pos }
 import scalafx.scene.Node
@@ -84,7 +84,7 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
         padding = Insets( 6 )
         orientation = Orientation.Horizontal
         prefColumns = 2
-        children = player.devCards.sortBySeq( Cards.devCards ).map( devCard => new GlowButton( devCard.title ) {
+        children = player.devCards.sortBy( _.title ).map( devCard => new GlowButton( devCard.title ) {
           minWidth = 60
           onMouseClicked = _ => new CustomDialog( gui, "Development Card" ) {
             headerText = devCard.title

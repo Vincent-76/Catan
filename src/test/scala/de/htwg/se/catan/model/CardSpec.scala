@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model
 
-import Cards._
+import Card._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.{Failure, Success}
@@ -9,8 +9,8 @@ class CardSpec extends WordSpec with Matchers {
   "Cards" when {
     "DevCards" should {
       "find" in {
-        Cards.usableDevCardOf( "kNight" ) shouldBe Some( KnightCard )
-        Cards.usableDevCardOf( "Knigh" ) shouldBe None
+        DevelopmentCard.usableOf( "kNight" ) shouldBe Some( KnightCard )
+        DevelopmentCard.usableOf( "Knigh" ) shouldBe None
       }
       "have a title" in {
         KnightCard.toString shouldBe KnightCard.title

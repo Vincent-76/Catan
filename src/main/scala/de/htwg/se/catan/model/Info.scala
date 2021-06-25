@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model
 
-import Cards.ResourceCards
+import Card.ResourceCards
 
 /**
  * @author Vincent76;

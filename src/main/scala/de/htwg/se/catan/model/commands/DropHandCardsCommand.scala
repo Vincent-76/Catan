@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model.commands
 
-import de.htwg.se.catan.model.Cards._
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
 import de.htwg.se.catan.model.{ Command, Game, InvalidResourceAmount, LostResourcesInfo }
 

@@ -1,12 +1,8 @@
 package de.htwg.se.catan
 
 import java.util.function.Predicate
-
-import de.htwg.se.catan.model.Cards.ResourceCards
-import de.htwg.se.catan.model.{ InsufficientResources, Resource, Resources }
-
 import scala.reflect.ClassTag
-import scala.util.{ Failure, Random, Success, Try }
+import scala.util.{ Failure, Random, Try }
 
 /**
  * @author Vincent76;

@@ -1,9 +1,9 @@
 package de.htwg.se.catan.aview.tui.command
 
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.{Cards, InvalidDevCard}
+import de.htwg.se.catan.model.{ Card, DevelopmentCard, InvalidDevCard }
 import de.htwg.se.catan.aview.tui.TUI.InvalidFormat
-import de.htwg.se.catan.aview.tui.{CommandAction, CommandInput, TUI}
+import de.htwg.se.catan.aview.tui.{ CommandAction, CommandInput, TUI }
 
 /**
  * @author Vincent76;
@@ -13,7 +13,7 @@ case object UseDevCommand
 
   override def action( commandInput:CommandInput, controller:Controller ):Unit = commandInput.args.headOption match {
     case Some( devCardString ) =>
-      val devCard = Cards.usableDevCardOf( devCardString )
+      val devCard = DevelopmentCard.usableOf( devCardString )
       if ( devCard.isEmpty )
         controller.error( InvalidDevCard( devCardString ) )
       else
@@ -22,6 +22,6 @@ case object UseDevCommand
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) + " (" +
-    Cards.devCards.filter( _.usable ).map( d => TUI.regexIgnoreCase( d.title ) ).mkString( "|" ) + ")"
+    DevelopmentCard.impls.filter( _.usable ).map( d => TUI.regexIgnoreCase( d.title ) ).mkString( "|" ) + ")"
 
 }

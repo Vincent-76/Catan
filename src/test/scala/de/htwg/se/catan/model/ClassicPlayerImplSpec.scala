@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model
 
-import Cards.ResourceCards
+import Card.ResourceCards
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import org.scalatest.{ Matchers, WordSpec }
@@ -12,12 +12,12 @@ class ClassicPlayerImplSpec extends WordSpec with Matchers {
   "PlayerColor" when {
     "static" should {
       "be constructed with of" in {
-        PlayerColor.colorOf( "grEEn" ) shouldBe Some( Green )
-        PlayerColor.colorOf( "Gree" ) shouldBe None
+        PlayerColor.of( "grEEn" ) shouldBe Some( Green )
+        PlayerColor.of( "Gree" ) shouldBe None
       }
       "have available colors" in {
-        PlayerColor.availableColors() should contain theSameElementsAs PlayerColor.all
-        PlayerColor.availableColors( List( player.color ) ) should contain theSameElementsAs PlayerColor.all.filter( _ != Green )
+        PlayerColor.availableColors() should contain theSameElementsAs PlayerColor.impls
+        PlayerColor.availableColors( List( player.color ) ) should contain theSameElementsAs PlayerColor.impls.filter( _ != Green )
       }
     }
   }

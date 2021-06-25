@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview.gui.commands
 
 import de.htwg.se.catan.aview.gui.GUI
 import de.htwg.se.catan.aview.gui.util.{ CustomDialog, ResourceSelector }
-import de.htwg.se.catan.model.Cards.ResourceCards
+import de.htwg.se.catan.model.Card.ResourceCards
 import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.{ Button, ButtonType }
 import scalafx.scene.layout.{ BorderPane, VBox }

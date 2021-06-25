@@ -15,7 +15,7 @@ case class BuyDevCardCommand( state:State ) extends Command {
   }
 
   override def undoStep( game:Game ):Game = {
-    val newGame = game.drawResourceCards( game.onTurn, Cards.developmentCardCost )._1
+    val newGame = game.drawResourceCards( game.onTurn, DevelopmentCard.cardCost )._1
     val devCard = newGame.player.devCards.last
     newGame.setState( state )
       .setTurn( newGame.turn.removeDrawnDevCard() )

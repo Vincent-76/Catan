@@ -1,46 +1,36 @@
 package de.htwg.se.catan.model
 
+import play.api.libs.json._
+
 /**
  * @author Vincent76;
  */
 
-object DiceValues {
+object DiceValue extends ObjectComponent[DiceValue] {
   val maxFrequency = 5
   val maxSum = 12
 
-  val all:List[DiceValue] = List(
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-    Nine,
-    Ten,
-    Eleven,
-    Twelve
-  )
+  Two.init()
+  Three.init()
+  Four.init()
+  Five.init()
+  Six.init()
+  Seven.init()
+  Eight.init()
+  Nine.init()
+  Ten.init()
+  Eleven.init()
+  Twelve.init()
 
-  def of( n:Int ):Option[DiceValue] = {
-    n match {
-      case 2 => Some( Two )
-      case 3 => Some( Three )
-      case 4 => Some( Four )
-      case 5 => Some( Five )
-      case 6 => Some( Six )
-      case 7 => Some( Seven )
-      case 8 => Some( Eight )
-      case 9 => Some( Nine )
-      case 10 => Some( Ten )
-      case 11 => Some( Eleven )
-      case 12 => Some( Twelve )
-      case _ => None
-    }
-  }
+  def of( n:Int ):Option[DiceValue] = impls.find( _.value == n )
+
+  implicit val diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
+
+  implicit val diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )
 }
 
-sealed abstract class DiceValue( val value:Int, val frequency:Int ) {
+sealed abstract class DiceValue( val value:Int, val frequency:Int ) extends ComponentImpl {
+  override def init() = DiceValue.addImpl( this )
 
   override def toString:String = {
     if( value < 10 )

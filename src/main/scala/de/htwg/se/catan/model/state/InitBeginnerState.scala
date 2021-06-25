@@ -1,8 +1,10 @@
 package de.htwg.se.catan.model.state
 
-import de.htwg.se.catan.model.{ Command, PlayerID, State }
+import de.htwg.se.catan.model.{ Command, PlayerID, State, StateImpl }
 import de.htwg.se.catan.model.commands.{ DiceOutBeginnerCommand, SetBeginnerCommand }
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
 
@@ -10,11 +12,17 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object InitBeginnerState {
+object InitBeginnerState extends StateImpl( "InitBeginnerState" ) {
   def fromXML( node:Node ):InitBeginnerState = InitBeginnerState(
-    beginner = node.childOf( "beginner" ).toOption( n => PlayerID.fromXML( n ) ),
-    diceValues = node.childOf( "diceValues" ).convertToMap( n => PlayerID.fromXML( n ), _.content.toInt ),
+    beginner = node.childOf( "beginner" ).asOption( n => PlayerID.fromXML( n ) ),
+    diceValues = node.childOf( "diceValues" ).asMap( n => PlayerID.fromXML( n ), _.content.toInt ),
     counter = ( node \ "@counter" ).content.toInt
+  )
+
+  def fromJson( json:JsValue ):State = InitBeginnerState(
+    beginner = ( json \ "beginner" ).asOption[PlayerID],
+    diceValues = ( json \ "diceValues" ).asMap[PlayerID, Int],
+    counter = ( json \ "counter" ).as[Int]
   )
 }
 
@@ -25,7 +33,14 @@ case class InitBeginnerState( beginner:Option[PlayerID] = None,
   def toXML:Node = <InitBeginnerState counter={ counter.toString }>
     <beginner>{ beginner.toXML( _.toXML ) }</beginner>
     <diceValues>{ diceValues.toXML( _.toXML, _.toString ) }</diceValues>
-  </InitBeginnerState>
+  </InitBeginnerState>.copy( label = InitBeginnerState.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( InitBeginnerState.name ),
+    "beginner" -> Json.toJson( beginner ),
+    "diceValues" -> Json.toJson( diceValues ),
+    "counter" -> Json.toJson( counter )
+  )
 
   override def diceOutBeginner():Option[Command] = Some(
     DiceOutBeginnerCommand( this )
