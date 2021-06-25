@@ -19,3 +19,5 @@ project/project/
 logs/
 project/.sbtserver
 .sbtserver/
+
+savegames/
