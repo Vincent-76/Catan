@@ -70,19 +70,12 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
   }
 
   def saveGame():Unit = {
-    val s = game
-    val xml = s.toXML
-    val s2 = Game.fromXML( xml )
-    println( "XML Same: " + ( s.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) == s2.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) ).toString )
-    val json = s.toJson
-    val s3 = Game.fromJson( json )
-    println( "JSON Same: " + ( s.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) == s2.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) ).toString )
     val path = fileIO.save( game )
     update( info = Some( GameSavedInfo( path ) ) )
   }
 
   def loadGame( path:String ):Unit = {
-    gameVal = fileIO.load( path )
+    gameVal = FileIO.load( path )
     undoStack = Nil
     redoStack = Nil
     update( info = Some( GameLoadedInfo( path ) ) )

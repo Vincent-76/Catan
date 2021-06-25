@@ -18,11 +18,24 @@ case class JsonParseError( expected:String, got:String ) extends RuntimeExceptio
   override def toString:String = "JsonParseError: Expected -> '" + expected + "', Got -> '" + got + "'"
 }
 
-object JsonFileIO {
+object JsonFileIO extends FileIO( "json" ) {
 
-  implicit val jsonSerializableWrites = new Writes[JsonSerializable] {
-    override def writes( o:JsonSerializable ):JsValue = o.toJson
+  override def load( path:String ):Game = {
+    val source = Source.fromFile( path )
+    val game = Game.fromJson( Json.parse( source.getLines.mkString ) )
+    source.close()
+    game
   }
+
+  override def save( game:Game ):String = {
+    val file = new File( getFileName )
+    val pw = new PrintWriter( file )
+    pw.write( Json.prettyPrint( game.toJson ) )
+    pw.close()
+    file.getAbsolutePath
+  }
+
+  implicit val jsonSerializableWrites:Writes[JsonSerializable] = ( o:JsonSerializable ) => o.toJson
 
   implicit class JsonSeq[E]( seq:Seq[E] ) {
     def toJson( implicit jfs:Writes[E] ):JsArray =
@@ -130,21 +143,5 @@ object JsonFileIO {
     def asVector[E]( implicit fjs:Reads[E] ):Vector[E] = jsonRes.get.asVector[E]
 
     def asVectorC[E]( builder:JsValue => E ):Vector[E] = jsonRes.get.asVectorC( builder )
-  }
-}
-
-class JsonFileIO extends FileIO {
-
-  override def load( path:String ):Game = {
-    val source = Source.fromFile( path ).getLines.mkString
-    Game.fromJson( Json.parse( source ) )
-  }
-
-  override def save( game:Game ):String = {
-    val file = new File( getFileName + ".json" )
-    val pw = new PrintWriter( file )
-    pw.write( Json.prettyPrint( game.toJson ) )
-    pw.close()
-    file.getAbsolutePath
   }
 }

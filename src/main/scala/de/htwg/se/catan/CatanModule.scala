@@ -6,7 +6,7 @@ import com.google.inject.name.Names
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model._
-import de.htwg.se.catan.model.impl.fileio.JsonFileIO
+import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, XMLFileIO }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
@@ -51,6 +51,9 @@ object CatanModule {
 
     Structure.init()
     Area.init()
+
+    XMLFileIO.init()
+    JsonFileIO.init()
   }
 }
 
@@ -65,7 +68,7 @@ class CatanModule( val test:Boolean = false ) extends AbstractModule with ScalaM
 
   override def configure( ):Unit = {
     bind[Controller].to[ClassicControllerImpl]
-    bind[FileIO].to[JsonFileIO]
+    bind[FileIO].toInstance( JsonFileIO )
     bind[Game].to[ClassicGameImpl]
     bind[Turn].to[ClassicTurnImpl]
     val seed = if( test ) 1 else Random.nextInt( Int.MaxValue / 1000 )

@@ -21,7 +21,18 @@ case class XMLParseError( expected:String, got:String ) extends RuntimeException
   override def toString:String = "XMLParseError: Expected -> '" + expected + "', Got -> '" + got + "'"
 }
 
-object XMLFileIO {
+object XMLFileIO extends FileIO( "xml" ) {
+
+  override def load( path:String ):Game = {
+    val file = scala.xml.XML.loadFile( path )
+    Game.fromXML( file )
+  }
+
+  override def save( game:Game ):String = {
+    val file = File( getFileName )
+    scala.xml.XML.save( file.toAbsolute.path, game.toXML );
+    file.toAbsolute.path
+  }
 
   private def wrap( data:io.Serializable ):io.Serializable = data match {
     case n:Node => n
@@ -164,18 +175,4 @@ object XMLFileIO {
     }
   }
 
-}
-
-class XMLFileIO extends FileIO {
-
-  override def load( path:String ):Game = {
-    val file = scala.xml.XML.loadFile( path )
-    Game.fromXML( file )
-  }
-
-  override def save( game:Game ):String = {
-    val file = File( getFileName + ".xml" )
-    scala.xml.XML.save( file.toAbsolute.path, game.toXML );
-    file.toAbsolute.path
-  }
 }
