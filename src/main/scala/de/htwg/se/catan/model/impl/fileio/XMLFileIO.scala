@@ -1,13 +1,10 @@
 package de.htwg.se.catan.model.impl.fileio
 
-import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.{ FileIO, Game }
 
 import java.io
-import java.text.SimpleDateFormat
-import java.util.Calendar
 import scala.reflect.io.File
-import scala.xml.{ Elem, Node, NodeSeq }
+import scala.xml.{ Elem, Node, NodeSeq, Utility }
 
 trait XMLSerializable {
   def toXML:Node
@@ -36,74 +33,47 @@ object XMLFileIO extends FileIO( "xml" ) {
 
   private def wrap( data:io.Serializable ):io.Serializable = data match {
     case n:Node => n
-    case s => <v>
-      {s}
-    </v>
+    case s => <v>{s}</v>
   }
-
-  /*implicit class XMLAnyVal[T]( val e:T ) {
-    def toXML:io.Serializable = e match {
-      case e:XMLSerializable => e.toXML
-      case _ => e.toString
-    }
-  }*/
 
   implicit class XMLOption[T]( val option:Option[T] ) {
     def toXML( valBuilder:T => io.Serializable ):Node = option match {
-      case Some( e ) => <Some>
-        {wrap( valBuilder( e ) )}
-      </Some>
+      case Some( e ) => <Some>{wrap( valBuilder( e ) )}</Some>
       case _ => <None/>
     }
+  }
+
+  implicit class XMLSequence[E]( val list:Seq[E] ) {
+    def toXML( valBuilder:E => io.Serializable ):Node = <List>
+      {list.map( e =>
+        <entry>{wrap( valBuilder( e ) )}</entry>
+      )}
+    </List>
   }
 
   implicit class XMLMap[K, V]( val map:Map[K, V] ) {
     def toXML( keyBuilder:K => io.Serializable, valBuilder:V => io.Serializable ):Node = <Map>
       {map.map( d =>
         <entry>
-          <key>
-            {wrap( keyBuilder( d._1 ) )}
-          </key>
-          <value>
-            {wrap( valBuilder( d._2 ) )}
-          </value>
+          <key>{wrap( keyBuilder( d._1 ) )}</key>
+          <value>{wrap( valBuilder( d._2 ) )}</value>
         </entry>
       ).toSeq}
     </Map>
   }
 
-  implicit class XMLSequence[E]( val list:Seq[E] ) {
-    def toXML( valBuilder:E => io.Serializable ):Node = <List>
-      {list.map( e =>
-        <entry>
-          {wrap( valBuilder( e ) )}
-        </entry>
-      )}
-    </List>
-  }
-
   implicit class XMLTuple2[T1, T2]( val tuple:(T1, T2) ) {
     def toXML( builder1:T1 => io.Serializable, builder2:T2 => io.Serializable ):Node = <Tuple2>
-      <value1>
-        {wrap( builder1( tuple._1 ) )}
-      </value1>
-      <value2>
-        {wrap( builder2( tuple._2 ) )}
-      </value2>
+      <value1>{wrap( builder1( tuple._1 ) )}</value1>
+      <value2>{wrap( builder2( tuple._2 ) )}</value2>
     </Tuple2>
   }
 
   implicit class XMLTuple3[T1, T2, T3]( val tuple:(T1, T2, T3) ) {
     def toXML( builder1:T1 => io.Serializable, builder2:T2 => io.Serializable, builder3:T3 => io.Serializable ):Node = <Tuple3>
-      <value1>
-        {wrap( builder1( tuple._1 ) )}
-      </value1>
-      <value2>
-        {wrap( builder2( tuple._2 ) )}
-      </value2>
-      <value3>
-        {wrap( builder3( tuple._3 ) )}
-      </value3>
+      <value1>{wrap( builder1( tuple._1 ) )}</value1>
+      <value2>{wrap( builder2( tuple._2 ) )}</value2>
+      <value3>{wrap( builder3( tuple._3 ) )}</value3>
     </Tuple3>
   }
 
@@ -115,10 +85,6 @@ object XMLFileIO extends FileIO( "xml" ) {
     def firstChild( ):Option[Node] = {
       val r = node.child.collectFirst {
         case e:Elem => e
-      }
-      if( r.isEmpty ) {
-        val n = Some( node )
-        println( "T" )
       }
       r
     }

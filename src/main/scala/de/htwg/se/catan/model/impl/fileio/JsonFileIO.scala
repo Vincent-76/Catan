@@ -127,11 +127,6 @@ object JsonFileIO extends FileIO( "json" ) {
       case _ => None
     }
 
-    def asMap[K, V]( implicit fjs:Reads[K], fjs2:Reads[V] ):Map[K, V] = jsonRes.get.asMap[K, V]
-
-    def asMapC[K, V]( keyBuilder:JsValue => K, valBuilder:JsValue => V ):Map[K, V] =
-      jsonRes.get.asMapC( keyBuilder, valBuilder )
-
     def asSeq[E]( implicit fjs:Reads[E] ):Seq[E] = jsonRes.get.asSeq[E]
 
     def asSeqC[E]( builder:JsValue => E ):Seq[E] = jsonRes.get.asSeqC( builder )
@@ -143,5 +138,18 @@ object JsonFileIO extends FileIO( "json" ) {
     def asVector[E]( implicit fjs:Reads[E] ):Vector[E] = jsonRes.get.asVector[E]
 
     def asVectorC[E]( builder:JsValue => E ):Vector[E] = jsonRes.get.asVectorC( builder )
+
+    def asMap[K, V]( implicit fjs:Reads[K], fjs2:Reads[V] ):Map[K, V] = jsonRes.get.asMap[K, V]
+
+    def asMapC[K, V]( keyBuilder:JsValue => K, valBuilder:JsValue => V ):Map[K, V] =
+      jsonRes.get.asMapC( keyBuilder, valBuilder )
+
+    def asTuple[T1, T2]( implicit fjs:Reads[T1], fjs2:Reads[T2] ):(T1, T2) = jsonRes.get.asTuple[T1, T2]
+
+    def asTupleC[T1, T2]( builder1:JsValue => T1, builder2:JsValue => T2 ):(T1, T2) = jsonRes.get.asTupleC( builder1, builder2 )
+
+    def asTuple[T1, T2, T3]( implicit fjs:Reads[T1], fjs2:Reads[T2], fjs3:Reads[T3] ):(T1, T2, T3) = jsonRes.get.asTuple[T1, T2, T3]
+
+    def asTupleC[T1, T2, T3]( builder1:JsValue => T1, builder2:JsValue => T2, builder3:JsValue => T3 ):(T1, T2, T3) = jsonRes.get.asTupleC( builder1, builder2, builder3 )
   }
 }

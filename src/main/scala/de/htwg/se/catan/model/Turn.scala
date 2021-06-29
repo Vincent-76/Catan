@@ -12,7 +12,6 @@ abstract class TurnImpl( name:String ) extends DeserializerComponentImpl[Turn]( 
 
 object Turn extends ClassComponent[Turn, TurnImpl] {
   implicit val turnWrites:Writes[Turn] = ( o:Turn ) => o.toJson
-
   implicit val turnReads:Reads[Turn] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
 }
 
