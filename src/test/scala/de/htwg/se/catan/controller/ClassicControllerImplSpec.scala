@@ -1,5 +1,6 @@
 package de.htwg.se.catan.controller
 
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO
@@ -29,6 +30,8 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
     override def onError(t: Throwable): Unit = this.error = Some( t )
   }
 
+  CatanModule.init()
+
   "ClassicControllerImpl" when {
     val controller = new ClassicControllerImpl( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" ), XMLFileIO )
     "new" should {
@@ -46,6 +49,12 @@ class ClassicControllerImplSpec extends WordSpec with Matchers {
         controller.endTurn()
         controller.update( Some( DiceInfo( 1, 2 ) ) )
         observer.updateInfo shouldBe Some( DiceInfo( 1, 2 ) )
+      }
+      "save and load game" in {
+        val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )
+        val path = controller.saveGame();
+        controller.loadGame( path )
+        controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game
       }
     }
     "running" should {

@@ -25,7 +25,7 @@ trait Controller extends Observable {
   def undoAction():Unit
   def redoAction():Unit
 
-  def saveGame():Unit
+  def saveGame():String
 
   def loadGame( path:String ):Unit
 
