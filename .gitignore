@@ -19,5 +19,6 @@ project/project/
 logs/
 project/.sbtserver
 .sbtserver/
+src/main/scala/META-INF
 
 savegames/

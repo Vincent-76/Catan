@@ -1,8 +1,9 @@
 package de.htwg.se.catan.model
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ResourceSpec extends WordSpec with Matchers{
+class ResourceSpec extends AnyWordSpec with Matchers{
   "Resources" when {
     "static" should {
       "be constructed with of" in {

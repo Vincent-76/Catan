@@ -2,14 +2,15 @@ package de.htwg.se.catan.util
 
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.util.{ Failure, Random, Success, Try }
 
 /**
  * @author Vincent76;
  */
-class UtilSpec extends WordSpec with Matchers {
+class UtilSpec extends AnyWordSpec with Matchers {
   "util" when {
     "RichAny" should {
       "check" in {

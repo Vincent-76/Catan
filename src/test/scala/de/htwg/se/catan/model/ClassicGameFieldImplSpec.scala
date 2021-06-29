@@ -2,12 +2,13 @@ package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.util._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
  * @author Vincent76;
  */
-class ClassicGameFieldImplSpec extends WordSpec with Matchers {
+class ClassicGameFieldImplSpec extends AnyWordSpec with Matchers {
   "ClassicGameFieldImpl" when {
     "new" should {
       val gameField = ClassicGameFieldImpl( 1 )

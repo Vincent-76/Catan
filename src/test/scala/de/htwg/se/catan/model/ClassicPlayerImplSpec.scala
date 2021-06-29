@@ -3,11 +3,12 @@ package de.htwg.se.catan.model
 import Card.ResourceCards
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.util.{ Failure, Success }
 
-class ClassicPlayerImplSpec extends WordSpec with Matchers {
+class ClassicPlayerImplSpec extends AnyWordSpec with Matchers {
   val player:ClassicPlayerImpl = new ClassicPlayerImpl( new PlayerID( 0 ), Green, "A" )
   "PlayerColor" when {
     "static" should {

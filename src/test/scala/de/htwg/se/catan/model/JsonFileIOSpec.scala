@@ -5,10 +5,11 @@ import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, JsonParseError, JsonSerializable }
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{ JsDefined, JsUndefined, Json }
 
-class JsonFileIOSpec extends WordSpec with Matchers {
+class JsonFileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
   "JsonParseError" when {

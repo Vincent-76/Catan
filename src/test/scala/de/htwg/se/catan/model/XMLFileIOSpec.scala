@@ -5,11 +5,12 @@ import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
 import de.htwg.se.catan.model.impl.fileio.{ XMLFileIO, XMLParseError }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.xml.{ Node, Utility }
 
-class XMLFileIOSpec extends WordSpec with Matchers {
+class XMLFileIOSpec extends AnyWordSpec with Matchers {
   implicit class XMLNodeTest( node:Node ) {
     def trim:String = Utility.trim( node ).toString
   }

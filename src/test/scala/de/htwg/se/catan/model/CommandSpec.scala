@@ -9,12 +9,13 @@ import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state._
 import de.htwg.se.catan.util._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.TreeMap
 import scala.util.{ Failure, Success, Try }
 
-class CommandSpec extends WordSpec with Matchers {
+class CommandSpec extends AnyWordSpec with Matchers {
   "Command" when {
     val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" )
     "AbortPlayerTradeCommand" should {

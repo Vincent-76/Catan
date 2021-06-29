@@ -1,12 +1,13 @@
 package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.impl.fileio.{ JsonParseError, XMLParseError }
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
 
-class ComponentSpec extends WordSpec with Matchers {
+class ComponentSpec extends AnyWordSpec with Matchers {
   object TestDeserializerComponentImpl extends DeserializerComponentImpl[String]( "TestImpl" ) {
     override def fromJson( json:JsValue ):String = "Test"
     override def fromXML( node:Node ):String = "Test"

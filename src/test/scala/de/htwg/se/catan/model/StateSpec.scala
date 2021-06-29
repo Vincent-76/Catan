@@ -4,9 +4,10 @@ import Card.ResourceCards
 import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class StateSpec extends WordSpec with Matchers {
+class StateSpec extends AnyWordSpec with Matchers {
   "State" when {
     "ActionState" should {
       val state = ActionState()

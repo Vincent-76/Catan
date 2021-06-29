@@ -7,14 +7,15 @@ import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state.{ ActionState, InitState }
 import de.htwg.se.catan.util._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.util.{ Failure, Random, Success }
 
 /**
  * @author Vincent76;
  */
-class ClassicGameImplSpec extends WordSpec with Matchers {
+class ClassicGameImplSpec extends AnyWordSpec with Matchers {
   "ClassicGameImpl" when {
     val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" )
     val seed = new Random().nextInt( Int.MaxValue / 1000 )

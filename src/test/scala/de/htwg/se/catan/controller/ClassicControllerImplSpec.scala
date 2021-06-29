@@ -12,12 +12,13 @@ import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state._
 import de.htwg.se.catan.model.{ KnightCard, _ }
 import de.htwg.se.catan.util._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
  * @author Vincent76;
  */
-class ClassicControllerImplSpec extends WordSpec with Matchers {
+class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
   class TestObserver extends Observer {
     var updateInfo:Option[Info] = None
     var info:Option[Info] = None

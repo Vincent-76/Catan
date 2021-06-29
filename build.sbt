@@ -2,11 +2,11 @@ name := "Catan"
 
 version := "0.1"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.5"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
-libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
+libraryDependencies += "org.scalafx" %% "scalafx" % "16.0.0-R24"
 
 libraryDependencies += "com.google.inject" % "guice" % "5.0.1"
 libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.0.1"
@@ -27,5 +27,5 @@ lazy val osName = System.getProperty("os.name") match {
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
 libraryDependencies ++= javaFXModules.map( m=>
-  "org.openjfx" % s"javafx-$m" % "15.0.1" classifier osName
+  "org.openjfx" % s"javafx-$m" % "16" classifier osName
 )

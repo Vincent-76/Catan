@@ -6,9 +6,10 @@ import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, Rob
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.util._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class PlacementSpec extends WordSpec with Matchers {
+class PlacementSpec extends AnyWordSpec with Matchers {
   "Placement" when {
     "static" should {
       "be constructed with of" in {

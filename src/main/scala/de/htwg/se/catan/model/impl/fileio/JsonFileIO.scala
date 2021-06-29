@@ -78,20 +78,22 @@ object JsonFileIO extends FileIO( "json" ) {
       case v => Some( builder( v ) )
     }
 
-    def asSeq[E]( implicit fjs:Reads[E] ):Seq[E] = asSeqC( _.as[E] )
-
-    def asSeqC[E]( builder:JsValue => E ):Seq[E] = json match {
+    private def asIndexedSeq[E]( builder:JsValue => E ):scala.collection.IndexedSeq[E] = json match {
       case arr:JsArray => arr.value.map( builder )
       case o => throw JsonParseError( expected = "JsonArray", got = o.toString() )
     }
 
-    def asList[E]( implicit fjs:Reads[E] ):List[E] = asSeq.toList
+    def asSeq[E]( implicit fjs:Reads[E] ):Seq[E] = asSeqC( _.as[E] )
 
-    def asListC[E]( builder:JsValue => E ):List[E] = asSeqC( builder ).toList
+    def asSeqC[E]( builder:JsValue => E ):Seq[E] = asIndexedSeq( builder ).toSeq
 
-    def asVector[E]( implicit fjs:Reads[E] ):Vector[E] = asSeq.toVector
+    def asList[E]( implicit fjs:Reads[E] ):List[E] = asListC( _.as[E] )
 
-    def asVectorC[E]( builder:JsValue => E ):Vector[E] = asSeqC( builder ).toVector
+    def asListC[E]( builder:JsValue => E ):List[E] = asIndexedSeq( builder ).toList
+
+    def asVector[E]( implicit fjs:Reads[E] ):Vector[E] = asVectorC( _.as[E] )
+
+    def asVectorC[E]( builder:JsValue => E ):Vector[E] = asIndexedSeq( builder ).toVector
 
 
     def asMap[K, V]( implicit fjs:Reads[K], fjs2:Reads[V] ):Map[K, V] = asMapC[K, V]( _.as[K], _.as[V] )

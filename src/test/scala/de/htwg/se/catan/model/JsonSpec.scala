@@ -10,10 +10,11 @@ import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, Rob
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{ Json, Reads, Writes }
 
-class JsonSpec extends WordSpec with Matchers {
+class JsonSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
   "(de)serialized" when {

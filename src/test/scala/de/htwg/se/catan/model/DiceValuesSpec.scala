@@ -1,8 +1,9 @@
 package de.htwg.se.catan.model
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DiceValuesSpec  extends WordSpec with Matchers {
+class DiceValuesSpec extends AnyWordSpec with Matchers {
   "Numbers" when {
     "static" should {
       "be constructed with of" in {

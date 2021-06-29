@@ -4,9 +4,10 @@ import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class FileIOSpec extends WordSpec with Matchers {
+class FileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
   "FileIO" when {
