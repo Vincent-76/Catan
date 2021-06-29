@@ -48,6 +48,41 @@ class XMLSpec extends WordSpec with Matchers {
         val xml = game.toXML
         ClassicGameImpl.fromXML( xml ).copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
       }
+      "Hex" in {
+        Hex( 0, 0, 0, DesertArea() ).check( Hex )
+      }
+      "Edge" in {
+        val hexList = List(
+          Hex( 0, 0, 0, DesertArea() ),
+          Hex( 1, 0, 1, WaterArea() )
+        )
+        val edge = Edge(
+          0,
+          hexList( 0 ),
+          hexList( 1 ),
+          port = Some( Port() ),
+          road = Some( Road( PlayerID( 0 ) ) )
+        )
+        val xml = edge.toXML
+        Edge.fromXML( xml, hexList ) shouldBe edge
+      }
+      "Vertex" in {
+        val hexList = List(
+          Hex( 0, 0, 0, DesertArea() ),
+          Hex( 1, 0, 1, WaterArea() ),
+          Hex( 2, 0, 2, ResourceArea( Wood, Three ) )
+        )
+        val vertex = Vertex(
+          0,
+          hexList( 0 ),
+          hexList( 1 ),
+          hexList( 2 ),
+          port = Some( Port() ),
+          building = Some( Settlement( PlayerID( 0 ) ) )
+        )
+        val xml = vertex.toXML
+        Vertex.fromXML( xml, hexList ) shouldBe vertex
+      }
       "ClassicGameFieldImpl" in {
         ClassicGameFieldImpl( 1 ).asInstanceOf[GameField].check( ClassicGameFieldImpl )
       }

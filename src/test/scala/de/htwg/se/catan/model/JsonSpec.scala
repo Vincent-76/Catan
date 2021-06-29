@@ -50,6 +50,41 @@ class JsonSpec extends WordSpec with Matchers {
         val json = Json.toJson( game.asInstanceOf[Game] )
         json.as[Game].asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
       }
+      "Hex" in {
+        Hex( 0, 0, 0, DesertArea() ).check()
+      }
+      "Edge" in {
+        val hexList = List(
+          Hex( 0, 0, 0, DesertArea() ),
+          Hex( 1, 0, 1, WaterArea() )
+        )
+        val edge = Edge(
+          0,
+          hexList( 0 ),
+          hexList( 1 ),
+          port = Some( Port() ),
+          road = Some( Road( PlayerID( 0 ) ) )
+        )
+        val json = Json.toJson( edge )
+        Edge.fromJson( json, hexList ) shouldBe edge
+      }
+      "Vertex" in {
+        val hexList = List(
+          Hex( 0, 0, 0, DesertArea() ),
+          Hex( 1, 0, 1, WaterArea() ),
+          Hex( 2, 0, 2, ResourceArea( Wood, Three ) )
+        )
+        val vertex = Vertex(
+          0,
+          hexList( 0 ),
+          hexList( 1 ),
+          hexList( 2 ),
+          port = Some( Port() ),
+          building = Some( Settlement( PlayerID( 0 ) ) )
+        )
+        val json = Json.toJson( vertex )
+        Vertex.fromJson( json, hexList ) shouldBe vertex
+      }
       "ClassicGameFieldImpl" in {
         ClassicGameFieldImpl( 1 ).asInstanceOf[GameField].check()
       }

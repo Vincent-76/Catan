@@ -2,8 +2,8 @@ package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLOption }
-import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
-import play.api.libs.json.{ JsSuccess, JsValue, Json, Reads, Writes }
+import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLDeserializer, XMLSerializable }
+import play.api.libs.json.{ JsSuccess, JsValue, Json, OWrites, Reads, Writes }
 
 import scala.collection.immutable.List
 import scala.xml.Node
@@ -61,7 +61,7 @@ trait GameField extends XMLSerializable with JsonSerializable {
 
 sealed trait PlacementPoint
 
-object Hex {
+object Hex extends XMLDeserializer[Hex] {
   //private def apply( id:Int, r:Int, c:Int, area:Area ):Hex = new Hex( id, r, c, area )
 
   def fromXML( node:Node ):Hex = Hex(
@@ -71,9 +71,8 @@ object Hex {
     area = Area.fromXML( node.childOf( "area" ) )
   )
 
-  implicit val hexWrites = Json.writes[Hex]
-
-  implicit val hexReads = Json.reads[Hex]
+  implicit val hexWrites:Writes[Hex] = Json.writes[Hex]
+  implicit val hexReads:Reads[Hex] = Json.reads[Hex]
 }
 
 case class Hex /*private[GameField]*/( id:Int, r:Int, c:Int, area:Area ) extends PlacementPoint with XMLSerializable {
@@ -99,15 +98,13 @@ object Edge {
     road = node.childOf( "road" ).asOption( n => Structure.fromXML( n ).asInstanceOf[Road] )
   )
 
-  implicit val edgeWrites = new Writes[Edge] {
-    def writes( o:Edge ):JsValue = Json.obj(
-      "id" -> Json.toJson( o.id ),
-      "h1" -> Json.toJson( o.h1.id ),
-      "h2" -> Json.toJson( o.h2.id ),
-      "port" -> Json.toJson( o.port ),
-      "road" -> Json.toJson( o.road )
-    )
-  }
+  implicit val edgeWrites:Writes[Edge] = ( o:Edge ) => Json.obj(
+    "id" -> Json.toJson( o.id ),
+    "h1" -> Json.toJson( o.h1.id ),
+    "h2" -> Json.toJson( o.h2.id ),
+    "port" -> Json.toJson( o.port ),
+    "road" -> Json.toJson( o.road )
+  )
 
   def fromJson( json:JsValue, hexList:List[Hex] ):Edge = Edge(
     id = ( json \ "id" ).as[Int],
@@ -143,16 +140,14 @@ object Vertex {
     building = node.childOf( "building" ).asOption( n => Structure.fromXML( n ).asInstanceOf[Building] )
   )
 
-  implicit val vertexWrites = new Writes[Vertex] {
-    def writes( o:Vertex ):JsValue = Json.obj(
-      "id" -> Json.toJson( o.id ),
-      "h1" -> Json.toJson( o.h1.id ),
-      "h2" -> Json.toJson( o.h2.id ),
-      "h3" -> Json.toJson( o.h3.id ),
-      "port" -> Json.toJson( o.port ),
-      "road" -> Json.toJson( o.building )
-    )
-  }
+  implicit val vertexWrites:Writes[Vertex] = ( o:Vertex ) => Json.obj(
+    "id" -> Json.toJson( o.id ),
+    "h1" -> Json.toJson( o.h1.id ),
+    "h2" -> Json.toJson( o.h2.id ),
+    "h3" -> Json.toJson( o.h3.id ),
+    "port" -> Json.toJson( o.port ),
+    "road" -> Json.toJson( o.building )
+  )
 
   def fromJson( json:JsValue, hexList:List[Hex] ):Vertex = Vertex(
     id = ( json \ "id" ).as[Int],
