@@ -42,7 +42,7 @@ abstract class ClassComponent[T, I <: DeserializerComponentImpl[T]] extends Comp
     val name = ( json \ "class" ).validate[String]
     if( name.isError )
       throw JsonParseError( expected = getClass.getSimpleName, got = name.toString )
-    findImpl( ( json \ "class" ).as[String] ) match {
+    findImpl( name.get ) match {
       case Left( impl ) => impl.fromJson( json )
       case Right( value ) => throw JsonParseError( expected = getClass.getSimpleName, got = value )
     }

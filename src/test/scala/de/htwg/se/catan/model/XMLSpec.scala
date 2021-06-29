@@ -7,7 +7,7 @@ import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLMap
 import de.htwg.se.catan.model.impl.fileio.{ XMLDeserializer, XMLSerializable }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
-import de.htwg.se.catan.model.impl.placement.RoadPlacement
+import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state._
@@ -36,7 +36,15 @@ class XMLSpec extends WordSpec with Matchers {
         ResourceCards.fromXML( xml ) shouldBe r
       }
       "ClassicGameImpl" in {
-        val game = new ClassicGameImpl( injector.getInstance( classOf[GameField] ), injector.getInstance( classOf[Turn] ), 1, injector.getInstance( classOf[PlayerFactory] ), "ClassicPlayerImpl" )
+        val game = ClassicGameImpl(
+          injector.getInstance( classOf[GameField] ),
+          injector.getInstance( classOf[Turn] ), 1,
+          injector.getInstance( classOf[PlayerFactory] ),
+          "ClassicPlayerImpl",
+          availablePlacementsVal = List( RoadPlacement, SettlementPlacement, CityPlacement ),
+        ).addPlayer( Green, "Test" )
+          .setBonusCard( LongestRoadCard, Some( PlayerID( 0 ), 6 ) )
+          .setWinner( PlayerID( 0 ) )
         val xml = game.toXML
         ClassicGameImpl.fromXML( xml ).copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
       }
@@ -47,7 +55,8 @@ class XMLSpec extends WordSpec with Matchers {
         PlayerID( 1 ).check( PlayerID )
       }
       "ClassicPlayerImpl" in {
-        ClassicPlayerImpl( PlayerID( 0 ), Green, "Test" ).asInstanceOf[Player].check( ClassicPlayerImpl )
+        ClassicPlayerImpl( PlayerID( 0 ), Green, "Test", devCardsVal = Vector( KnightCard ), usedDevCards = Vector( KnightCard ) )
+          .asInstanceOf[Player].check( ClassicPlayerImpl )
       }
       "Road" in {
         Road( PlayerID( 1 ) ).asInstanceOf[Structure].check( Road )
@@ -59,7 +68,7 @@ class XMLSpec extends WordSpec with Matchers {
         City( PlayerID( 1 ) ).asInstanceOf[Structure].check( City )
       }
       "ClassicTurnImpl" in {
-        ClassicTurnImpl().asInstanceOf[Turn].check( ClassicTurnImpl )
+        ClassicTurnImpl( drawnDevCardsVal = List( KnightCard ) ).asInstanceOf[Turn].check( ClassicTurnImpl )
       }
       "ActionState" in {
         ActionState().asInstanceOf[State].check( ActionState )
@@ -80,10 +89,13 @@ class XMLSpec extends WordSpec with Matchers {
         DiceState().asInstanceOf[State].check( DiceState )
       }
       "DropHandCardsState" in {
-        DropHandCardsState( PlayerID( 0 ) ).asInstanceOf[State].check( DropHandCardsState )
+        DropHandCardsState( PlayerID( 0 ), List( PlayerID( 0 ) ) ).asInstanceOf[State].check( DropHandCardsState )
       }
       "InitBeginnerState" in {
-        InitBeginnerState().asInstanceOf[State].check( InitBeginnerState )
+        InitBeginnerState(
+          beginner = Some( PlayerID( 0 ) ),
+          diceValues = Map( PlayerID( 0 ) -> 3 )
+        ).asInstanceOf[State].check( InitBeginnerState )
       }
       "InitPlayerState" in {
         InitPlayerState().asInstanceOf[State].check( InitPlayerState )
@@ -98,16 +110,25 @@ class XMLSpec extends WordSpec with Matchers {
         NextPlayerState().asInstanceOf[State].check( NextPlayerState )
       }
       "PlayerTradeEndState" in {
-        PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty ).asInstanceOf[State].check( PlayerTradeEndState )
+        PlayerTradeEndState(
+          ResourceCards.of( wood = 1 ),
+          ResourceCards.of( clay = 1 ),
+          Map( PlayerID( 0 ) -> true )
+        ).asInstanceOf[State].check( PlayerTradeEndState )
       }
       "PlayerTradeState" in {
-        PlayerTradeState( PlayerID( 0 ), ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty ).asInstanceOf[State].check( PlayerTradeState )
+        PlayerTradeState(
+          PlayerID( 0 ),
+          ResourceCards.of( wood = 1 ),
+          ResourceCards.of( clay = 1 ),
+          Map( PlayerID( 0 ) -> true )
+        ).asInstanceOf[State].check( PlayerTradeState )
       }
       "RobberPlaceState" in {
         RobberPlaceState( ActionState() ).asInstanceOf[State].check( RobberPlaceState )
       }
       "RobberStealState" in {
-        RobberStealState( List.empty, ActionState() ).asInstanceOf[State].check( RobberStealState )
+        RobberStealState( List( PlayerID( 0 ) ), ActionState() ).asInstanceOf[State].check( RobberStealState )
       }
       "YearOfPlentyState" in {
         YearOfPlentyState( ActionState() ).asInstanceOf[State].check( YearOfPlentyState )

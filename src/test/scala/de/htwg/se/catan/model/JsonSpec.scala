@@ -25,7 +25,7 @@ class JsonSpec extends WordSpec with Matchers {
         WaterArea().asInstanceOf[Area].check()
       }
       "DesertArea" in {
-        DesertArea().asInstanceOf[Area].check()
+        DesertArea().asInstanceOf[LandArea].check()
       }
       "ResourceArea" in {
         ResourceArea( Wood, Six ).asInstanceOf[Area].check()
@@ -46,6 +46,7 @@ class JsonSpec extends WordSpec with Matchers {
       }
       "ClassicGameImpl" in {
         val game = new ClassicGameImpl( injector.getInstance( classOf[GameField] ), injector.getInstance( classOf[Turn] ), 1, injector.getInstance( classOf[PlayerFactory] ), "ClassicPlayerImpl" )
+          .setBonusCard( LongestRoadCard, Some( PlayerID( 0 ), 6 ) )
         val json = Json.toJson( game.asInstanceOf[Game] )
         json.as[Game].asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
       }
@@ -80,10 +81,12 @@ class JsonSpec extends WordSpec with Matchers {
         Wood.asInstanceOf[Resource].check()
       }
       "Structure" in {
+        Road( PlayerID( 1 ) ).check()
         Road( PlayerID( 1 ) ).asInstanceOf[Structure].check()
       }
       "Building" in {
         Settlement( PlayerID( 1 ) ).asInstanceOf[Building].check()
+        City( PlayerID( 1 ) ).asInstanceOf[Building].check()
       }
       "ClassicTurnImpl" in {
         ClassicTurnImpl().asInstanceOf[Turn].check()
