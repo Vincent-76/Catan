@@ -7,7 +7,7 @@ import play.api.libs.json.{ JsSuccess, JsValue, Reads, Writes }
  * @author Vincent76;
  */
 abstract class TurnImpl( name:String ) extends DeserializerComponentImpl[Turn]( name ) {
-  override def init() = Turn.addImpl( this )
+  override def init():Unit = Turn.addImpl( this )
 }
 
 object Turn extends ClassComponent[Turn, TurnImpl] {

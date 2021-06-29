@@ -4,7 +4,7 @@ import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.{ Command, PlayerID, State, StateImpl }
 import de.htwg.se.catan.model.commands.DropHandCardsCommand
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
-import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLSequence }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
@@ -29,7 +29,7 @@ case class DropHandCardsState( pID:PlayerID, dropped:List[PlayerID] = List.empty
 
   def toXML:Node = <DropHandCardsState>
     <pID>{ pID.toXML }</pID>
-    <dropped>{ dropped.map( pID => pID.toXML ) }</dropped>
+    <dropped>{ dropped.toXML( _.toXML ) }</dropped>
   </DropHandCardsState>.copy( label = DropHandCardsState.name )
 
   def toJson:JsValue = Json.obj(

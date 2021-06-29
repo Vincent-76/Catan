@@ -58,11 +58,11 @@ abstract class StructurePlacement( title:String,
 
 
 object VertexPlacement extends ObjectComponent[VertexPlacement] {
+  implicit val vertexPlacementWrites:Writes[VertexPlacement] = ( o:VertexPlacement ) => Json.toJson( o.title )
+  implicit val vertexPlacementReads:Reads[VertexPlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+
   def of( s:String ):Option[VertexPlacement] = impls.find( _.title ^= s )
 
-  implicit val vertexPlacementWrites:Writes[VertexPlacement] = ( o:VertexPlacement ) => Json.toJson( o.title )
-
-  implicit val vertexPlacementReads:Reads[VertexPlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 }
 
 abstract class VertexPlacement( title:String,

@@ -2,7 +2,7 @@ package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLOption }
-import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
+import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLDeserializer, XMLSerializable }
 import play.api.libs.json._
 
 import scala.xml.Node
@@ -11,13 +11,12 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object Port {
+object Port extends XMLDeserializer[Port] {
   def fromXML( node:Node ):Port = Port(
     specific = node.childOf( "specific" ).asOption( n => Resource.of( n.content ).get )
   )
 
   implicit val portWrites:Writes[Port] = Json.writes[Port]
-
   implicit val portReads:Reads[Port] = Json.reads[Port]
 }
 
@@ -35,7 +34,6 @@ abstract class AreaImpl[+T <: Area]( name:String ) extends DeserializerComponent
 
 object Area extends ClassComponent[Area, AreaImpl[Area]] {
   implicit val areaWrites:Writes[Area] = ( o:Area ) => o.toJson
-
   implicit val areaReads:Reads[Area] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
 
   def init():Unit = {

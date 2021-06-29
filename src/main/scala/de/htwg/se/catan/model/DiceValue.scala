@@ -10,6 +10,9 @@ object DiceValue extends ObjectComponent[DiceValue] {
   val maxFrequency = 5
   val maxSum = 12
 
+  implicit val diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
+  implicit val diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )
+
   Two.init()
   Three.init()
   Four.init()
@@ -23,10 +26,6 @@ object DiceValue extends ObjectComponent[DiceValue] {
   Twelve.init()
 
   def of( n:Int ):Option[DiceValue] = impls.find( _.value == n )
-
-  implicit val diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
-
-  implicit val diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )
 }
 
 sealed abstract class DiceValue( val value:Int, val frequency:Int ) extends ComponentImpl {

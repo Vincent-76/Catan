@@ -19,7 +19,6 @@ object PlayerID extends XMLDeserializer[PlayerID] {
   )
 
   implicit val playerIDWrites:Writes[PlayerID] = Json.writes[PlayerID]
-
   implicit val playerIDReads:Reads[PlayerID] = Json.reads[PlayerID]
 }
 

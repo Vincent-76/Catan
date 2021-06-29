@@ -3,152 +3,123 @@ package de.htwg.se.catan.model
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Card.ResourceCards
-import de.htwg.se.catan.model.impl.fileio.{ JsonDeserializer, JsonSerializable }
-import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLMap
+import de.htwg.se.catan.model.impl.fileio.{ XMLDeserializer, XMLSerializable }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
-import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
+import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state._
 import org.scalatest.{ Matchers, WordSpec }
-import play.api.libs.json.{ JsValue, Json, Reads, Writes }
 
-class JsonSpec extends WordSpec with Matchers {
+class XMLSpec extends WordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
   "(de)serialized" when {
     "requested" should {
       "Port" in {
-        Port().check()
+        Port().check( Port )
       }
       "WaterArea" in {
-        WaterArea().asInstanceOf[Area].check()
+        WaterArea().check( WaterArea )
       }
       "DesertArea" in {
-        DesertArea().asInstanceOf[Area].check()
+        DesertArea().check( DesertArea )
       }
       "ResourceArea" in {
-        ResourceArea( Wood, Six ).asInstanceOf[Area].check()
+        ResourceArea( Wood, Six ).check( ResourceArea )
       }
-      "DevelopmentCard" in {
-        KnightCard.asInstanceOf[DevelopmentCard].check()
-      }
-      "BonusCard" in {
-        LongestRoadCard.asInstanceOf[BonusCard].check()
-      }
-      "DiceValue" in {
-        Two.asInstanceOf[DiceValue].check()
+      "ResourceCards" in {
+        val r = ResourceCards.of( wood = 1 )
+        val xml = r.toXML( _.title, _.toString )
+        ResourceCards.fromXML( xml ) shouldBe r
       }
       "ClassicGameImpl" in {
         val game = new ClassicGameImpl( injector.getInstance( classOf[GameField] ), injector.getInstance( classOf[Turn] ), 1, injector.getInstance( classOf[PlayerFactory] ), "ClassicPlayerImpl" )
-        val json = Json.toJson( game.asInstanceOf[Game] )
-        json.as[Game].asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
+        val xml = game.toXML
+        ClassicGameImpl.fromXML( xml ).copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
       }
       "ClassicGameFieldImpl" in {
-        ClassicGameFieldImpl( 1 ).asInstanceOf[GameField].check()
-      }
-      "RobberPlacement" in {
-        RobberPlacement.asInstanceOf[Placement].check()
-      }
-      "RoadPlacement" in {
-        RoadPlacement.asInstanceOf[StructurePlacement].check()
-      }
-      "SettlementPlacement" in {
-        SettlementPlacement.asInstanceOf[VertexPlacement].check()
-      }
-      "CityPlacement" in {
-        CityPlacement.asInstanceOf[VertexPlacement].check()
+        ClassicGameFieldImpl( 1 ).asInstanceOf[GameField].check( ClassicGameFieldImpl )
       }
       "PlayerID" in {
-        PlayerID( 1 ).check()
-      }
-      "PlayerColor" in {
-        Green.asInstanceOf[PlayerColor].check()
+        PlayerID( 1 ).check( PlayerID )
       }
       "ClassicPlayerImpl" in {
-        ClassicPlayerImpl( PlayerID( 0 ), Green, "Test" ).asInstanceOf[Player].check()
+        ClassicPlayerImpl( PlayerID( 0 ), Green, "Test" ).asInstanceOf[Player].check( ClassicPlayerImpl )
       }
-      "FieldType" in {
-        Water.asInstanceOf[FieldType].check()
+      "Road" in {
+        Road( PlayerID( 1 ) ).asInstanceOf[Structure].check( Road )
       }
-      "Resource" in {
-        Wood.asInstanceOf[Resource].check()
+      "Settlement" in {
+        Settlement( PlayerID( 1 ) ).asInstanceOf[Structure].check( Settlement )
       }
-      "Structure" in {
-        Road( PlayerID( 1 ) ).asInstanceOf[Structure].check()
-      }
-      "Building" in {
-        Settlement( PlayerID( 1 ) ).asInstanceOf[Building].check()
+      "City" in {
+        City( PlayerID( 1 ) ).asInstanceOf[Structure].check( City )
       }
       "ClassicTurnImpl" in {
-        injector.getInstance( classOf[ClassicTurnImpl] ).asInstanceOf[Turn].check()
+        ClassicTurnImpl().asInstanceOf[Turn].check( ClassicTurnImpl )
       }
       "ActionState" in {
-        ActionState().asInstanceOf[State].check()
+        ActionState().asInstanceOf[State].check( ActionState )
       }
       "BuildInitRoadState" in {
-        BuildInitRoadState( 1 ).asInstanceOf[State].check()
+        BuildInitRoadState( 1 ).asInstanceOf[State].check( BuildInitRoadState )
       }
       "BuildInitSettlementState" in {
-        BuildInitSettlementState().asInstanceOf[State].check()
+        BuildInitSettlementState().asInstanceOf[State].check( BuildInitSettlementState )
       }
       "BuildState" in {
-        BuildState( RoadPlacement ).asInstanceOf[State].check()
+        BuildState( RoadPlacement ).asInstanceOf[State].check( BuildState )
       }
       "DevRoadBuildingState" in {
-        DevRoadBuildingState( ActionState() ).asInstanceOf[State].check()
+        DevRoadBuildingState( ActionState() ).asInstanceOf[State].check( DevRoadBuildingState )
       }
       "DiceState" in {
-        DiceState().asInstanceOf[State].check()
+        DiceState().asInstanceOf[State].check( DiceState )
       }
       "DropHandCardsState" in {
-        DropHandCardsState( PlayerID( 0 ) ).asInstanceOf[State].check()
+        DropHandCardsState( PlayerID( 0 ) ).asInstanceOf[State].check( DropHandCardsState )
       }
       "InitBeginnerState" in {
-        InitBeginnerState().asInstanceOf[State].check()
+        InitBeginnerState().asInstanceOf[State].check( InitBeginnerState )
       }
       "InitPlayerState" in {
-        InitPlayerState().asInstanceOf[State].check()
+        InitPlayerState().asInstanceOf[State].check( InitPlayerState )
       }
       "InitState" in {
-        InitState().asInstanceOf[State].check()
+        InitState().asInstanceOf[State].check( InitState )
       }
       "MonopolyState" in {
-        MonopolyState( ActionState() ).asInstanceOf[State].check()
+        MonopolyState( ActionState() ).asInstanceOf[State].check( MonopolyState )
       }
       "NextPlayerState" in {
-        NextPlayerState().asInstanceOf[State].check()
+        NextPlayerState().asInstanceOf[State].check( NextPlayerState )
       }
       "PlayerTradeEndState" in {
-        PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty ).asInstanceOf[State].check()
+        PlayerTradeEndState( ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty ).asInstanceOf[State].check( PlayerTradeEndState )
       }
       "PlayerTradeState" in {
-        PlayerTradeState( PlayerID( 0 ), ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty ).asInstanceOf[State].check()
+        PlayerTradeState( PlayerID( 0 ), ResourceCards.of( wood = 1 ), ResourceCards.of( clay = 1 ), Map.empty ).asInstanceOf[State].check( PlayerTradeState )
       }
       "RobberPlaceState" in {
-        RobberPlaceState( ActionState() ).asInstanceOf[State].check()
+        RobberPlaceState( ActionState() ).asInstanceOf[State].check( RobberPlaceState )
       }
       "RobberStealState" in {
-        RobberStealState( List.empty, ActionState() ).asInstanceOf[State].check()
+        RobberStealState( List.empty, ActionState() ).asInstanceOf[State].check( RobberStealState )
       }
       "YearOfPlentyState" in {
-        YearOfPlentyState( ActionState() ).asInstanceOf[State].check()
+        YearOfPlentyState( ActionState() ).asInstanceOf[State].check( YearOfPlentyState )
       }
     }
   }
 
-  /*implicit class JsonTestSerializable[T <: JsonSerializable]( obj:T ) {
-    def check( deserializer:JsonDeserializer[T] ):Unit = {
-      val json = Json.toJson( obj.asInstanceOf[JsonSerializable] )
-      deserializer.fromJson( json ) shouldBe obj
-    }
-  }*/
-
-  implicit class JsonTestObject[T]( obj:T )( implicit fjs:Writes[T], fjs2:Reads[T] ) {
-    def check():Unit = {
-      val json = Json.toJson( obj )
-      json.as[T] shouldBe obj
+  implicit class XMLTestSerializable[T <: XMLSerializable]( obj:T ) {
+    def check( deserializer:XMLDeserializer[T] ):Unit = {
+      val xml = obj.toXML
+      val test = xml.toString
+      deserializer.fromXML( xml ) shouldBe obj
     }
   }
 

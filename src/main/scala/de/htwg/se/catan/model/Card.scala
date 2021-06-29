@@ -79,7 +79,6 @@ object DevelopmentCard extends ObjectComponent[DevelopmentCard] {
   val cardCost:ResourceCards = Map( Sheep -> 1, Wheat -> 1, Ore -> 1 )
 
   implicit val devCardWrites:Writes[DevelopmentCard] = ( developmentCard:DevelopmentCard ) => Json.toJson( developmentCard.title )
-
   implicit val devCardsReads:Reads[DevelopmentCard] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   KnightCard.init()
@@ -127,7 +126,6 @@ case object MonopolyCard extends DevelopmentCard( 2, true, "Monopoly",
 
 object BonusCard extends ObjectComponent[BonusCard] {
   implicit val bonusCardWrites:Writes[BonusCard] = ( bonusCard:BonusCard ) => Json.toJson( bonusCard.title )
-
   implicit val bonusCardReads:Reads[BonusCard] = ( json:JsValue ) => JsSuccess( BonusCard.of( json.as[String] ).get )
 
   LargestArmyCard.init()

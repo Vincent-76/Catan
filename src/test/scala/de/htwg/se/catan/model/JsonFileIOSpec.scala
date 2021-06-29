@@ -80,6 +80,7 @@ class JsonFileIOSpec extends WordSpec with Matchers {
       Json.toJson( o ).asOption[String] shouldBe o
       val o2 = Option.empty[String]
       Json.toJson( o2 ).asOption[String] shouldBe o2
+      Json.toJson( List.empty ).asOption[String] shouldBe None
     }
   }
   "JsonLookupResult" should {
