@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model
 
 import Card._
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
@@ -16,6 +17,7 @@ import scala.collection.immutable.TreeMap
 import scala.util.{ Failure, Success, Try }
 
 class CommandSpec extends AnyWordSpec with Matchers {
+  CatanModule.init()
   "Command" when {
     val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" )
     "AbortPlayerTradeCommand" should {
@@ -145,8 +147,8 @@ class CommandSpec extends AnyWordSpec with Matchers {
           Failure( NoConnectedStructures( edge.id ) )
       }
       "success road" in {
-        val edge = game.gameField.edgeList.head
-        val edge2 = game.gameField.adjacentEdges( edge ).head
+        val edge = game.gameField.edgeList.find( e => e.h1.isLand || e.h2.isLand ).get
+        val edge2 = game.gameField.adjacentEdges( edge ).find( e => e.h1.isLand || e.h2.isLand ).get
         val game2 = game.setGameField( game.gameField.update( edge2.setRoad( Some( Road( pID ) ) ) ) )
         val command = BuildCommand( edge.id, BuildState( RoadPlacement ) )
         val res = command.doStep( game2 )
