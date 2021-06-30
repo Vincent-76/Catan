@@ -20,7 +20,7 @@ object SetBuildStateCommand extends CommandImpl( "SetBuildStateCommand" ) {
   )
 
   override def fromJson( json:JsValue ):SetBuildStateCommand = SetBuildStateCommand(
-    structure = ( json \ "resource" ).as[StructurePlacement],
+    structure = ( json \ "structure" ).as[StructurePlacement],
     state = ( json \ "state" ).as[State]
   )
 }

@@ -43,7 +43,7 @@ case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) 
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( RobberStealCommand.name ),
-    "tradePlayerID" -> Json.toJson( stealPlayerID ),
+    "stealPlayerID" -> Json.toJson( stealPlayerID ),
     "state" -> state.toJson,
     "robbedResources" -> Json.toJson( robbedResource )
   )

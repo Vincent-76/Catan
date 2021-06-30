@@ -241,7 +241,7 @@ class XMLSpec extends AnyWordSpec with Matchers {
           .asInstanceOf[Command].check( PlayerTradeCommand )
       }
       "PlayerTradeDecisionCommand" in {
-        PlayerTradeDecisionCommand( true, PlayerTradeState( PlayerID( 0 ), ResourceCards.of(), ResourceCards.of(), Map.empty ) )
+        PlayerTradeDecisionCommand( decision = true, PlayerTradeState( PlayerID( 0 ), ResourceCards.of(), ResourceCards.of(), Map.empty ) )
           .asInstanceOf[Command].check( PlayerTradeDecisionCommand )
       }
       "RobberStealCommand" in {
