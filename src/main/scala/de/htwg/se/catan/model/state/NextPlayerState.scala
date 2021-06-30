@@ -13,7 +13,7 @@ import scala.xml.Node
 object NextPlayerState extends StateImpl( "NextPlayerState" ) {
   def fromXML( node:Node ):NextPlayerState = NextPlayerState()
 
-  def fromJson( json:JsValue ):State = NextPlayerState()
+  def fromJson( json:JsValue ):NextPlayerState = NextPlayerState()
 }
 
 case class NextPlayerState( ) extends State {

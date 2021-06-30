@@ -1,16 +1,42 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state.{ BuildInitRoadState, BuildInitSettlementState, NextPlayerState }
-import de.htwg.se.catan.model.{ Command, Game, InvalidPlacementPoint }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game, InvalidPlacementPoint }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object BuildInitRoadCommand extends CommandImpl( "BuildInitRoadCommand" ) {
+  override def fromXML( node:Node ):BuildInitRoadCommand = BuildInitRoadCommand(
+    eID = ( node \ "@eID" ).content.toInt,
+    state = BuildInitRoadState.fromXML( node.childOf( "state" ) )
+  )
+
+  override def fromJson( json:JsValue ):BuildInitRoadCommand = BuildInitRoadCommand(
+    eID = ( json \ "eID" ).as[Int],
+    state = BuildInitRoadState.fromJson( ( json \ "state" ).get )
+  )
+}
+
 case class BuildInitRoadCommand( eID:Int, state:BuildInitRoadState ) extends Command {
+
+  def toXML:Node = <BuildInitRoadCommand eID={ eID.toString }>
+    <state>{ state.toXML }</state>
+  </BuildInitRoadCommand>.copy( label = BuildInitRoadCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( BuildInitRoadCommand.name ),
+    "eID" -> Json.toJson( eID ),
+    "state" -> state.toJson
+  )
 
   override def doStep( game:Game ):Try[CommandSuccess] = {
     if( !game.gameField.adjacentEdges( game.gameField.findVertex( state.settlementVID ).get ).exists( _.id == eID ) )

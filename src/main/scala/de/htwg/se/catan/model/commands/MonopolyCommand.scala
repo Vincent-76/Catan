@@ -4,13 +4,31 @@ import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.state.MonopolyState
 import de.htwg.se.catan.model.{ Player, _ }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.Try
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object MonopolyCommand extends CommandImpl( "MonopolyCommand" ) {
+  override def fromXML( node:Node ):MonopolyCommand = ???
+
+  override def fromJson( json:JsValue ):MonopolyCommand = ???
+}
+
 case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
+
+  def toXML:Node = <MonopolyCommand>
+    <state>{ state.toXML }</state>
+  </MonopolyCommand>.copy( label = MonopolyCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( MonopolyCommand.name ),
+    "state" -> state.toJson
+  )
 
   var robbedResources:Option[Map[PlayerID, Int]] = None
 

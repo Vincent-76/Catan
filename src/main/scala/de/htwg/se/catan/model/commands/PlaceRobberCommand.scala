@@ -2,13 +2,31 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.state.{ RobberPlaceState, RobberStealState }
 import de.htwg.se.catan.model.{ Hex, _ }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object PlaceRobberCommand extends CommandImpl( "PlaceRobberCommand" ) {
+  override def fromXML( node:Node ):PlaceRobberCommand = ???
+
+  override def fromJson( json:JsValue ):PlaceRobberCommand = ???
+}
+
 case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberCommand {
+
+  def toXML:Node = <PlaceRobberCommand>
+    <state>{ state.toXML }</state>
+  </PlaceRobberCommand>.copy( label = PlaceRobberCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( PlaceRobberCommand.name ),
+    "state" -> state.toJson
+  )
 
   private var actualRobber:Option[Hex] = None
 

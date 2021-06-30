@@ -16,7 +16,7 @@ object BuildState extends StateImpl( "BuildState" ) {
     structure = StructurePlacement.of( ( node \ "@structure" ).content ).get
   )
 
-  def fromJson( json:JsValue ):State = BuildState(
+  def fromJson( json:JsValue ):BuildState = BuildState(
     structure = ( json \ "structure" ).as[StructurePlacement]
   )
 }

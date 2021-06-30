@@ -2,12 +2,15 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model._
+import play.api.libs.json.JsValue
 
 import scala.util.Try
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
 abstract class RobberCommand( ) extends Command {
 
   var robbedResource:Option[Resource] = None

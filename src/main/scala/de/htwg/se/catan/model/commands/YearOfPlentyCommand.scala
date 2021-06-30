@@ -3,13 +3,31 @@ package de.htwg.se.catan.model.commands
 import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.state.YearOfPlentyState
 import de.htwg.se.catan.model._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object YearOfPlentyCommand extends CommandImpl( "YearOfPlentyCommand" ) {
+  override def fromXML( node:Node ):YearOfPlentyCommand = ???
+
+  override def fromJson( json:JsValue ):YearOfPlentyCommand = ???
+}
+
 case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState ) extends Command {
+
+  def toXML:Node = <YearOfPlentyCommand>
+    <state>{ state.toXML }</state>
+  </YearOfPlentyCommand>.copy( label = YearOfPlentyCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( YearOfPlentyCommand.name ),
+    "state" -> state.toJson
+  )
 
   var drawnResources:Option[ResourceCards] = None
 

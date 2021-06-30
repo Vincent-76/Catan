@@ -1,12 +1,24 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
+import play.api.libs.json.{ JsSuccess, JsValue, Reads, Writes }
+
 import scala.util.{ Success, Try }
 
 /**
  * @author Vincent76;
  */
 
-trait Command {
+abstract class CommandImpl( name:String ) extends DeserializerComponentImpl[Command]( name ) {
+  override def init():Unit = Command.addImpl( this )
+}
+
+object Command extends ClassComponent[Command, CommandImpl] {
+  implicit val stateWrites:Writes[Command] = ( o:Command ) => o.toJson
+  implicit val stateReads:Reads[Command] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+}
+
+trait Command extends XMLSerializable with JsonSerializable {
 
   type CommandSuccess = (Game, Option[Info])
 

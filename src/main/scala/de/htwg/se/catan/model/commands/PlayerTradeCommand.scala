@@ -2,13 +2,31 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.state.{ ActionState, PlayerTradeEndState }
 import de.htwg.se.catan.model.{ Command, _ }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object PlayerTradeCommand extends CommandImpl( "PlayerTradeCommand" ) {
+  override def fromXML( node:Node ):PlayerTradeCommand = ???
+
+  override def fromJson( json:JsValue ):PlayerTradeCommand = ???
+}
+
 case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState ) extends Command {
+
+  def toXML:Node = <PlayerTradeCommand>
+    <state>{ state.toXML }</state>
+  </PlayerTradeCommand>.copy( label = PlayerTradeCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( PlayerTradeCommand.name ),
+    "state" -> state.toJson
+  )
 
   override def doStep( game:Game ):Try[CommandSuccess] = {
     if( !state.decisions.getOrElse( tradePlayerID, false ) )

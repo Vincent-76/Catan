@@ -14,7 +14,7 @@ import scala.xml.Node
 object ActionState extends StateImpl( "ActionState" ) {
   def fromXML( node:Node ):ActionState = ActionState()
 
-  def fromJson( json:JsValue ):State = ActionState()
+  def fromJson( json:JsValue ):ActionState = ActionState()
 }
 
 case class ActionState() extends State {

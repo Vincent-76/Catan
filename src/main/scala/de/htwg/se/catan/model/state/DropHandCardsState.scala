@@ -19,7 +19,7 @@ object DropHandCardsState extends StateImpl( "DropHandCardsState" ) {
     dropped = node.childOf( "dropped" ).asList( n => PlayerID.fromXML( n ) )
   )
 
-  def fromJson( json:JsValue ):State = DropHandCardsState(
+  def fromJson( json:JsValue ):DropHandCardsState = DropHandCardsState(
     pID = ( json \ "pID" ).as[PlayerID],
     dropped = ( json \ "dropped" ).asList[PlayerID]
   )

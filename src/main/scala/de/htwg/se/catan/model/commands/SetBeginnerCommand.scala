@@ -1,14 +1,32 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.state.{ BuildInitSettlementState, InitBeginnerState }
-import de.htwg.se.catan.model.{ Command, Game, NoUniqueBeginner, Turn }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game, NoUniqueBeginner, Turn }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object SetBeginnerCommand extends CommandImpl( "SetBeginnerCommand" ) {
+  override def fromXML( node:Node ):SetBeginnerCommand = ???
+
+  override def fromJson( json:JsValue ):SetBeginnerCommand = ???
+}
+
 case class SetBeginnerCommand( state:InitBeginnerState ) extends Command {
+
+  def toXML:Node = <SetBeginnerCommand>
+    <state>{ state.toXML }</state>
+  </SetBeginnerCommand>.copy( label = SetBeginnerCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( SetBeginnerCommand.name ),
+    "state" -> state.toJson
+  )
 
   var oldTurn:Option[Turn] = None
 

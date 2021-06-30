@@ -13,7 +13,7 @@ import scala.xml.Node
 object BuildInitSettlementState extends StateImpl( "BuildInitSettlementState" ) {
   def fromXML( node:Node ):BuildInitSettlementState = BuildInitSettlementState()
 
-  def fromJson( json:JsValue ):State = BuildInitSettlementState()
+  def fromJson( json:JsValue ):BuildInitSettlementState = BuildInitSettlementState()
 }
 
 case class BuildInitSettlementState() extends State {

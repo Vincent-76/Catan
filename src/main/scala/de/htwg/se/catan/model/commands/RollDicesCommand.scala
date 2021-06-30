@@ -4,13 +4,31 @@ import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
 import de.htwg.se.catan.model.{ Card, _ }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object RollDicesCommand extends CommandImpl( "RollDicesCommand" ) {
+  override def fromXML( node:Node ):RollDicesCommand = ???
+
+  override def fromJson( json:JsValue ):RollDicesCommand = ???
+}
+
 case class RollDicesCommand( state:State ) extends Command {
+
+  def toXML:Node = <RollDicesCommand>
+    <state>{ state.toXML }</state>
+  </RollDicesCommand>.copy( label = RollDicesCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( RollDicesCommand.name ),
+    "state" -> state.toJson
+  )
 
   private var availablePlayerResources:Option[Map[PlayerID, ResourceCards]] = None
 

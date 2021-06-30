@@ -4,13 +4,31 @@ import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state.{ DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object UseDevCardCommand extends CommandImpl( "UseDevCardCommand" ) {
+  override def fromXML( node:Node ):UseDevCardCommand = ???
+
+  override def fromJson( json:JsValue ):UseDevCardCommand = ???
+}
+
 case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Command {
+
+  def toXML:Node = <UseDevCardCommand>
+    <state>{ state.toXML }</state>
+  </UseDevCardCommand>.copy( label = UseDevCardCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( UseDevCardCommand.name ),
+    "state" -> state.toJson
+  )
 
   var actualBonusCards:Option[Map[BonusCard, Option[(PlayerID, Int)]]] = None
 

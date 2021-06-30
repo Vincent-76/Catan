@@ -13,7 +13,7 @@ import scala.xml.Node
 object DiceState extends StateImpl( "DiceState" ) {
   def fromXML( node:Node ):DiceState = DiceState()
 
-  def fromJson( json:JsValue ):State = DiceState()
+  def fromJson( json:JsValue ):DiceState = DiceState()
 }
 
 case class DiceState() extends State {

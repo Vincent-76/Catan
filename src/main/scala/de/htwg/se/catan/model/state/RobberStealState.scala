@@ -18,7 +18,7 @@ object RobberStealState extends StateImpl( "RobberStealState" ) {
     nextState = State.fromXML( node.childOf( "nextState" ) )
   )
 
-  def fromJson( json:JsValue ):State = RobberStealState(
+  def fromJson( json:JsValue ):RobberStealState = RobberStealState(
     adjacentPlayers = ( json \ "adjacentPlayers" ).asList[PlayerID],
     nextState = ( json \ "nextState" ).as[State]
   )

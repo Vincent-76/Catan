@@ -20,7 +20,7 @@ object PlayerTradeEndState extends StateImpl( "PlayerTradeEndState" ) {
     decisions = node.childOf( "decisions" ).asMap( n => PlayerID.fromXML( n ), _.content.toBoolean )
   )
 
-  def fromJson( json:JsValue ):State = PlayerTradeEndState(
+  def fromJson( json:JsValue ):PlayerTradeEndState = PlayerTradeEndState(
     give = ( json \ "give" ).as[ResourceCards],
     get = ( json \ "get" ).as[ResourceCards],
     decisions = ( json \ "decisions" ).asMap[PlayerID, Boolean]

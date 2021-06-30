@@ -23,14 +23,18 @@ object Catan {
   val injector:Injector = Guice.createInjector( new CatanModule( test = false ) )
   val controller:Controller = injector.getInstance( classOf[Controller] )
   val tui:TUI = new TUI( controller )
-  val gui:GUIApp = new GUIApp( controller )
 
   def main( args:Array[String] ):Unit = {
+    val gui:Option[GUIApp] = if( args.contains( "gui" ) )
+      Some( new GUIApp( controller ) )
+    else None
+    args.foreach( s => println( s ) )
     var input:String = ""
     do {
       input = StdIn.readLine()
       tui.onInput( input )
     } while( input != "exit" )
-    gui.exit()
+    if( gui.isDefined )
+      gui.get.exit()
   }
 }
