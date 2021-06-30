@@ -1,5 +1,6 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
 import de.htwg.se.catan.model.state.{ ActionState, PlayerTradeEndState }
 import de.htwg.se.catan.model.{ Command, _ }
 import play.api.libs.json.{ JsValue, Json }
@@ -12,19 +13,27 @@ import scala.xml.Node
  */
 
 object PlayerTradeCommand extends CommandImpl( "PlayerTradeCommand" ) {
-  override def fromXML( node:Node ):PlayerTradeCommand = ???
+  override def fromXML( node:Node ):PlayerTradeCommand = PlayerTradeCommand(
+    tradePlayerID = PlayerID.fromXML( node.childOf( "tradePlayerID" ) ),
+    state = PlayerTradeEndState.fromXML( node.childOf( "state" ) )
+  )
 
-  override def fromJson( json:JsValue ):PlayerTradeCommand = ???
+  override def fromJson( json:JsValue ):PlayerTradeCommand = PlayerTradeCommand(
+    tradePlayerID = ( json \ "tradePlayerID" ).as[PlayerID],
+    state = PlayerTradeEndState.fromJson( ( json \ "state" ).get )
+  )
 }
 
 case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState ) extends Command {
 
   def toXML:Node = <PlayerTradeCommand>
+    <tradePlayerID>{ tradePlayerID.toXML }</tradePlayerID>
     <state>{ state.toXML }</state>
   </PlayerTradeCommand>.copy( label = PlayerTradeCommand.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( PlayerTradeCommand.name ),
+    "tradePlayerID" -> Json.toJson( tradePlayerID ),
     "state" -> state.toJson
   )
 

@@ -3,6 +3,7 @@ package de.htwg.se.catan.model
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLMap
 import de.htwg.se.catan.model.impl.fileio.{ XMLDeserializer, XMLSerializable }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
@@ -18,7 +19,7 @@ class XMLSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
   "(de)serialized" when {
-    "requested" should {
+    "Model" should {
       "Port" in {
         Port().check( Port )
       }
@@ -106,6 +107,8 @@ class XMLSpec extends AnyWordSpec with Matchers {
       "ClassicTurnImpl" in {
         ClassicTurnImpl( drawnDevCardsVal = List( KnightCard ) ).asInstanceOf[Turn].check( ClassicTurnImpl )
       }
+    }
+    "State" should {
       "ActionState" in {
         ActionState().asInstanceOf[State].check( ActionState )
       }
@@ -168,6 +171,111 @@ class XMLSpec extends AnyWordSpec with Matchers {
       }
       "YearOfPlentyState" in {
         YearOfPlentyState( ActionState() ).asInstanceOf[State].check( YearOfPlentyState )
+      }
+    }
+    "Command" should {
+      "AbortPlayerTradeCommand" in {
+        AbortPlayerTradeCommand(
+          PlayerTradeEndState( ResourceCards.of(), ResourceCards.of(), Map.empty )
+        ).asInstanceOf[Command].check( AbortPlayerTradeCommand )
+      }
+      "AddPlayerCommand" in {
+        AddPlayerCommand( Green, "Test", InitPlayerState() )
+          .asInstanceOf[Command].check( AddPlayerCommand )
+      }
+      "BankTradeCommand" in {
+        BankTradeCommand( ResourceCards.of(), ResourceCards.of() )
+          .asInstanceOf[Command].check( BankTradeCommand )
+      }
+      "BuildCommand" in {
+        BuildCommand( 1, BuildState( RoadPlacement ) )
+          .asInstanceOf[Command].check( BuildCommand )
+      }
+      "BuildInitRoadCommand" in {
+        BuildInitRoadCommand( 1, BuildInitRoadState( 1 ) )
+          .asInstanceOf[Command].check( BuildInitRoadCommand )
+      }
+      "BuildInitSettlementCommand" in {
+        BuildInitSettlementCommand( 1, BuildInitSettlementState() )
+          .asInstanceOf[Command].check( BuildInitSettlementCommand )
+      }
+      "BuyDevCardCommand" in {
+        BuyDevCardCommand( ActionState() )
+          .asInstanceOf[Command].check( BuyDevCardCommand )
+      }
+      "ChangeStateCommand" in {
+        ChangeStateCommand( ActionState(), NextPlayerState() )
+          .asInstanceOf[Command].check( ChangeStateCommand )
+      }
+      "DevBuildRoadCommand" in {
+        DevBuildRoadCommand( 1, DevRoadBuildingState( ActionState(), 1 ) )
+          .asInstanceOf[Command].check( DevBuildRoadCommand )
+      }
+      "DiceOutBeginnerCommand" in {
+        DiceOutBeginnerCommand( InitBeginnerState() )
+          .asInstanceOf[Command].check( DiceOutBeginnerCommand )
+      }
+      "DropHandCardsCommand" in {
+        DropHandCardsCommand( DropHandCardsState( PlayerID( 0 ) ), ResourceCards.of() )
+          .asInstanceOf[Command].check( DropHandCardsCommand )
+      }
+      "EndTurnCommand" in {
+        EndTurnCommand( ActionState() )
+          .asInstanceOf[Command].check( EndTurnCommand )
+      }
+      "InitGameCommand" in {
+        InitGameCommand()
+          .asInstanceOf[Command].check( InitGameCommand )
+      }
+      "MonopolyCommand" in {
+        MonopolyCommand( Wood, MonopolyState( ActionState() ) )
+          .asInstanceOf[Command].check( MonopolyCommand )
+      }
+      "PlaceRobberCommand" in {
+        val cmd = PlaceRobberCommand( 1, RobberPlaceState( ActionState() ) )
+        cmd.robbedResource = Some( Wood )
+        cmd.asInstanceOf[Command].check( PlaceRobberCommand )
+      }
+      "PlayerTradeCommand" in {
+        PlayerTradeCommand( PlayerID( 1 ), PlayerTradeEndState( ResourceCards.of(), ResourceCards.of(), Map.empty ) )
+          .asInstanceOf[Command].check( PlayerTradeCommand )
+      }
+      "PlayerTradeDecisionCommand" in {
+        PlayerTradeDecisionCommand( true, PlayerTradeState( PlayerID( 0 ), ResourceCards.of(), ResourceCards.of(), Map.empty ) )
+          .asInstanceOf[Command].check( PlayerTradeDecisionCommand )
+      }
+      "RobberStealCommand" in {
+        val cmd = RobberStealCommand( PlayerID( 1 ), RobberStealState( List.empty, ActionState() ) )
+        cmd.robbedResource = Some( Wood )
+        cmd.asInstanceOf[Command].check( RobberStealCommand )
+      }
+      "RollDicesCommand" in {
+        RollDicesCommand( ActionState() )
+          .asInstanceOf[Command].check( RollDicesCommand )
+      }
+      "SetBeginnerCommand" in {
+        SetBeginnerCommand( InitBeginnerState() )
+          .asInstanceOf[Command].check( SetBeginnerCommand )
+      }
+      "SetBuildStateCommand" in {
+        SetBuildStateCommand( RoadPlacement, ActionState() )
+          .asInstanceOf[Command].check( SetBuildStateCommand )
+      }
+      "SetInitBeginnerStateCommand" in {
+        SetInitBeginnerStateCommand( ActionState() )
+          .asInstanceOf[Command].check( SetInitBeginnerStateCommand )
+      }
+      "SetPlayerTradeStateCommand" in {
+        SetPlayerTradeStateCommand( ResourceCards.of(), ResourceCards.of(), ActionState() )
+          .asInstanceOf[Command].check( SetPlayerTradeStateCommand )
+      }
+      "UseDevCardCommand" in {
+        UseDevCardCommand( KnightCard, ActionState() )
+          .asInstanceOf[Command].check( UseDevCardCommand )
+      }
+      "YearOfPlentyCommand" in {
+        YearOfPlentyCommand( ResourceCards.of(), YearOfPlentyState( ActionState() ) )
+          .asInstanceOf[Command].check( YearOfPlentyCommand )
       }
     }
   }

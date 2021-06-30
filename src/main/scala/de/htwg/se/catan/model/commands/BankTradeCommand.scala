@@ -35,7 +35,7 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( BankTradeCommand.name ),
     "give" -> Json.toJson( give ),
-    "get" -> Json.toJson( get ),
+    "get" -> Json.toJson( get )
   )
 
   var giveResources:Option[ResourceCards] = None

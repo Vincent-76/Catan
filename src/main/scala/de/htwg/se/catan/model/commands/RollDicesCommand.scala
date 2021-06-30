@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
 import de.htwg.se.catan.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
 import de.htwg.se.catan.model.{ Card, _ }
 import de.htwg.se.catan.util._
@@ -14,9 +15,13 @@ import scala.xml.Node
  */
 
 object RollDicesCommand extends CommandImpl( "RollDicesCommand" ) {
-  override def fromXML( node:Node ):RollDicesCommand = ???
+  override def fromXML( node:Node ):RollDicesCommand = RollDicesCommand(
+    state = State.fromXML( node.childOf( "state" ) )
+  )
 
-  override def fromJson( json:JsValue ):RollDicesCommand = ???
+  override def fromJson( json:JsValue ):RollDicesCommand = RollDicesCommand(
+    state = ( json \ "state" ).as[State]
+  )
 }
 
 case class RollDicesCommand( state:State ) extends Command {

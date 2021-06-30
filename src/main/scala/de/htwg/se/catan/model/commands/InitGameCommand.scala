@@ -12,20 +12,17 @@ import scala.xml.Node
  */
 
 object InitGameCommand extends CommandImpl( "InitGameCommand" ) {
-  override def fromXML( node:Node ):InitGameCommand = ???
+  override def fromXML( node:Node ):InitGameCommand = InitGameCommand()
 
-  override def fromJson( json:JsValue ):InitGameCommand = ???
+  override def fromJson( json:JsValue ):InitGameCommand = InitGameCommand()
 }
 
 case class InitGameCommand() extends Command {
 
-  def toXML:Node = <InitGameCommand>
-    <state>{ state.toXML }</state>
-  </InitGameCommand>.copy( label = InitGameCommand.name )
+  def toXML:Node = <InitGameCommand />.copy( label = InitGameCommand.name )
 
   def toJson:JsValue = Json.obj(
-    "class" -> Json.toJson( InitGameCommand.name ),
-    "state" -> state.toJson
+    "class" -> Json.toJson( InitGameCommand.name )
   )
 
   def doStep( game:Game ):Try[(Game, Option[Info])] = success(

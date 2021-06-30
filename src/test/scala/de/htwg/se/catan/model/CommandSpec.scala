@@ -482,7 +482,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
       "success" in {
         val state = ActionState()
         val nextState = NextPlayerState()
-        val command = ChangeStateCommand( state, nextState, None )
+        val command = ChangeStateCommand( state, nextState )
         val res = command.doStep( newGame )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None

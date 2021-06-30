@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state.{ DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState }
 import de.htwg.se.catan.util._
@@ -14,19 +15,26 @@ import scala.xml.Node
  */
 
 object UseDevCardCommand extends CommandImpl( "UseDevCardCommand" ) {
-  override def fromXML( node:Node ):UseDevCardCommand = ???
+  override def fromXML( node:Node ):UseDevCardCommand = UseDevCardCommand(
+    devCard = DevelopmentCard.of( ( node \ "@devCard" ).content ).get,
+    state = State.fromXML( node.childOf( "state" ) )
+  )
 
-  override def fromJson( json:JsValue ):UseDevCardCommand = ???
+  override def fromJson( json:JsValue ):UseDevCardCommand = UseDevCardCommand(
+    devCard = ( json \ "devCard" ).as[DevelopmentCard],
+    state = ( json \ "state" ).as[State]
+  )
 }
 
 case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Command {
 
-  def toXML:Node = <UseDevCardCommand>
+  def toXML:Node = <UseDevCardCommand devCard={ devCard.title }>
     <state>{ state.toXML }</state>
   </UseDevCardCommand>.copy( label = UseDevCardCommand.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( UseDevCardCommand.name ),
+    "devCard" -> Json.toJson( devCard ),
     "state" -> state.toJson
   )
 

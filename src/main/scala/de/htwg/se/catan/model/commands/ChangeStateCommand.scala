@@ -27,7 +27,7 @@ case class ChangeStateCommand( state:State, nextState:State ) extends Command {
 
   def toXML:Node = <ChangeStateCommand>
     <state>{ state.toXML }</state>
-    <nextState>{ state.toXML }</nextState>
+    <nextState>{ nextState.toXML }</nextState>
   </ChangeStateCommand>.copy( label = ChangeStateCommand.name )
 
   def toJson:JsValue = Json.obj(
@@ -36,7 +36,7 @@ case class ChangeStateCommand( state:State, nextState:State ) extends Command {
     "nextState" -> nextState.toJson
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = success( game.setState( nextState ), info = info )
+  override def doStep( game:Game ):Try[CommandSuccess] = success( game.setState( nextState ) )
 
   override def undoStep( game:Game ):Game = game.setState( state )
 

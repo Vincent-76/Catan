@@ -2,6 +2,7 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.state.BuildState
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.util._
 import play.api.libs.json.{ JsValue, Json }
 
@@ -13,19 +14,26 @@ import scala.xml.Node
  */
 
 object SetBuildStateCommand extends CommandImpl( "SetBuildStateCommand" ) {
-  override def fromXML( node:Node ):SetBuildStateCommand = ???
+  override def fromXML( node:Node ):SetBuildStateCommand = SetBuildStateCommand(
+    structure = StructurePlacement.of( ( node \ "@structure" ).content ).get,
+    state = State.fromXML( node.childOf( "state" ) )
+  )
 
-  override def fromJson( json:JsValue ):SetBuildStateCommand = ???
+  override def fromJson( json:JsValue ):SetBuildStateCommand = SetBuildStateCommand(
+    structure = ( json \ "resource" ).as[StructurePlacement],
+    state = ( json \ "state" ).as[State]
+  )
 }
 
 case class SetBuildStateCommand( structure:StructurePlacement, state:State ) extends Command {
 
-  def toXML:Node = <SetBuildStateCommand>
+  def toXML:Node = <SetBuildStateCommand structure={ structure.title }>
     <state>{ state.toXML }</state>
   </SetBuildStateCommand>.copy( label = SetBuildStateCommand.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( SetBuildStateCommand.name ),
+    "structure" -> Json.toJson( structure ),
     "state" -> state.toJson
   )
 

@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.state.MonopolyState
 import de.htwg.se.catan.model.{ Player, _ }
 import de.htwg.se.catan.util._
@@ -14,19 +15,26 @@ import scala.xml.Node
  */
 
 object MonopolyCommand extends CommandImpl( "MonopolyCommand" ) {
-  override def fromXML( node:Node ):MonopolyCommand = ???
+  override def fromXML( node:Node ):MonopolyCommand = MonopolyCommand(
+    resource = Resource.of( ( node \ "@resource" ).content ).get,
+    state = MonopolyState.fromXML( node.childOf( "state" ) )
+  )
 
-  override def fromJson( json:JsValue ):MonopolyCommand = ???
+  override def fromJson( json:JsValue ):MonopolyCommand = MonopolyCommand(
+    resource = ( json \ "resource" ).as[Resource],
+    state = MonopolyState.fromJson( ( json \ "state" ).get )
+  )
 }
 
-case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
+case class MonopolyCommand( resource:Resource, state:MonopolyState ) extends Command {
 
-  def toXML:Node = <MonopolyCommand>
+  def toXML:Node = <MonopolyCommand resource={ resource.title }>
     <state>{ state.toXML }</state>
   </MonopolyCommand>.copy( label = MonopolyCommand.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( MonopolyCommand.name ),
+    "resource" -> Json.toJson( resource ),
     "state" -> state.toJson
   )
 
@@ -36,18 +44,18 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
     val newData = game.players.red( (List.empty, Map.empty[PlayerID, Int]),
       ( data:(List[Player], Map[PlayerID, Int]), pID:PlayerID, p:Player ) => {
         if( pID != game.onTurn ) {
-          val amount = p.resourceAmount( r )
-          (data._1 :+ p.removeResourceCard( r, amount ).get, data._2.updated( pID, amount ))
+          val amount = p.resourceAmount( resource )
+          (data._1 :+ p.removeResourceCard( resource, amount ).get, data._2.updated( pID, amount ))
         } else data
       } )
     robbedResources = Some( newData._2 )
     val amount = newData._2.values.sum
     success(
       game.setState( state.nextState )
-        .updatePlayers( ( newData._1 :+ game.player.addResourceCard( r, amount ) ):_* ),
+        .updatePlayers( ( newData._1 :+ game.player.addResourceCard( resource, amount ) ):_* ),
       info = Some( ResourceChangeInfo(
-        playerAdd = Map( game.onTurn -> ResourceCards.ofResource( r, amount ) ),
-        playerSub = newData._2.map( d => (d._1, ResourceCards.ofResource( r, d._2 )) )
+        playerAdd = Map( game.onTurn -> ResourceCards.ofResource( resource, amount ) ),
+        playerSub = newData._2.map( d => (d._1, ResourceCards.ofResource( resource, d._2 )) )
       ) )
     )
   }
@@ -55,9 +63,9 @@ case class MonopolyCommand( r:Resource, state:MonopolyState ) extends Command {
   override def undoStep( game:Game ):Game = (robbedResources match {
     case None => game
     case Some( playerResources ) =>
-      val amount = Math.min( playerResources.values.sum, game.player.resourceAmount( r ) )
-      val nPlayer = game.player.removeResourceCard( r, amount ).get
-      game.updatePlayers( ( playerResources.map( d => game.player( d._1 ).addResourceCard( r, d._2 ) ).toSeq :+ nPlayer ):_* )
+      val amount = Math.min( playerResources.values.sum, game.player.resourceAmount( resource ) )
+      val nPlayer = game.player.removeResourceCard( resource, amount ).get
+      game.updatePlayers( ( playerResources.map( d => game.player( d._1 ).addResourceCard( resource, d._2 ) ).toSeq :+ nPlayer ):_* )
   }).setState( state )
 
   /*override def toString:String = getClass.getSimpleName + ": Resource[" + r + "], " + state +

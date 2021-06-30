@@ -1,5 +1,6 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
 import de.htwg.se.catan.model.state.InitBeginnerState
 import de.htwg.se.catan.model.{ Command, CommandImpl, Game, NotEnoughPlayers, State }
 import play.api.libs.json.{ JsValue, Json }
@@ -12,9 +13,13 @@ import scala.xml.Node
  */
 
 object SetInitBeginnerStateCommand extends CommandImpl( "SetInitBeginnerStateCommand" ) {
-  override def fromXML( node:Node ):SetInitBeginnerStateCommand = ???
+  override def fromXML( node:Node ):SetInitBeginnerStateCommand = SetInitBeginnerStateCommand(
+    state = State.fromXML( node.childOf( "state" ) )
+  )
 
-  override def fromJson( json:JsValue ):SetInitBeginnerStateCommand = ???
+  override def fromJson( json:JsValue ):SetInitBeginnerStateCommand = SetInitBeginnerStateCommand(
+    state = ( json \ "state" ).as[State]
+  )
 }
 
 case class SetInitBeginnerStateCommand( state:State ) extends Command {
