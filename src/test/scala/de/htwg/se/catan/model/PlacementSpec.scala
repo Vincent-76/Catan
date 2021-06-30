@@ -1,5 +1,6 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
@@ -10,6 +11,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class PlacementSpec extends AnyWordSpec with Matchers {
+  CatanModule.init()
   "Placement" when {
     "static" should {
       "be constructed with of" in {

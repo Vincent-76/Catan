@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model
 
 import Card.ResourceCards
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state._
@@ -8,6 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class StateSpec extends AnyWordSpec with Matchers {
+  CatanModule.init()
   "State" when {
     "ActionState" should {
       val state = ActionState()

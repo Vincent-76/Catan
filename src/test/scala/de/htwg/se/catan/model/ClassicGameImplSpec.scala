@@ -1,5 +1,6 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
@@ -16,6 +17,7 @@ import scala.util.{ Failure, Random, Success }
  * @author Vincent76;
  */
 class ClassicGameImplSpec extends AnyWordSpec with Matchers {
+  CatanModule.init()
   "ClassicGameImpl" when {
     val newGame:ClassicGameImpl = new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" )
     val seed = new Random().nextInt( Int.MaxValue / 1000 )
