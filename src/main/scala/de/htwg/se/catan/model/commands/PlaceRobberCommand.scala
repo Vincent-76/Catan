@@ -1,14 +1,51 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLOption }
 import de.htwg.se.catan.model.state.{ RobberPlaceState, RobberStealState }
 import de.htwg.se.catan.model.{ Hex, _ }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object PlaceRobberCommand extends CommandImpl( "PlaceRobberCommand" ) {
+  override def fromXML( node:Node ):PlaceRobberCommand = {
+    val cmd = PlaceRobberCommand(
+      hID = ( node \ "@hID" ).content.toInt,
+      state = RobberPlaceState.fromXML( node.childOf( "state" ) )
+    )
+    cmd.robbedResource = node.childOf( "robbedResource" ).asOption( n => Resource.of( n.content ).get )
+    cmd
+  }
+
+  override def fromJson( json:JsValue ):PlaceRobberCommand = {
+    val cmd = PlaceRobberCommand(
+      hID = ( json \ "hID" ).as[Int],
+      state = RobberPlaceState.fromJson( ( json \ "state" ).get )
+    )
+    cmd.robbedResource = ( json \ "robbedResource" ).asOption[Resource]
+    cmd
+  }
+}
+
 case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberCommand {
+
+  def toXML:Node = <PlaceRobberCommand hID={ hID.toString }>
+    <state>{ state.toXML }</state>
+    <robbedResource>{ robbedResource.toXML( _.title ) }</robbedResource>
+  </PlaceRobberCommand>.copy( label = PlaceRobberCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( PlaceRobberCommand.name ),
+    "hID" -> Json.toJson( hID ),
+    "state" -> state.toJson,
+    "robbedResources" -> Json.toJson( robbedResource )
+  )
 
   private var actualRobber:Option[Hex] = None
 

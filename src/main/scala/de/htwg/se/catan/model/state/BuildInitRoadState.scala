@@ -17,7 +17,7 @@ object BuildInitRoadState extends StateImpl( "BuildInitRoadState" ) {
     settlementVID = ( node \ "@settlementVID" ).content.toInt
   )
 
-  def fromJson( json:JsValue ):State = BuildInitRoadState(
+  def fromJson( json:JsValue ):BuildInitRoadState = BuildInitRoadState(
     settlementVID = ( json \ "settlementVID" ).as[Int]
   )
 }

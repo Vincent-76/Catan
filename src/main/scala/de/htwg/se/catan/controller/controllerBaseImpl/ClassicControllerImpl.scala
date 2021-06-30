@@ -5,6 +5,7 @@ import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
+import de.htwg.se.catan.util.UndoManager
 
 import scala.util.{ Failure, Success }
 
@@ -15,13 +16,14 @@ import scala.util.{ Failure, Success }
 class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) extends Controller {
   var running:Boolean = true
   //var gameVal:Game = ClassicGameImpl( gameField = ClassicGameFieldImpl() )
-  private var undoStack:List[Command] = Nil
-  private var redoStack:List[Command] = Nil
+  private val undoManager:UndoManager = new UndoManager()
+  /*private var undoStack:List[Command] = Nil
+  private var redoStack:List[Command] = Nil*/
 
   def game:Game = gameVal
 
-  def hasUndo:Boolean = undoStack.nonEmpty
-  def hasRedo:Boolean = redoStack.nonEmpty
+  def hasUndo:Boolean = undoManager.hasUndo
+  def hasRedo:Boolean = undoManager.hasRedo
 
   private def checkWinner( newGame:Game ):Option[PlayerID] =
     newGame.players.values.find( p => newGame.getPlayerVictoryPoints( p.id ) >= newGame.requiredVictoryPoints ) match {
@@ -29,10 +31,10 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
       case None => Option.empty
     }
 
-  private def actionDone( newGame:Game, command:Command, newRedoStack:List[Command], info:Option[Info] ):Unit = {
+  private def actionDone( newGame:Game, /*command:Command, newRedoStack:List[Command],*/ info:Option[Info] ):Unit = {
     gameVal = newGame
-    undoStack = command :: undoStack
-    redoStack = newRedoStack
+    /*undoStack = command :: undoStack
+    redoStack = newRedoStack*/
     checkWinner( game ) match {
       case None =>
         update( info )
@@ -46,39 +48,53 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
   def action( command:Option[Command] ):Unit = {
     if( command.isEmpty )
       error( WrongState )
-    else command.get.doStep( this.game ) match {
+    else undoManager.doStep( command.get, game ) match {
+      case Success( (game, info) ) => actionDone( game, info )
+      case Failure( t ) => error( t )
+    }
+    /*else command.get.doStep( this.game ) match {
       case Success( (game, info) ) => actionDone( game, command.get, Nil, info )
       case Failure( t ) =>
         error( t )
-    }
+    }*/
   }
 
-  def undoAction():Unit = undoStack match {
+  def undoAction():Unit = undoManager.undoStep( game ) match {
+    case Success( newGame ) => actionDone( newGame, None )
+    case Failure( t ) => error( t )
+  }
+    /*undoStack match {
     case Nil => error( NothingToUndo )
     case head :: stack =>
       gameVal = head.undoStep( this.game )
       undoStack = stack
       redoStack = head :: redoStack
       update()
-  }
+  }*/
 
-  def redoAction():Unit = redoStack match {
+  def redoAction():Unit = undoManager.redoStep( game ) match {
+    case Success( (newGame, info) ) => actionDone( newGame, info )
+    case Failure( t ) => error( t )
+  }
+    /*redoStack match {
     case Nil => error( NothingToRedo )
     case head :: stack =>
       val (game, info) = head.doStep( this.game ).get
       actionDone( game, head, stack, info )
-  }
+  }*/
 
   def saveGame():String = {
-    val path = fileIO.save( game )
+    val path = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
     update( info = Some( GameSavedInfo( path ) ) )
     path
   }
 
   def loadGame( path:String ):Unit = {
-    gameVal = FileIO.load( path )
-    undoStack = Nil
-    redoStack = Nil
+    val (newGame, undoStack, redoStack) = FileIO.load( path )
+    gameVal = newGame
+    undoManager.clear()
+    undoManager.undoStack = undoStack
+    undoManager.redoStack = redoStack
     update( info = Some( GameLoadedInfo( path ) ) )
   }
 

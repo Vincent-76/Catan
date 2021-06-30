@@ -17,7 +17,7 @@ object YearOfPlentyState extends StateImpl( "YearOfPlentyState" ) {
     nextState = State.fromXML( node.childOf( "nextState" ) )
   )
 
-  def fromJson( json:JsValue ):State = YearOfPlentyState(
+  def fromJson( json:JsValue ):YearOfPlentyState = YearOfPlentyState(
     nextState = ( json \ "nextState" ).as[State]
   )
 }

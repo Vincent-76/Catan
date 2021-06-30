@@ -2,6 +2,7 @@ package de.htwg.se.catan.model
 
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
+import de.htwg.se.catan.model.commands.InitGameCommand
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import org.scalatest.matchers.should.Matchers
@@ -19,8 +20,13 @@ class FileIOSpec extends AnyWordSpec with Matchers {
           injector.getInstance( classOf[PlayerFactory] ),
           "ClassicPlayerImpl"
         )
-        val path = JsonFileIO.save( game )
-        FileIO.load( path ).asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
+        val undoStack = List( InitGameCommand() )
+        val redoStack = List( InitGameCommand() )
+        val path = JsonFileIO.save( game, undoStack, redoStack )
+        val (game2, undoStack2, redoStack2) = FileIO.load( path )
+        game2.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game.copy( playerFactory = null )
+        undoStack2 shouldBe undoStack
+        redoStack2 shouldBe redoStack
         intercept[NotImplementedError] {
           FileIO.load( path.replace( "json", "abc" ) )
         }

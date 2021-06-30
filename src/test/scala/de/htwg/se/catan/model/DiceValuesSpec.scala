@@ -1,9 +1,11 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.CatanModule
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class DiceValuesSpec extends AnyWordSpec with Matchers {
+  CatanModule.init()
   "Numbers" when {
     "static" should {
       "be constructed with of" in {

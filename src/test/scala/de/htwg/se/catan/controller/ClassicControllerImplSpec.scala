@@ -53,7 +53,7 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
       }
       "save and load game" in {
         val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )
-        val path = controller.saveGame();
+        val path = controller.saveGame()
         controller.loadGame( path )
         controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game
       }

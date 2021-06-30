@@ -1,12 +1,14 @@
 package de.htwg.se.catan.model
 
 import Card._
+import de.htwg.se.catan.CatanModule
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 class CardSpec extends AnyWordSpec with Matchers {
+  CatanModule.init()
   "Cards" when {
     "DevCards" should {
       "find" in {

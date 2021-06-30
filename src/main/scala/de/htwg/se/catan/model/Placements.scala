@@ -33,11 +33,10 @@ abstract class Placement( val title:String ) extends ComponentImpl {
 
 
 object StructurePlacement extends ObjectComponent[StructurePlacement] {
-  def of( s:String ):Option[StructurePlacement] = impls.find( _.title ^= s )
-
   implicit val structurePlacementWrites:Writes[StructurePlacement] = ( o:StructurePlacement ) => Json.toJson( o.title )
-
   implicit val structurePlacementReads:Reads[StructurePlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+
+  def of( s:String ):Option[StructurePlacement] = impls.find( _.title ^= s )
 }
 
 abstract class StructurePlacement( title:String,

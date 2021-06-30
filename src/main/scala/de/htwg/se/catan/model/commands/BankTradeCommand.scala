@@ -2,14 +2,41 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode }
 import de.htwg.se.catan.util._
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object BankTradeCommand extends CommandImpl( "BankTradeCommand" ) {
+  override def fromXML( node:Node ):BankTradeCommand = BankTradeCommand(
+    give = ResourceCards.fromXML( node.childOf( "give" ) ),
+    get = ResourceCards.fromXML( node.childOf( "get" ) )
+  )
+
+  override def fromJson( json:JsValue ):BankTradeCommand = BankTradeCommand(
+    give = ( json \ "give" ).as[ResourceCards],
+    get = ( json \ "get" ).as[ResourceCards]
+  )
+}
+
 case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Command {
+
+  def toXML:Node = <BankTradeCommand>
+    <give>{ give.toXML( _.title, _.toString ) }</give>
+    <get>{ get.toXML( _.title, _.toString ) }</get>
+  </BankTradeCommand>.copy( label = BankTradeCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( BankTradeCommand.name ),
+    "give" -> Json.toJson( give ),
+    "get" -> Json.toJson( get )
+  )
 
   var giveResources:Option[ResourceCards] = None
 

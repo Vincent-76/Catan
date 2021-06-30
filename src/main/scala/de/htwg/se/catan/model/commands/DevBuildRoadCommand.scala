@@ -1,15 +1,41 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.state.DevRoadBuildingState
 import de.htwg.se.catan.model.{ Command, _ }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object DevBuildRoadCommand extends CommandImpl( "DevBuildRoadCommand" ) {
+  override def fromXML( node:Node ):DevBuildRoadCommand = DevBuildRoadCommand(
+    eID = ( node \ "@eID" ).content.toInt,
+    state = DevRoadBuildingState.fromXML( node.childOf( "state" ) )
+  )
+
+  override def fromJson( json:JsValue ):DevBuildRoadCommand = DevBuildRoadCommand(
+    eID = ( json \ "eID" ).as[Int],
+    state = DevRoadBuildingState.fromJson( ( json \ "state" ).get )
+  )
+}
+
 case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Command {
+
+  def toXML:Node = <DevBuildRoadCommand eID={ eID.toString }>
+    <state>{ state.toXML }</state>
+  </DevBuildRoadCommand>.copy( label = DevBuildRoadCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( DevBuildRoadCommand.name ),
+    "eID" -> Json.toJson( eID ),
+    "state" -> state.toJson
+  )
 
   override def doStep( game:Game ):Try[CommandSuccess] = {
     RoadPlacement.build( game, game.onTurn, eID ) match {

@@ -19,7 +19,7 @@ object InitBeginnerState extends StateImpl( "InitBeginnerState" ) {
     counter = ( node \ "@counter" ).content.toInt
   )
 
-  def fromJson( json:JsValue ):State = InitBeginnerState(
+  def fromJson( json:JsValue ):InitBeginnerState = InitBeginnerState(
     beginner = ( json \ "beginner" ).asOption[PlayerID],
     diceValues = ( json \ "diceValues" ).asMap[PlayerID, Int],
     counter = ( json \ "counter" ).as[Int]

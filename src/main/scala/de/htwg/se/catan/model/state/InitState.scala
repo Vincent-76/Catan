@@ -13,7 +13,7 @@ import scala.xml.Node
 object InitState extends StateImpl( "InitState" ) {
   def fromXML( node:Node ):InitState = InitState()
 
-  def fromJson( json:JsValue ):State = InitState()
+  def fromJson( json:JsValue ):InitState = InitState()
 }
 
 case class InitState( ) extends State {

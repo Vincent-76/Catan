@@ -17,7 +17,7 @@ object DevRoadBuildingState extends StateImpl( "DevRoadBuildingState" ) {
     roads = ( node \ "@roads" ).content.toInt
   )
 
-  def fromJson( json:JsValue ):State = DevRoadBuildingState(
+  def fromJson( json:JsValue ):DevRoadBuildingState = DevRoadBuildingState(
     nextState = ( json \ "nextState" ).as[State],
     roads = ( json \ "roads" ).as[Int]
   )

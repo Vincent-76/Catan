@@ -1,10 +1,10 @@
 package de.htwg.se.catan.model.impl.fileio
 
-import de.htwg.se.catan.model.{ FileIO, Game }
+import de.htwg.se.catan.model.{ Command, FileIO, Game }
 
 import java.io
 import scala.reflect.io.File
-import scala.xml.{ Elem, Node, NodeSeq, Utility }
+import scala.xml.{ Elem, Node, NodeSeq, PrettyPrinter, Utility }
 
 trait XMLSerializable {
   def toXML:Node
@@ -20,14 +20,22 @@ case class XMLParseError( expected:String, got:String ) extends RuntimeException
 
 object XMLFileIO extends FileIO( "xml" ) {
 
-  override def load( path:String ):Game = {
-    val file = scala.xml.XML.loadFile( path )
-    Game.fromXML( file )
+  override def load( path:String ):(Game, List[Command], List[Command]) = {
+    val xml = scala.xml.XML.loadFile( path )
+    val game = Game.fromXML( xml.childOf( "game" ) )
+    val undoStack = xml.childOf( "undoStack" ).asList( n => Command.fromXML( n ) )
+    val redoStack = xml.childOf( "redoStack" ).asList( n => Command.fromXML( n ) )
+    (game, undoStack, redoStack)
   }
 
-  override def save( game:Game ):String = {
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String = {
     val file = File( getFileName )
-    scala.xml.XML.save( file.toAbsolute.path, game.toXML );
+    val save = <Save>
+      <game>{ game.toXML }</game>
+      <undoStack>{ undoStack.toXML( _.toXML ) }</undoStack>
+      <redoStack>{ redoStack.toXML( _.toXML ) }</redoStack>
+    </Save>
+    scala.xml.XML.save( file.toAbsolute.path, save )
     file.toAbsolute.path
   }
 

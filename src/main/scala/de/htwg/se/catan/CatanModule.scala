@@ -6,6 +6,7 @@ import com.google.inject.name.Names
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, XMLFileIO }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
@@ -48,6 +49,32 @@ object CatanModule {
     RobberPlaceState.init()
     RobberStealState.init()
     YearOfPlentyState.init()
+
+    AbortPlayerTradeCommand.init()
+    AddPlayerCommand.init()
+    BankTradeCommand.init()
+    BuildCommand.init()
+    BuildInitRoadCommand.init()
+    BuildInitSettlementCommand.init()
+    BuyDevCardCommand.init()
+    ChangeStateCommand.init()
+    DevBuildRoadCommand.init()
+    DiceOutBeginnerCommand.init()
+    DropHandCardsCommand.init()
+    EndTurnCommand.init()
+    InitGameCommand.init()
+    MonopolyCommand.init()
+    PlaceRobberCommand.init()
+    PlayerTradeCommand.init()
+    PlayerTradeDecisionCommand.init()
+    RobberStealCommand.init()
+    RollDicesCommand.init()
+    SetBeginnerCommand.init()
+    SetBuildStateCommand.init()
+    SetInitBeginnerStateCommand.init()
+    SetPlayerTradeStateCommand.init()
+    UseDevCardCommand.init()
+    YearOfPlentyCommand.init()
 
     Structure.init()
     Area.init()

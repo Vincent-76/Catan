@@ -1,14 +1,37 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
 import de.htwg.se.catan.model.state.InitBeginnerState
 import de.htwg.se.catan.model.{ Command, _ }
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Random, Success, Try }
+import scala.xml.Node
 
 /**
  * @author Vincent76;
  */
+
+object DiceOutBeginnerCommand extends CommandImpl( "DiceOutBeginnerCommand" ) {
+  override def fromXML( node:Node ):DiceOutBeginnerCommand = DiceOutBeginnerCommand(
+    state = InitBeginnerState.fromXML( node.childOf( "state" ) )
+  )
+
+  override def fromJson( json:JsValue ):DiceOutBeginnerCommand = DiceOutBeginnerCommand(
+    state = InitBeginnerState.fromJson( ( json \ "state" ).get )
+  )
+}
+
 case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command {
+
+  def toXML:Node = <DiceOutBeginnerCommand>
+    <state>{ state.toXML }</state>
+  </DiceOutBeginnerCommand>.copy( label = DiceOutBeginnerCommand.name )
+
+  def toJson:JsValue = Json.obj(
+    "class" -> Json.toJson( DiceOutBeginnerCommand.name ),
+    "state" -> state.toJson
+  )
 
   override def doStep( game:Game ):Try[CommandSuccess] = {
     if ( state.beginner.isDefined )

@@ -5,10 +5,15 @@ This game works like the classic version of the board game, same rules and some 
 
 Features:
 - Colored TUI
-- GUI
+- Optional GUI
 - Expandability
 - Save Game via XML and JSON
 - Undo/Redo
+
+
+## Run
+
+Run the Catan object with or without the argument 'gui' to whether enable or disable the optional gui.
 
 
 ## Expandability

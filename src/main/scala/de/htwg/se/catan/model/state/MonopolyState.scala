@@ -16,7 +16,7 @@ object MonopolyState extends StateImpl( "MonopolyState" ) {
     nextState = State.fromXML( node.childOf( "nextState" ) )
   )
 
-  def fromJson( json:JsValue ):State = MonopolyState(
+  def fromJson( json:JsValue ):MonopolyState = MonopolyState(
     nextState = ( json \ "nextState" ).as[State]
   )
 }

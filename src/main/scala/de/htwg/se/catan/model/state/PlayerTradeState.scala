@@ -21,7 +21,7 @@ object PlayerTradeState extends StateImpl( "PlayerTradeState" ) {
     decisions = node.childOf( "decisions" ).asMap( n => PlayerID.fromXML( n ), _.content.toBoolean )
   )
 
-  def fromJson( json:JsValue ):State = PlayerTradeState(
+  def fromJson( json:JsValue ):PlayerTradeState = PlayerTradeState(
     pID = ( json \ "pID" ).as[PlayerID],
     give = ( json \ "give" ).as[ResourceCards],
     get = ( json \ "get" ).as[ResourceCards],
