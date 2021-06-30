@@ -2,6 +2,7 @@ package de.htwg.se.catan.model
 
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
+import de.htwg.se.catan.model.commands.InitGameCommand
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
 import de.htwg.se.catan.model.impl.fileio.{ XMLFileIO, XMLParseError }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
@@ -29,10 +30,14 @@ class XMLFileIOSpec extends AnyWordSpec with Matchers {
     "created" should {
       "save and load" in {
         val game = injector.getInstance( classOf[ClassicGameImpl] )
-        val path = XMLFileIO.save( game )
-        val game2 = XMLFileIO.load( path );
+        val undoStack = List( InitGameCommand() )
+        val redoStack = List( InitGameCommand() )
+        val path = XMLFileIO.save( game, undoStack, redoStack )
+        val (game2, undoStack2, redoStack2) = XMLFileIO.load( path );
         game2.asInstanceOf[impl.game.ClassicGameImpl].copy( playerFactory = null ) shouldBe
           game.copy( playerFactory = null )
+        undoStack2 shouldBe undoStack
+        redoStack2 shouldBe redoStack
       }
     }
   }

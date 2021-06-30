@@ -84,14 +84,17 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
   }*/
 
   def saveGame():String = {
-    val path = fileIO.save( game )
+    val path = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
     update( info = Some( GameSavedInfo( path ) ) )
     path
   }
 
   def loadGame( path:String ):Unit = {
-    gameVal = FileIO.load( path )
+    val (newGame, undoStack, redoStack) = FileIO.load( path )
+    gameVal = newGame
     undoManager.clear()
+    undoManager.undoStack = undoStack
+    undoManager.redoStack = redoStack
     update( info = Some( GameLoadedInfo( path ) ) )
   }
 

@@ -1,6 +1,6 @@
 package de.htwg.se.catan.model.impl.fileio
 
-import de.htwg.se.catan.model.{ FileIO, Game }
+import de.htwg.se.catan.model.{ Command, FileIO, Game }
 import play.api.libs.json.{ JsArray, JsDefined, JsLookupResult, JsNull, JsValue, Json, Reads, Writes }
 
 import java.io.{ File, PrintWriter }
@@ -20,17 +20,25 @@ case class JsonParseError( expected:String, got:String ) extends RuntimeExceptio
 
 object JsonFileIO extends FileIO( "json" ) {
 
-  override def load( path:String ):Game = {
+  override def load( path:String ):(Game, List[Command], List[Command]) = {
     val source = Source.fromFile( path )
-    val game = Game.fromJson( Json.parse( source.getLines.mkString ) )
+    val json = Json.parse( source.getLines.mkString )
+    val game = ( json \ "game" ).as[Game]
+    val undoStack = ( json \ "undoStack" ).asList[Command]
+    val redoStack = ( json \ "redoStack" ).asList[Command]
     source.close()
-    game
+    (game, undoStack, redoStack)
   }
 
-  override def save( game:Game ):String = {
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String = {
     val file = new File( getFileName )
     val pw = new PrintWriter( file )
-    pw.write( Json.prettyPrint( game.toJson ) )
+    val save = Json.obj(
+      "game" -> Json.toJson( game ),
+      "undoStack" -> Json.toJson( undoStack ),
+      "redoStack" -> Json.toJson( redoStack )
+    )
+    pw.write( Json.prettyPrint( save ) )
     pw.close()
     file.getAbsolutePath
   }

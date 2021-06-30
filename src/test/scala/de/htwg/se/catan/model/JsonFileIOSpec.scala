@@ -2,6 +2,7 @@ package de.htwg.se.catan.model
 
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
+import de.htwg.se.catan.model.commands.InitGameCommand
 import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, JsonParseError, JsonSerializable }
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
@@ -24,10 +25,14 @@ class JsonFileIOSpec extends AnyWordSpec with Matchers {
     "created" should {
       "save and load" in {
         val game = injector.getInstance( classOf[ClassicGameImpl] )
-        val path = JsonFileIO.save( game )
-        val game2 = JsonFileIO.load( path );
+        val undoStack = List( InitGameCommand() )
+        val redoStack = List( InitGameCommand() )
+        val path = JsonFileIO.save( game, undoStack, redoStack )
+        val (game2, undoStack2, redoStack2) = JsonFileIO.load( path );
         game2.asInstanceOf[impl.game.ClassicGameImpl].copy( playerFactory = null ) shouldBe
           game.copy( playerFactory = null )
+        undoStack2 shouldBe undoStack
+        redoStack2 shouldBe redoStack
       }
     }
     "writeJsonSerializable" in {
