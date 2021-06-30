@@ -15,6 +15,8 @@ Features:
 
 Run the Catan object with or without the argument 'gui' to whether enable or disable the optional gui.
 
+In docker run it with the environment variable 'DISPLAY' to enable the gui.
+
 
 ## Expandability
 
