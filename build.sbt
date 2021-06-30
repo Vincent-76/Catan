@@ -3,9 +3,6 @@ version := "0.1"
 
 scalaVersion := "2.13.5"
 
-run / fork := true
-run / connectInput := true
-
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "16.0.0-R24"

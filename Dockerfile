@@ -4,6 +4,7 @@ WORKDIR /Catan
 ADD . /Catan
 RUN chmod +x /Catan/run.sh
 RUN sbt compile
+RUN sbt test
 ENTRYPOINT ["/Catan/run.sh"]
 CMD [""]
 

@@ -28,7 +28,6 @@ object Catan {
     val gui:Option[GUIApp] = if( args.contains( "gui" ) )
       Some( new GUIApp( controller ) )
     else None
-    args.foreach( s => println( s ) )
     var input:String = ""
     do {
       input = StdIn.readLine()
