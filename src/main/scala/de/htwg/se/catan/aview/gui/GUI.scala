@@ -33,6 +33,7 @@ class GUI( guiApp:GUIApp, val controller:Controller ) extends JFXApp {
   val infoPane:InfoPane = new InfoPane( this )
 
   stage = new PrimaryStage {
+    icons.add( new Image( "/catan_icon.png" ) )
     title = "Settlers of Catan"
     minWidth = 850
     minHeight = 650
