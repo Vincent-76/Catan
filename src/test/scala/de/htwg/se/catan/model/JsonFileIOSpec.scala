@@ -10,6 +10,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{ JsDefined, JsUndefined, Json }
 
+import java.io.File
+
 class JsonFileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
@@ -28,7 +30,10 @@ class JsonFileIOSpec extends AnyWordSpec with Matchers {
         val undoStack = List( InitGameCommand() )
         val redoStack = List( InitGameCommand() )
         val path = JsonFileIO.save( game, undoStack, redoStack )
-        val (game2, undoStack2, redoStack2) = JsonFileIO.load( path );
+        val (game2, undoStack2, redoStack2) = JsonFileIO.load( path )
+        val file = new File( path )
+        if( file.exists )
+          file.delete()
         game2.asInstanceOf[impl.game.ClassicGameImpl].copy( playerFactory = null ) shouldBe
           game.copy( playerFactory = null )
         undoStack2 shouldBe undoStack

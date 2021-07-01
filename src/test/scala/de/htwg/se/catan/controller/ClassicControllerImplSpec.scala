@@ -15,6 +15,8 @@ import de.htwg.se.catan.util._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.io.File
+
 /**
  * @author Vincent76;
  */
@@ -55,6 +57,9 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
         val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )
         val path = controller.saveGame()
         controller.loadGame( path )
+        val file = new File( path )
+        if( file.exists )
+          file.delete()
         controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null ) shouldBe game
       }
     }
