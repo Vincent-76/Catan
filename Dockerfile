@@ -3,8 +3,7 @@ RUN apt-get update && apt-get install -y libxrender1 libxtst6 libxi6 libgl1-mesa
 WORKDIR /Catan
 ADD . /Catan
 RUN chmod +x /Catan/run.sh
-RUN sbt compile
-RUN sbt test
+#RUN sbt compile && sbt test
 ENTRYPOINT ["/Catan/run.sh"]
 CMD [""]
 
