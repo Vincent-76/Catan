@@ -37,4 +37,4 @@ So build the implementation and add the according companion object which inherit
 
 ## Docker
 
-https://hub.docker.com/repository/docker/vince76/catan
+https://hub.docker.com/r/vince76/catan
