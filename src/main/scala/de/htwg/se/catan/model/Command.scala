@@ -1,5 +1,6 @@
 package de.htwg.se.catan.model
 
+import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
 import play.api.libs.json.{ JsSuccess, JsValue, Reads, Writes }
 
@@ -14,15 +15,16 @@ abstract class CommandImpl( name:String ) extends DeserializerComponentImpl[Comm
 }
 
 object Command extends ClassComponent[Command, CommandImpl] {
+  type CommandSuccess = (Game, Option[Info])
+
   implicit val stateWrites:Writes[Command] = ( o:Command ) => o.toJson
   implicit val stateReads:Reads[Command] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
 }
 
 trait Command extends XMLSerializable with JsonSerializable {
 
-  type CommandSuccess = (Game, Option[Info])
-
-  def success( game:Game, info:Option[Info] = None ):Success[CommandSuccess] = Success( (game, info) )
+  def success( game:Game, info:Option[Info] = None ):Success[CommandSuccess] =
+    Success( (game, info) )
 
   def doStep( game:Game ):Try[CommandSuccess]
 

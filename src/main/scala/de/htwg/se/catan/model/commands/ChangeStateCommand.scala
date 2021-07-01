@@ -1,10 +1,11 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
-import de.htwg.se.catan.model.{ Command, CommandImpl, Game, Info, State }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game, State }
 import play.api.libs.json.{ JsValue, Json }
 
-import scala.util.{ Success, Try }
+import scala.util.Try
 import scala.xml.Node
 
 /**

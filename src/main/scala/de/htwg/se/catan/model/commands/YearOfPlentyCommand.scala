@@ -1,12 +1,13 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card._
-import de.htwg.se.catan.model.state.YearOfPlentyState
+import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode }
+import de.htwg.se.catan.model.state.YearOfPlentyState
 import play.api.libs.json.{ JsValue, Json }
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Try }
 import scala.xml.Node
 
 /**

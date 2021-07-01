@@ -23,7 +23,6 @@ abstract class ComponentImpl {
   def init()
 }
 
-
 abstract class DeserializerComponentImpl[+T]( var name:String ) extends ComponentImpl with XMLDeserializer[T] with JsonDeserializer[T]
 
 abstract class ClassComponent[T, I <: DeserializerComponentImpl[T]] extends Component[I] with XMLDeserializer[T] with JsonDeserializer[T] {

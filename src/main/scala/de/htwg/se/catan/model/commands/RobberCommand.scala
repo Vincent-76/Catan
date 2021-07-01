@@ -1,11 +1,10 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model._
-import play.api.libs.json.JsValue
 
 import scala.util.Try
-import scala.xml.Node
 
 /**
  * @author Vincent76;

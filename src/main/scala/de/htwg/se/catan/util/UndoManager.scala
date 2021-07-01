@@ -1,24 +1,27 @@
 package de.htwg.se.catan.util
 
-import de.htwg.se.catan.model.{ Command, Game, Info, NothingToRedo, NothingToUndo }
+import de.htwg.se.catan.model.Command.CommandSuccess
+import de.htwg.se.catan.model.{ Command, Game, NothingToRedo, NothingToUndo }
 
 import scala.util.{ Failure, Success, Try }
 
-case class UndoManager(
-                        var undoStack:List[Command] = Nil,
+class UndoManager( var undoStack:List[Command] = Nil,
                         var redoStack:List[Command] = Nil
                       ) {
 
   def hasUndo:Boolean = undoStack.nonEmpty
   def hasRedo:Boolean = redoStack.nonEmpty
 
-  def stepDone( command:Command, newRedoStack:List[Command], result:(Game, Option[Info]) ):Try[(Game, Option[Info])] = {
+  private def stepDone( command:Command,
+                        newRedoStack:List[Command],
+                        result:CommandSuccess
+                      ):Try[CommandSuccess] = {
     undoStack = command :: undoStack
     redoStack = newRedoStack
     Success( result )
   }
 
-  def doStep( command:Command, game:Game ):Try[(Game, Option[Info])] = {
+  def doStep( command:Command, game:Game ):Try[CommandSuccess] = {
     command.doStep( game ) match {
       case Success( result ) => stepDone( command, Nil, result )
       case f => f.rethrow
@@ -34,7 +37,7 @@ case class UndoManager(
       Success( newGame )
   }
 
-  def redoStep( game:Game ):Try[(Game, Option[Info])] = redoStack match {
+  def redoStep( game:Game ):Try[CommandSuccess] = redoStack match {
     case Nil => Failure( NothingToRedo )
     case head :: stack => head.doStep( game )  match {
       case Success( result ) => stepDone( head, stack, result )

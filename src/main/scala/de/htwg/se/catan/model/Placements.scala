@@ -25,7 +25,7 @@ object Placement extends ObjectComponent[Placement] {
 }
 
 abstract class Placement( val title:String ) extends ComponentImpl {
-  override def init() = Placement.addImpl( this )
+  override def init():Unit = Placement.addImpl( this )
 
   def getBuildablePoints( game:Game, pID:PlayerID, any:Boolean = false ):List[PlacementPoint]
 }
@@ -46,10 +46,11 @@ abstract class StructurePlacement( title:String,
                                  ) extends Placement( title ) {
   StructurePlacement.addImpl( this )
 
-  def build( game:Game, pID:PlayerID, id:Int, anywhere:Boolean = false ):Try[Game] = game.player( pID ).getStructure( this ) match {
-    case Success( newPlayer ) => doBuild( game.updatePlayer( newPlayer ), pID, id, anywhere )
-    case Failure( e ) => Failure( e )
-  }
+  def build( game:Game, pID:PlayerID, id:Int, anywhere:Boolean = false ):Try[Game] =
+    game.player( pID ).getStructure( this ) match {
+      case Success( newPlayer ) => doBuild( game.updatePlayer( newPlayer ), pID, id, anywhere )
+      case Failure( e ) => Failure( e )
+    }
 
   protected def doBuild( game:Game, pID:PlayerID, id:Int, anywhere:Boolean = false ):Try[Game]
 }

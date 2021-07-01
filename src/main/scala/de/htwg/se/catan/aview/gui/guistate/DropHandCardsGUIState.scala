@@ -10,6 +10,7 @@ import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.Node
 import scalafx.scene.control.Button
 import scalafx.scene.layout.{ BorderPane, Pane, Priority }
+import scalafx.scene.paint.Color
 import scalafx.scene.text.{ Text, TextAlignment }
 
 /**
@@ -28,6 +29,7 @@ case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controlle
         margin = Insets( 6, 0, 6, 0 )
       }
       top = new Text( "Drop " + (p.resources.amount / 2) + " resources!" ) {
+        fill = Color.White
         alignmentInParent = Pos.Center
         textAlignment = TextAlignment.Center
       }

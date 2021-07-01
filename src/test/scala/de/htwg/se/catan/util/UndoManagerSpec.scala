@@ -13,9 +13,9 @@ import scala.util.{ Failure, Success }
 class UndoManagerSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
-  val game = injector.getInstance( classOf[Game] )
+  val game:Game = injector.getInstance( classOf[Game] )
   "UndoManager" when {
-    val undoManager = UndoManager()
+    val undoManager = new UndoManager()
     "new" should {
       "not hasUndo" in {
         undoManager.hasUndo shouldBe false

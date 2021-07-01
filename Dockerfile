@@ -11,3 +11,5 @@ CMD [""]
 #docker build -t vince76/catan .
 #docker run -it vince76/catan
 #docker run -it --rm -e DISPLAY=host.docker.internal:0.0 vince76/catan
+
+

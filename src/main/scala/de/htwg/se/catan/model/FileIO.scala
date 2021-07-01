@@ -23,7 +23,8 @@ abstract class FileIO( val extension:String ) extends ComponentImpl {
 
   def getFileName:String = {
     File( CatanModule.savegamePath ).createDirectory().path + File.separator +
-    "Catan_" + new SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" ).format( Calendar.getInstance().getTime ) + "_savegame." + extension
+    "Catan_" + new SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" )
+      .format( Calendar.getInstance().getTime ) + "_savegame." + extension
   }
 
   def load( path:String ):(Game, List[Command], List[Command])

@@ -22,7 +22,7 @@ object State extends ClassComponent[State, StateImpl] {
 
 trait State extends XMLSerializable with JsonSerializable {
 
-  def initGame( ):Option[Command] = None
+  def initGame():Option[Command] = None
 
   def addPlayer( playerColor:PlayerColor, name:String ):Option[Command] = None
 

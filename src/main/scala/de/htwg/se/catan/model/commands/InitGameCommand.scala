@@ -1,7 +1,8 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.state.{ InitPlayerState, InitState }
-import de.htwg.se.catan.model.{ Command, CommandImpl, Game, Info }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.Try
@@ -25,7 +26,7 @@ case class InitGameCommand() extends Command {
     "class" -> Json.toJson( InitGameCommand.name )
   )
 
-  def doStep( game:Game ):Try[(Game, Option[Info])] = success(
+  def doStep( game:Game ):Try[CommandSuccess] = success(
     game.setState( InitPlayerState() )
   )
 

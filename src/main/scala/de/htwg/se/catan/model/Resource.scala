@@ -18,7 +18,7 @@ object FieldType extends ObjectComponent[FieldType] {
 }
 
 abstract class FieldType( val title:String ) extends ComponentImpl {
-  override def init() = FieldType.addImpl( this )
+  override def init():Unit = FieldType.addImpl( this )
 
   override def toString:String = title
 }
@@ -29,8 +29,10 @@ case object Desert extends FieldType( "Desert" )
 
 
 object Resource extends ObjectComponent[Resource] {
-  implicit val resourceWrites:Writes[Resource] = ( o:Resource ) => Json.toJson( o.title )
-  implicit val resourceReads:Reads[Resource] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+  implicit val resourceWrites:Writes[Resource] =
+    ( o:Resource ) => Json.toJson( o.title )
+  implicit val resourceReads:Reads[Resource] =
+    ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   Wood.init()
   Clay.init()
@@ -38,7 +40,8 @@ object Resource extends ObjectComponent[Resource] {
   Wheat.init()
   Ore.init()
 
-  def of( s:String ):Option[Resource] = impls.find( _.title ^= s )
+  def of( s:String ):Option[Resource] =
+    impls.find( _.title ^= s )
 }
 
 abstract class Resource( val index:Int, title:String ) extends FieldType( title ) {

@@ -1,5 +1,6 @@
 package de.htwg.se.catan.model.commands
 
+import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
