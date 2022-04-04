@@ -5,6 +5,5 @@ import de.htwg.se.catan.aview.gui.GUI
 /**
  * @author Vincent76;
  */
-case object StartTurnCommand extends SimpleGUICommand( "Start Turn" ) {
+case object StartTurnCommand extends SimpleGUICommand( "Start Turn" ):
   override def action( gui:GUI ):Unit = gui.controller.startTurn()
-}

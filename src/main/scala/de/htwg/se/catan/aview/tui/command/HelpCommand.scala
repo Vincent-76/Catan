@@ -9,9 +9,9 @@ import de.htwg.se.catan.util._
  */
 
 case object HelpCommand
-  extends CommandAction( "help", List.empty, "Lists all available commands." ) {
+  extends CommandAction( "help", List.empty, "Lists all available commands." ):
 
-  override def action( commandInput:CommandInput, controller:Controller ):Unit = {
+  override def action( commandInput:CommandInput, controller:Controller ):Unit =
     TUI.clear()
     val commands = TUI.commands
     TUI.outln( "Commands:" )
@@ -20,5 +20,3 @@ case object HelpCommand
     commands.foreach( c => TUI.outln( c.command.toLength( cLength ) + "\t" + c.parameter.map( p => "<" + p + ">" ).mkString( " " ).toLength( pLength ) + "\t->\t" + c.desc ) )
     //TUI.awaitKey()
     //state.show()
-  }
-}

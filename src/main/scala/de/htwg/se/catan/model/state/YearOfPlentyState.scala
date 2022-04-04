@@ -12,7 +12,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object YearOfPlentyState extends StateImpl( "YearOfPlentyState" ) {
+object YearOfPlentyState extends StateImpl( "YearOfPlentyState" ):
   def fromXML( node:Node ):YearOfPlentyState = YearOfPlentyState(
     nextState = State.fromXML( node.childOf( "nextState" ) )
   )
@@ -20,9 +20,9 @@ object YearOfPlentyState extends StateImpl( "YearOfPlentyState" ) {
   def fromJson( json:JsValue ):YearOfPlentyState = YearOfPlentyState(
     nextState = ( json \ "nextState" ).as[State]
   )
-}
 
-case class YearOfPlentyState( nextState:State ) extends State {
+
+case class YearOfPlentyState( nextState:State ) extends State:
 
   def toXML:Node = <YearOfPlentyState>
     <nextState>{ nextState.toXML }</nextState>
@@ -38,4 +38,3 @@ case class YearOfPlentyState( nextState:State ) extends State {
   )
 
   //override def toString:String = getClass.getSimpleName + ": nextState[" + nextState + "]"
-}

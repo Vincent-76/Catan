@@ -14,7 +14,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object SetBuildStateCommand extends CommandImpl( "SetBuildStateCommand" ) {
+object SetBuildStateCommand extends CommandImpl( "SetBuildStateCommand" ):
   override def fromXML( node:Node ):SetBuildStateCommand = SetBuildStateCommand(
     structure = StructurePlacement.of( ( node \ "@structure" ).content ).get,
     state = State.fromXML( node.childOf( "state" ) )
@@ -24,9 +24,9 @@ object SetBuildStateCommand extends CommandImpl( "SetBuildStateCommand" ) {
     structure = ( json \ "structure" ).as[StructurePlacement],
     state = ( json \ "state" ).as[State]
   )
-}
 
-case class SetBuildStateCommand( structure:StructurePlacement, state:State ) extends Command {
+
+case class SetBuildStateCommand( structure:StructurePlacement, state:State ) extends Command:
 
   def toXML:Node = <SetBuildStateCommand structure={ structure.title }>
     <state>{ state.toXML }</state>
@@ -38,25 +38,21 @@ case class SetBuildStateCommand( structure:StructurePlacement, state:State ) ext
     "state" -> state.toJson
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
-    if( !game.availablePlacements.contains( structure ) )
+  override def doStep( game:Game ):Try[CommandSuccess] =
+    if !game.availablePlacements.contains( structure ) then
       Failure( UnavailableStructure( structure ) )
-    else if( !game.player.hasStructure( structure ) )
+    else if !game.player.hasStructure( structure ) then
       Failure( InsufficientStructures( structure ) )
-    else if( structure.getBuildablePoints( game, game.onTurn ).isEmpty )
+    else if structure.getBuildablePoints( game, game.onTurn ).isEmpty then
       Failure( NoPlacementPoints( structure ) )
-    else game.dropResourceCards( game.onTurn, structure.resources ) match {
+    else game.dropResourceCards( game.onTurn, structure.resources ) match
       case Success( newGame ) => success(
         newGame.setState( BuildState( structure ) ),
-        info = Some( LostResourcesInfo( game.onTurn, structure.resources ) )
+        info = Some( Info.LostResourcesInfo( game.onTurn, structure.resources ) )
       )
       case f => f.rethrow
-    }
-  }
 
-  override def undoStep( game:Game ):Game = {
+  override def undoStep( game:Game ):Game =
     game.setState( state ).drawResourceCards( game.onTurn, structure.resources )._1
-  }
 
   //override def toString:String = getClass.getSimpleName + ": structure[" + structure.title + "], " + state
-}

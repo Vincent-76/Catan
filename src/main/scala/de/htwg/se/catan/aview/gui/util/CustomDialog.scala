@@ -9,7 +9,7 @@ import scalafx.scene.control.{ ButtonType, DialogPane }
  */
 class CustomDialog( gui:GUI,
                     val title:String = "",
-                    buttonType:ButtonType = ButtonType.OK ) extends DialogPane {
+                    buttonType:ButtonType = ButtonType.OK ) extends DialogPane:
 
 
   padding = Insets( 0, 8, 0, 8 )
@@ -18,4 +18,3 @@ class CustomDialog( gui:GUI,
   def close( ):Unit = scene.value.getWindow.hide()
 
   def show( ):Unit = gui.showDialog( this )
-}

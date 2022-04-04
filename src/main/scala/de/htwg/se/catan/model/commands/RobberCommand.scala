@@ -10,13 +10,13 @@ import scala.util.Try
  * @author Vincent76;
  */
 
-abstract class RobberCommand( ) extends Command {
+abstract class RobberCommand( ) extends Command:
 
   var robbedResource:Option[Resource] = None
 
-  protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[GameField] = None ):Try[CommandSuccess] = {
+  protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[GameField] = None ):Try[CommandSuccess] =
     robbedResource = game.players( stealPlayerID ).randomHandResource()
-    robbedResource match {
+    robbedResource match
       case Some( r ) => success(
         game.setState( nextState )
           .setGameField( gameField.getOrElse( game.gameField ) )
@@ -24,7 +24,7 @@ abstract class RobberCommand( ) extends Command {
             game.players( stealPlayerID ).removeResourceCard( r ).get,
             game.player.addResourceCard( r )
           ),
-        info = Some( ResourceChangeInfo(
+        info = Some( Info.ResourceChangeInfo(
           playerAdd = Map( game.onTurn -> ResourceCards.ofResource( r ) ),
           playerSub = Map( stealPlayerID -> ResourceCards.ofResource( r ) )
         ) ) )
@@ -32,8 +32,4 @@ abstract class RobberCommand( ) extends Command {
         .setGameField( gameField.getOrElse( game.gameField ) )
       )
 
-    }
-  }
-
   //override def toString:String = getClass.getSimpleName + ": robbedResource[" + robbedResource.useOrElse( r => r, "-" ) + "]"
-}

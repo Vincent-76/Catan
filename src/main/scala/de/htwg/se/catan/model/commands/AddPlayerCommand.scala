@@ -14,7 +14,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object AddPlayerCommand extends CommandImpl( "AddPlayerCommand" ) {
+object AddPlayerCommand extends CommandImpl( "AddPlayerCommand" ):
   override def fromXML( node:Node ):AddPlayerCommand = AddPlayerCommand(
     playerColor = PlayerColor.of( ( node \ "@playerColor" ).content ).get,
     name = ( node \ "@name" ).content,
@@ -26,9 +26,9 @@ object AddPlayerCommand extends CommandImpl( "AddPlayerCommand" ) {
     name = ( json \ "name" ).as[String],
     state = InitPlayerState.fromJson( ( json \ "state" ).get )
   )
-}
 
-case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPlayerState ) extends Command {
+
+case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPlayerState ) extends Command:
 
   def toXML:Node = <AddPlayerCommand playerColor={ playerColor.title } name={ name }>
     <state>{ state.toXML }</state>
@@ -41,25 +41,22 @@ case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPla
     "state" -> state.toJson
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
-    if( name.isEmpty )
+  override def doStep( game:Game ):Try[CommandSuccess] =
+    if name.isEmpty then
       Failure( PlayerNameEmpty )
-    else if( name.length > game.maxPlayerNameLength )
+    else if name.length > game.maxPlayerNameLength then
       Failure( PlayerNameTooLong( name ) )
-    else if ( game.players.exists( _._2.name ^= name ) )
+    else if game.players.exists( _._2.name ^= name ) then
       Failure( PlayerNameAlreadyExists( name ) )
-    else if ( game.players.exists( _._2.color == playerColor ) )
+    else if game.players.exists( _._2.color == playerColor ) then
       Failure( PlayerColorIsAlreadyInUse( playerColor ) )
-    else {
+    else
       val newGame = game.addPlayer( playerColor, name )
-      if ( newGame.players.size >= game.maxPlayers )
+      if newGame.players.size >= game.maxPlayers then
         success( newGame.setState( InitBeginnerState() ) )
       else
         success( newGame )
-    }
-  }
 
   override def undoStep( game:Game ):Game = game.removeLastPlayer().setState( state )
 
   //override def toString:String = getClass.getSimpleName + ": Name[" + name + "], Color[" + playerColor.name + "]"
-}

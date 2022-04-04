@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object PlayerTradeDecisionCommand extends CommandImpl( "PlayerTradeDecisionCommand" ) {
+object PlayerTradeDecisionCommand extends CommandImpl( "PlayerTradeDecisionCommand" ):
   override def fromXML( node:Node ):PlayerTradeDecisionCommand = PlayerTradeDecisionCommand(
     decision = ( node \ "@decision" ).content.toBoolean,
     state = PlayerTradeState.fromXML( node.childOf( "state" ) )
@@ -23,9 +23,9 @@ object PlayerTradeDecisionCommand extends CommandImpl( "PlayerTradeDecisionComma
     decision = ( json \ "decision" ).as[Boolean],
     state = PlayerTradeState.fromJson( ( json \ "state" ).get )
   )
-}
 
-case class PlayerTradeDecisionCommand( decision:Boolean, state:PlayerTradeState ) extends Command {
+
+case class PlayerTradeDecisionCommand( decision:Boolean, state:PlayerTradeState ) extends Command:
 
   def toXML:Node = <PlayerTradeDecisionCommand decision={ decision.toString }>
     <state>{ state.toXML }</state>
@@ -37,15 +37,13 @@ case class PlayerTradeDecisionCommand( decision:Boolean, state:PlayerTradeState 
     "state" -> state.toJson
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
+  override def doStep( game:Game ):Try[CommandSuccess] =
     val decisions = state.decisions.updated( state.pID, decision )
-    success( game.getNextTradePlayerInOrder( decisions, state.pID ) match {
+    success( game.getNextTradePlayerInOrder( decisions, state.pID ) match
       case Some( pID ) => game.setState( PlayerTradeState( pID, state.give, state.get, decisions ) )
       case None => game.setState( PlayerTradeEndState( state.give, state.get, decisions ) )
-    }, None )
-  }
+    , None )
 
   override def undoStep( game:Game ):Game = game.setState( state )
 
   //override def toString:String = getClass.getSimpleName + ": Decision[" + decision + "], " + state
-}

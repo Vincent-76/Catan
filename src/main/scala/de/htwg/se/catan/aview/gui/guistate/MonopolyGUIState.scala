@@ -12,7 +12,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class MonopolyGUIState( controller:Controller ) extends GUIState {
+case class MonopolyGUIState( controller:Controller ) extends GUIState:
 
   override def getActions:List[GUICommand] = List( _ => new BorderPane {
     vgrow = Priority.Always
@@ -38,4 +38,3 @@ case class MonopolyGUIState( controller:Controller ) extends GUIState {
   } )
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
-}

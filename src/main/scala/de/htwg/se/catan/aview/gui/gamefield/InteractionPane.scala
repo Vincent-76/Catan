@@ -11,19 +11,18 @@ import scalafx.scene.shape.Circle
 /**
  * @author Vincent76;
  */
-object InteractionPane {
+object InteractionPane:
   val circleRadius:Double = 8
   val circleStroke:Double = 2
-}
 
-class InteractionPane extends AnchorPane {
+class InteractionPane extends AnchorPane:
   var input:Option[FieldInputDisplayState] = None
 
   def resetInput( ):Unit = this.input = None
 
   def setInput( input:FieldInputDisplayState ):Unit = this.input = Some( input )
 
-  def update( coords:Map[Hex, (Double, Double)], hSize:Double ):Unit = children = input match {
+  def update( coords:Map[Hex, (Double, Double)], hSize:Double ):Unit = children = input match
     case Some( input ) =>
       val circleRadius = GameFieldPane.mult( InteractionPane.circleRadius, hSize )
       input.points.map {
@@ -58,5 +57,3 @@ class InteractionPane extends AnchorPane {
         }
       } )
     case _ => Nil
-  }
-}

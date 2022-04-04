@@ -6,30 +6,16 @@ import play.api.libs.json._
  * @author Vincent76;
  */
 
-object DiceValue extends ObjectComponent[DiceValue] {
+object DiceValue:
   val maxFrequency = 5
   val maxSum = 12
 
-  implicit val diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
-  implicit val diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )
+  given diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
+  given diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )
 
-  Two.init()
-  Three.init()
-  Four.init()
-  Five.init()
-  Six.init()
-  Seven.init()
-  Eight.init()
-  Nine.init()
-  Ten.init()
-  Eleven.init()
-  Twelve.init()
+  def of( n:Int ):Option[DiceValue] = DiceValue.values.find( _.value == n )
 
-  def of( n:Int ):Option[DiceValue] = impls.find( _.value == n )
-}
-
-sealed abstract class DiceValue( val value:Int, val frequency:Int ) extends ComponentImpl {
-  override def init() = DiceValue.addImpl( this )
+enum DiceValue( val value:Int, val frequency:Int ):
 
   override def toString:String = {
     if( value < 10 )
@@ -37,26 +23,15 @@ sealed abstract class DiceValue( val value:Int, val frequency:Int ) extends Comp
     else
       value.toString
   }
-}
 
-case object Two extends DiceValue( 2, 1 )
-
-case object Three extends DiceValue( 3, 2 )
-
-case object Four extends DiceValue( 4, 3 )
-
-case object Five extends DiceValue( 5, 4 )
-
-case object Six extends DiceValue( 6, 5 )
-
-case object Seven extends DiceValue( 7, 0 )
-
-case object Eight extends DiceValue( 8, 5 )
-
-case object Nine extends DiceValue( 9, 4 )
-
-case object Ten extends DiceValue( 10, 3 )
-
-case object Eleven extends DiceValue( 11, 2 )
-
-case object Twelve extends DiceValue( 12, 1 )
+  case Two extends DiceValue( 2, 1 )
+  case Three extends DiceValue( 3, 2 )
+  case Four extends DiceValue( 4, 3 )
+  case Five extends DiceValue( 5, 4 )
+  case Six extends DiceValue( 6, 5 )
+  case Seven extends DiceValue( 7, 0 )
+  case Eight extends DiceValue( 8, 5 )
+  case Nine extends DiceValue( 9, 4 )
+  case Ten extends DiceValue( 10, 3 )
+  case Eleven extends DiceValue( 11, 2 )
+  case Twelve extends DiceValue( 12, 1 )

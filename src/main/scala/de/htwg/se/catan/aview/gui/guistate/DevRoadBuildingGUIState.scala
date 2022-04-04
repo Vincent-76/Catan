@@ -8,7 +8,7 @@ import de.htwg.se.catan.model.impl.placement.RoadPlacement
 /**
  * @author Vincent76;
  */
-case class DevRoadBuildingGUIState( controller:Controller ) extends GUIState {
+case class DevRoadBuildingGUIState( controller:Controller ) extends GUIState:
 
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( RoadPlacement.getBuildablePoints( controller.game, controller.onTurn ) ) {
@@ -16,4 +16,3 @@ case class DevRoadBuildingGUIState( controller:Controller ) extends GUIState {
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
-}

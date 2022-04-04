@@ -12,7 +12,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object ChangeStateCommand extends CommandImpl( "ChangeStateCommand" ) {
+object ChangeStateCommand extends CommandImpl( "ChangeStateCommand" ):
   override def fromXML( node:Node ):ChangeStateCommand = ChangeStateCommand(
     state = State.fromXML( node.childOf( "state" ) ),
     nextState = State.fromXML( node.childOf( "nextState" ) )
@@ -22,9 +22,9 @@ object ChangeStateCommand extends CommandImpl( "ChangeStateCommand" ) {
     state = ( json \ "state" ).as[State],
     nextState = ( json \ "nextState" ).as[State]
   )
-}
 
-case class ChangeStateCommand( state:State, nextState:State ) extends Command {
+
+case class ChangeStateCommand( state:State, nextState:State ) extends Command:
 
   def toXML:Node = <ChangeStateCommand>
     <state>{ state.toXML }</state>
@@ -42,4 +42,3 @@ case class ChangeStateCommand( state:State, nextState:State ) extends Command {
   override def undoStep( game:Game ):Game = game.setState( state )
 
   //override def toString:String = getClass.getSimpleName + ": State[" + state + "], NextState[" + nextState + "], Info[" + info.useOrElse( i => i.getClass.getSimpleName, "-" ) + "]"
-}

@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object EndTurnCommand extends CommandImpl( "EndTurnCommand" ) {
+object EndTurnCommand extends CommandImpl( "EndTurnCommand" ):
   override def fromXML( node:Node ):EndTurnCommand = EndTurnCommand(
     state = State.fromXML( node.childOf( "state" ) )
   )
@@ -21,9 +21,9 @@ object EndTurnCommand extends CommandImpl( "EndTurnCommand" ) {
   override def fromJson( json:JsValue ):EndTurnCommand = EndTurnCommand(
     state = ( json \ "state" ).as[State]
   )
-}
 
-case class EndTurnCommand( state:State ) extends Command {
+
+case class EndTurnCommand( state:State ) extends Command:
 
   def toXML:Node = <EndTurnCommand>
     <state>{ state.toXML }</state>
@@ -36,14 +36,11 @@ case class EndTurnCommand( state:State ) extends Command {
 
   var turn:Option[Turn] = None
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
+  override def doStep( game:Game ):Try[CommandSuccess] =
     turn = Some( game.turn )
     success( game.setState( NextPlayerState() ).nextRound() )
-  }
-
-
+  
   override def undoStep( game:Game ):Game = game.setState( state )
     .previousRound( turn )
 
   //override def toString:String = getClass.getSimpleName + ": " + state + ", turn[" + turn.useOrElse( t => t.playerID, "-" ) + "]"
-}

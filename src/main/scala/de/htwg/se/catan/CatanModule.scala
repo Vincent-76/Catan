@@ -5,28 +5,27 @@ import com.google.inject.assistedinject.FactoryModuleBuilder
 import com.google.inject.name.Names
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
-import de.htwg.se.catan.model._
-import de.htwg.se.catan.model.commands._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.commands.*
 import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, XMLFileIO }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
-import de.htwg.se.catan.model.state._
+import de.htwg.se.catan.model.state.*
 import net.codingwell.scalaguice.ScalaModule
 
 import scala.util.Random
 
-object CatanModule {
+object CatanModule:
   val savegamePath:String = "savegames"
 
-  def playerFactoryFromString( playerFactoryClass:String ):Option[PlayerFactory] = playerFactoryClass match {
+  def playerFactoryFromString( playerFactoryClass:String ):Option[PlayerFactory] = playerFactoryClass match
     case "ClassicPlayerImpl" => Some( ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
     case _ => None
-  }
 
-  def init():Unit = {
+  def init():Unit =
     ClassicGameImpl.init()
     ClassicGameFieldImpl.init()
     ClassicPlayerImpl.init()
@@ -81,10 +80,8 @@ object CatanModule {
 
     XMLFileIO.init()
     JsonFileIO.init()
-  }
-}
 
-class CatanModule( val test:Boolean = false ) extends AbstractModule with ScalaModule {
+class CatanModule( val test:Boolean = false ) extends AbstractModule:
 
   val availablePlacements:List[Placement] = List(
     RobberPlacement,
@@ -93,20 +90,18 @@ class CatanModule( val test:Boolean = false ) extends AbstractModule with ScalaM
     CityPlacement,
   )
 
-  override def configure( ):Unit = {
-    bind[Controller].to[ClassicControllerImpl]
-    bind[FileIO].toInstance( JsonFileIO )
-    bind[Game].to[ClassicGameImpl]
-    bind[Turn].to[ClassicTurnImpl]
+  override def configure( ):Unit =
+    bind( classOf[Controller] ).to( classOf[ClassicControllerImpl] )
+    bind( classOf[FileIO] ).toInstance( JsonFileIO )
+    bind( classOf[Game] ).to( classOf[ClassicGameImpl] )
+    bind( classOf[Turn] ).to( classOf[ClassicTurnImpl] )
     val seed = if( test ) 1 else Random.nextInt( Int.MaxValue / 1000 )
-    bind[Int].annotatedWith( Names.named( "seed" ) ).toInstance( seed )
-    bind[GameField].toInstance( ClassicGameFieldImpl( seed ) )
+    bind( classOf[Int] ).annotatedWith( Names.named( "seed" ) ).toInstance( seed )
+    bind( classOf[GameField] ).toInstance( ClassicGameFieldImpl( seed ) )
     val playerClass = classOf[ClassicPlayerImpl]
-    bind[String].annotatedWith( Names.named( "playerFactoryClass" ) ).toInstance( playerClass.getSimpleName )
+    bind( classOf[String] ).annotatedWith( Names.named( "playerFactoryClass" ) ).toInstance( playerClass.getSimpleName )
     install( new FactoryModuleBuilder()
         .implement( classOf[Player], playerClass )
         .build( classOf[PlayerFactory] )
     )
-    bind[List[Placement]].annotatedWith( Names.named( "availablePlacements" ) ).toInstance( availablePlacements )
-  }
-}
+    bind( classOf[Any] ).annotatedWith( Names.named( "availablePlacements" ) ).toInstance( availablePlacements )

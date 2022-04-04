@@ -3,6 +3,7 @@ package de.htwg.se.catan.model.impl.player
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
 import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.resourceCardsReads
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLSequence }
@@ -12,7 +13,7 @@ import play.api.libs.json.{ JsValue, Json }
 import scala.util.{ Failure, Random, Success, Try }
 import scala.xml.Node
 
-object ClassicPlayerImpl extends PlayerImpl( "ClassicPlayerImpl" ) {
+object ClassicPlayerImpl extends PlayerImpl( "ClassicPlayerImpl" ):
   def fromXML( node:Node ):ClassicPlayerImpl = ClassicPlayerImpl(
     idVal = PlayerID.fromXML( node.childOf( "id" ) ),
     colorVal = PlayerColor.of( ( node \ "@color" ).content ).get,
@@ -34,7 +35,7 @@ object ClassicPlayerImpl extends PlayerImpl( "ClassicPlayerImpl" ) {
     victoryPointsVal = ( json \ "victoryPoints" ).as[Int],
     structures = ( json \ "structures" ).asMap[StructurePlacement, Int]
   )
-}
+
 
 case class ClassicPlayerImpl( idVal:PlayerID,
                               colorVal:PlayerColor,
@@ -44,7 +45,7 @@ case class ClassicPlayerImpl( idVal:PlayerID,
                               usedDevCards:Vector[DevelopmentCard] = Vector.empty,
                               victoryPointsVal:Int = 0,
                               structures:Map[StructurePlacement, Int] = StructurePlacement.impls.map( p => (p, p.available) ).toMap
-                            ) extends Player {
+                            ) extends Player:
 
   @Inject
   def this( @Assisted id:PlayerID, @Assisted color:PlayerColor, @Assisted name:String ) = this(
@@ -87,15 +88,13 @@ case class ClassicPlayerImpl( idVal:PlayerID,
   def resourceAmount:Int = resourcesVal.amount
   def resourceAmount( resource:Resource ):Int = resourcesVal.getOrElse( resource, 0 )
 
-  def removeResourceCard( resource:Resource, amount:Int = 1 ):Try[ClassicPlayerImpl] = resourcesVal.subtract( resource, amount ) match {
+  def removeResourceCard( resource:Resource, amount:Int = 1 ):Try[ClassicPlayerImpl] = resourcesVal.subtract( resource, amount ) match
     case Success( newResources ) => Success( copy( resourcesVal = newResources ) )
     case Failure( e ) => Failure( e )
-  }
 
-  def removeResourceCards( cards:ResourceCards ):Try[ClassicPlayerImpl] = resourcesVal.subtract( cards ) match {
+  def removeResourceCards( cards:ResourceCards ):Try[ClassicPlayerImpl] = resourcesVal.subtract( cards ) match
     case Success( newResources ) => Success( copy( resourcesVal = newResources ) )
     case Failure( e ) => Failure( e )
-  }
 
   def addResourceCard( resource:Resource, amount:Int = 1 ):ClassicPlayerImpl = copy( resourcesVal = resourcesVal.add( resource, amount ) )
 
@@ -103,7 +102,7 @@ case class ClassicPlayerImpl( idVal:PlayerID,
 
   def trade( get:ResourceCards, give:ResourceCards ):Try[ClassicPlayerImpl] = addResourceCards( get ).removeResourceCards( give )
 
-  def addDevCard( card:DevelopmentCard, removeFromUsed:Boolean = false ):ClassicPlayerImpl = if( removeFromUsed )
+  def addDevCard( card:DevelopmentCard, removeFromUsed:Boolean = false ):ClassicPlayerImpl = if removeFromUsed then
     copy( devCardsVal = devCardsVal :+ card, usedDevCards = usedDevCards.removed( card ).toVector )
   else copy( devCardsVal = devCardsVal :+ card )
 
@@ -115,35 +114,29 @@ case class ClassicPlayerImpl( idVal:PlayerID,
 
   def hasStructure( structure:StructurePlacement ):Boolean = structures.getOrElse( structure, 0 ) > 0
 
-  def getStructure( structure:StructurePlacement ):Try[ClassicPlayerImpl] = {
+  def getStructure( structure:StructurePlacement ):Try[ClassicPlayerImpl] =
     val available = structures.getOrElse( structure, 0 )
-    if( available > 0 ) {
-      val newStructures = if( structure.replaces.isDefined )
+    if available > 0 then
+      val newStructures = if structure.replaces.isDefined then
         structures.updated( structure.replaces.get, structures( structure.replaces.get ) + 1 )
       else structures
       Success( copy( structures = newStructures.updated( structure, available - 1 ) ) )
-    } else
+    else
       Failure( InsufficientStructures( structure ) )
-  }
 
-  def addStructure( structure:StructurePlacement ):ClassicPlayerImpl = {
-    val newStructures = if( structure.replaces.isDefined )
+  def addStructure( structure:StructurePlacement ):ClassicPlayerImpl =
+    val newStructures = if structure.replaces.isDefined then
       structures.updated( structure.replaces.get, structures.getOrElse( structure.replaces.get, 0 ) - 1 )
     else structures
-    copy(
-      structures = newStructures.updated( structure, newStructures.getOrElse( structure, 0 ) + 1 )
-    )
-  }
+    copy( structures = newStructures.updated( structure, newStructures.getOrElse( structure, 0 ) + 1 ) )
 
   def randomHandResource( ):Option[Resource] = Random.element( resources.flatMap( d => ( 0 until d._2 ).map( _ => d._1 ) ).toSeq )
 
-  def useDevCard( devCard:DevelopmentCard ):Try[ClassicPlayerImpl] = {
+  def useDevCard( devCard:DevelopmentCard ):Try[ClassicPlayerImpl] =
     val index = devCardsVal.indexOf( devCard )
-    if( index >= 0 )
+    if index >= 0 then
       Success( copy(
         devCardsVal = devCardsVal.removeAt( index ),
         usedDevCards = usedDevCards :+ devCard
       ) )
     else Failure( InsufficientDevCards( devCard ) )
-  }
-}

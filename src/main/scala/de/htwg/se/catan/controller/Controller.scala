@@ -8,7 +8,7 @@ import de.htwg.se.catan.util.Observable
  * @author Vincent76;
  */
 
-trait Controller extends Observable {
+trait Controller extends Observable:
 
   def game:Game
 
@@ -54,4 +54,3 @@ trait Controller extends Observable {
   def devBuildRoad( eID:Int ):Unit = action( game.state.devBuildRoad( eID ) )
   def monopolyAction( r:Resource ):Unit = action( game.state.monopolyAction( r ) )
   def endTurn():Unit = action( game.state.endTurn() )
-}

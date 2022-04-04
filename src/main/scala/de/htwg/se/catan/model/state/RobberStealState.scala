@@ -12,7 +12,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object RobberStealState extends StateImpl( "RobberStealState" ) {
+object RobberStealState extends StateImpl( "RobberStealState" ):
   def fromXML( node:Node ):RobberStealState = RobberStealState(
     adjacentPlayers = node.childOf( "adjacentPlayers" ).asList( n => PlayerID.fromXML( n ) ),
     nextState = State.fromXML( node.childOf( "nextState" ) )
@@ -22,10 +22,10 @@ object RobberStealState extends StateImpl( "RobberStealState" ) {
     adjacentPlayers = ( json \ "adjacentPlayers" ).asList[PlayerID],
     nextState = ( json \ "nextState" ).as[State]
   )
-}
+
 
 case class RobberStealState( adjacentPlayers:List[PlayerID],
-                             nextState:State ) extends State {
+                             nextState:State ) extends State:
 
   def toXML:Node = <RobberStealState>
     <adjacentPlayers>{ adjacentPlayers.toXML( _.toXML ) }</adjacentPlayers>
@@ -44,4 +44,3 @@ case class RobberStealState( adjacentPlayers:List[PlayerID],
 
   /*override def toString:String = getClass.getSimpleName + ": adjacentPlayers[" + adjacentPlayers.mkString( ", " ) +
     "], NextState[" + nextState + "]"*/
-}

@@ -15,7 +15,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class InitPlayerGUIState( controller:Controller ) extends GUIState {
+case class InitPlayerGUIState( controller:Controller ) extends GUIState:
   override def getDisplayState:DisplayState = new InitDisplayState {
     override def getDisplayPane:Pane = new VBox {
       spacing = 10
@@ -31,7 +31,7 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
         styleClass.add( "button" )
       }
       onKeyPressed = ( e:KeyEvent ) => {
-        if( e.getCode == KeyCode.ENTER )
+        if e.getCode == KeyCode.ENTER then
           controller.addPlayer( PlayerColor.of( comboBox.getValue ).get, textField.getText() )
       }
       children = List(
@@ -63,4 +63,3 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
       )
     }
   }
-}

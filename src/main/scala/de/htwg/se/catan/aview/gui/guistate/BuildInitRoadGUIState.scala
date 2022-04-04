@@ -8,7 +8,7 @@ import de.htwg.se.catan.model.state.BuildInitRoadState
 /**
  * @author Vincent76;
  */
-case class BuildInitRoadGUIState( state:BuildInitRoadState, controller:Controller ) extends GUIState {
+case class BuildInitRoadGUIState( state:BuildInitRoadState, controller:Controller ) extends GUIState:
 
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( controller.game.getBuildableRoadSpotsForSettlement( state.settlementVID ) ) {
@@ -16,4 +16,3 @@ case class BuildInitRoadGUIState( state:BuildInitRoadState, controller:Controlle
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, false )
-}

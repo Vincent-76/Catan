@@ -12,7 +12,7 @@ import scalafx.scene.layout.{ BorderPane, Priority, VBox }
 /**
  * @author Vincent76;
  */
-case class RobberStealGUIState( state:RobberStealState, controller:Controller ) extends GUIState {
+case class RobberStealGUIState( state:RobberStealState, controller:Controller ) extends GUIState:
   override def getActions:List[GUICommand] = List( _ => new BorderPane {
     vgrow = Priority.Always
     top = new ActionHeader( "Select a player to steal from" )
@@ -26,4 +26,3 @@ case class RobberStealGUIState( state:RobberStealState, controller:Controller ) 
   } )
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
-}

@@ -17,7 +17,7 @@ import play.api.libs.json.{ Json, Reads, Writes }
 
 class JsonSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( CatanModule( test = true ) )
   "(de)serialized" when {
     "Model" should {
       "Port" in {
@@ -30,7 +30,7 @@ class JsonSpec extends AnyWordSpec with Matchers {
         DesertArea().asInstanceOf[LandArea].check()
       }
       "ResourceArea" in {
-        ResourceArea( Wood, Six ).asInstanceOf[Area].check()
+        ResourceArea( Wood, DiceValue.Six ).asInstanceOf[Area].check()
       }
       "ResourceCards" in {
         val r = ResourceCards.of( wood = 1 )
@@ -44,7 +44,7 @@ class JsonSpec extends AnyWordSpec with Matchers {
         LongestRoadCard.asInstanceOf[BonusCard].check()
       }
       "DiceValue" in {
-        Two.asInstanceOf[DiceValue].check()
+        DiceValue.Two.asInstanceOf[DiceValue].check()
       }
       "ClassicGameImpl" in {
         val game = new ClassicGameImpl( injector.getInstance( classOf[GameField] ), injector.getInstance( classOf[Turn] ), 1, injector.getInstance( classOf[PlayerFactory] ), "ClassicPlayerImpl" )
@@ -74,7 +74,7 @@ class JsonSpec extends AnyWordSpec with Matchers {
         val hexList = List(
           Hex( 0, 0, 0, DesertArea() ),
           Hex( 1, 0, 1, WaterArea() ),
-          Hex( 2, 0, 2, ResourceArea( Wood, Three ) )
+          Hex( 2, 0, 2, ResourceArea( Wood, DiceValue.Three ) )
         )
         val vertex = Vertex(
           0,

@@ -11,7 +11,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object DevRoadBuildingState extends StateImpl( "DevRoadBuildingState" ) {
+object DevRoadBuildingState extends StateImpl( "DevRoadBuildingState" ):
   def fromXML( node:Node ):DevRoadBuildingState = DevRoadBuildingState(
     nextState = State.fromXML( node.childOf( "nextState" ) ),
     roads = ( node \ "@roads" ).content.toInt
@@ -21,9 +21,9 @@ object DevRoadBuildingState extends StateImpl( "DevRoadBuildingState" ) {
     nextState = ( json \ "nextState" ).as[State],
     roads = ( json \ "roads" ).as[Int]
   )
-}
 
-case class DevRoadBuildingState( nextState:State, roads:Int = 0 ) extends State {
+
+case class DevRoadBuildingState( nextState:State, roads:Int = 0 ) extends State:
 
   def toXML:Node = <DevRoadBuildingState roads={ roads.toString }>
     <nextState>{ nextState.toXML }</nextState>
@@ -40,4 +40,4 @@ case class DevRoadBuildingState( nextState:State, roads:Int = 0 ) extends State 
   )
 
   //override def toString:String = getClass.getSimpleName + ": NextState[" + nextState + "], Roads[" + roads + "]"
-}
+

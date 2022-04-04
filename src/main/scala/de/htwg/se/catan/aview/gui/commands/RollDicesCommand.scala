@@ -5,6 +5,5 @@ import de.htwg.se.catan.aview.gui.GUI
 /**
  * @author Vincent76;
  */
-case object RollDicesCommand extends SimpleGUICommand( "Roll the Dices" ) {
+case object RollDicesCommand extends SimpleGUICommand( "Roll the Dices" ):
   override def action( gui:GUI ):Unit = gui.controller.rollTheDices()
-}

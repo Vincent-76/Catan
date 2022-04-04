@@ -7,7 +7,7 @@ import scalafx.scene.layout.{ AnchorPane, Pane, Priority, VBox }
 /**
  * @author Vincent76;
  */
-class ActionPane( gui:GUI ) extends VBox {
+class ActionPane( gui:GUI ) extends VBox:
   background = GUIApp.stoneBackground
   hgrow = Priority.Always
   vgrow = Priority.Always
@@ -15,7 +15,7 @@ class ActionPane( gui:GUI ) extends VBox {
   fillWidth = true
   spacing = 10
 
-  def update( commands:List[GUICommand] ):Unit = {
+  def update( commands:List[GUICommand] ):Unit =
     children = commands.map( s => new AnchorPane {
       maxWidth = ActionPane.this.width.value - 20
       hgrow = Priority.Always
@@ -24,6 +24,3 @@ class ActionPane( gui:GUI ) extends VBox {
       children.add( node )
       AnchorPane.setAnchors( node, 0, 0, 0, 0 )
     } )
-
-  }
-}

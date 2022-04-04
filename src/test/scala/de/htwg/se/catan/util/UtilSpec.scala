@@ -133,7 +133,7 @@ class UtilSpec extends AnyWordSpec with Matchers {
       "rethrow" in {
         tr.rethrow[String].isInstanceOf[Try[String]] shouldBe true
         intercept[NullPointerException] {
-          Success( 5 ).rethrow
+          Success( 5 ).rethrow[Int]
         }
       }
       "failureOption" in {

@@ -15,7 +15,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 import scalafx.scene.text.Text
 
-case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDisplay {
+case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDisplay:
 
   def build( gui:GUI, game:Game, full:Boolean ):List[Node] = List(
     new HBox {
@@ -47,7 +47,7 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
         }
       )
     },
-  ) ++ (if( full )
+  ) ++ (if full then
     List(
       new FlowGridPane( 3 ) {
         padding = Insets( 10, 10, 10, 10 )
@@ -96,4 +96,3 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
       }
     )
   else Nil)
-}

@@ -9,7 +9,7 @@ import scalafx.scene.layout.VBox
 /**
  * @author Vincent76;
  */
-case object BuyDevCardCommand extends SimpleGUICommand( "Buy Development Card" ) {
+case object BuyDevCardCommand extends SimpleGUICommand( "Buy Development Card" ):
 
   override protected def action( gui:GUI ):Unit =
     new CustomDialog( gui, "Buy a Development Card", ButtonType.Cancel ) {
@@ -22,4 +22,3 @@ case object BuyDevCardCommand extends SimpleGUICommand( "Buy Development Card" )
         }
       }
     }.show()
-}

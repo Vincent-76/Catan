@@ -1,38 +1,36 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.util.RichString
+import de.htwg.se.catan.util.^=
 import play.api.libs.json._
 
 /**
  * @author Vincent76;
  */
 
-object FieldType extends ObjectComponent[FieldType] {
-  implicit val fieldTypeWrites:Writes[FieldType] = ( o:FieldType ) => Json.toJson( o.title )
-  implicit val fieldTypeReads:Reads[FieldType] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+object FieldType extends ObjectComponent[FieldType]:
+  given fieldTypeWrites:Writes[FieldType] = ( o:FieldType ) => Json.toJson( o.title )
+  given fieldTypeReads:Reads[FieldType] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   Water.init()
   Desert.init()
 
   def of( s:String ):Option[FieldType] = impls.find( _.title ^= s )
-}
 
-abstract class FieldType( val title:String ) extends ComponentImpl {
+
+abstract class FieldType( val title:String ) extends ComponentImpl:
   override def init():Unit = FieldType.addImpl( this )
 
   override def toString:String = title
-}
+
 
 case object Water extends FieldType( "Water" )
 
 case object Desert extends FieldType( "Desert" )
 
 
-object Resource extends ObjectComponent[Resource] {
-  implicit val resourceWrites:Writes[Resource] =
-    ( o:Resource ) => Json.toJson( o.title )
-  implicit val resourceReads:Reads[Resource] =
-    ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+object Resource extends ObjectComponent[Resource]:
+  given resourceWrites:Writes[Resource] = ( o:Resource ) => Json.toJson( o.title )
+  given resourceReads:Reads[Resource] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   Wood.init()
   Clay.init()
@@ -42,14 +40,13 @@ object Resource extends ObjectComponent[Resource] {
 
   def of( s:String ):Option[Resource] =
     impls.find( _.title ^= s )
-}
 
-abstract class Resource( val index:Int, title:String ) extends FieldType( title ) {
-  override def init():Unit = {
+
+abstract class Resource( val index:Int, title:String ) extends FieldType( title ):
+  override def init():Unit =
     super.init()
     Resource.addImpl( this )
-  }
-}
+    
 
 case object Wood extends Resource( 0, "Wood" )
 

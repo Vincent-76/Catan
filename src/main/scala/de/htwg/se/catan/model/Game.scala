@@ -12,20 +12,20 @@ import scala.util.{ Random, Try }
  * @author Vincent76;
  */
 
-object PlayerOrdering extends Ordering[PlayerID] {
+object PlayerOrdering extends Ordering[PlayerID]:
   override def compare( x:PlayerID, y:PlayerID ):Int = x.id.compareTo( y.id )
-}
 
-abstract class GameImpl( name:String ) extends DeserializerComponentImpl[Game]( name ) {
+
+abstract class GameImpl( name:String ) extends DeserializerComponentImpl[Game]( name ):
   override def init():Unit = Game.addImpl( this )
-}
 
-object Game extends ClassComponent[Game, GameImpl] {
-  implicit val turnWrites:Writes[Game] = ( o:Game ) => o.toJson
-  implicit val turnReads:Reads[Game] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
-}
 
-trait Game extends XMLSerializable with JsonSerializable {
+object Game extends ClassComponent[Game, GameImpl]:
+  given gameWrites:Writes[Game] = ( o:Game ) => o.toJson
+  given gameReads:Reads[Game] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+
+
+trait Game extends XMLSerializable with JsonSerializable:
 
   def minPlayers:Int
   def maxPlayers:Int
@@ -117,23 +117,20 @@ trait Game extends XMLSerializable with JsonSerializable {
   def playerHasAdjacentEdge( pID:PlayerID, edges:List[Edge] ):Boolean = edges.containsWhere( e => e.road.isDefined && e.road.get.owner == pID )
   def playerHasAdjacentVertex( pID:PlayerID, vertices:List[Vertex] ):Boolean = vertices.containsWhere( v => v.building.isDefined && v.building.get.owner == pID )
 
-  def checkHandCardsInOrder( p:Player = player, dropped:List[PlayerID] = List.empty ):Option[Player] = {
-    if( !dropped.contains( p.id ) && p.resourceAmount > maxHandCards )
+  def checkHandCardsInOrder( p:Player = player, dropped:List[PlayerID] = List.empty ):Option[Player] =
+    if !dropped.contains( p.id ) && p.resourceAmount > maxHandCards then
       Some( p )
-    else nextPlayer( p ) match {
+    else nextPlayer( p ) match
       case next:Player if next.id == onTurn => None
       case next:Player => checkHandCardsInOrder( next, dropped )
-    }
-  }
 
   def getNextTradePlayerInOrder( decisions:Map[PlayerID, Boolean], pID:PlayerID = nextTurn() ):Option[PlayerID] =
     getNextTradePlayerInOrder( decisions, players( pID ) )
 
-  def getNextTradePlayerInOrder( decisions:Map[PlayerID, Boolean], p:Player ):Option[PlayerID] = {
-    if( p == player )
+  def getNextTradePlayerInOrder( decisions:Map[PlayerID, Boolean], p:Player ):Option[PlayerID] =
+    if p == player then
       None
-    else if( decisions.contains( p.id ) )
+    else if decisions.contains( p.id ) then
       getNextTradePlayerInOrder( decisions, nextPlayer( p ) )
     else Some( p.id )
-  }
-}
+  

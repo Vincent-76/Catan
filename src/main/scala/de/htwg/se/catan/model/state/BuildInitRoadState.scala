@@ -12,7 +12,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object BuildInitRoadState extends StateImpl( "BuildInitRoadState" ) {
+object BuildInitRoadState extends StateImpl( "BuildInitRoadState" ):
   def fromXML( node:Node ):BuildInitRoadState = BuildInitRoadState(
     settlementVID = ( node \ "@settlementVID" ).content.toInt
   )
@@ -20,9 +20,9 @@ object BuildInitRoadState extends StateImpl( "BuildInitRoadState" ) {
   def fromJson( json:JsValue ):BuildInitRoadState = BuildInitRoadState(
     settlementVID = ( json \ "settlementVID" ).as[Int]
   )
-}
 
-case class BuildInitRoadState( settlementVID:Int ) extends State {
+
+case class BuildInitRoadState( settlementVID:Int ) extends State:
 
   def toXML:Node = <BuildInitRoadState settlementVID={ settlementVID.toString } />.copy( label = BuildInitRoadState.name )
 
@@ -36,4 +36,3 @@ case class BuildInitRoadState( settlementVID:Int ) extends State {
   )
 
   //override def toString:String = getClass.getSimpleName + ": SettlementVID[" + settlementVID + "]"
-}

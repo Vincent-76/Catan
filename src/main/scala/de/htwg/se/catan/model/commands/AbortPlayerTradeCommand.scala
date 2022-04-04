@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object AbortPlayerTradeCommand extends CommandImpl( "AbortPlayerTradeCommand" ) {
+object AbortPlayerTradeCommand extends CommandImpl( "AbortPlayerTradeCommand" ):
   override def fromXML( node:Node ):AbortPlayerTradeCommand = AbortPlayerTradeCommand(
     state = PlayerTradeEndState.fromXML( node.childOf( "state" ) )
   )
@@ -21,9 +21,8 @@ object AbortPlayerTradeCommand extends CommandImpl( "AbortPlayerTradeCommand" ) 
   override def fromJson( json:JsValue ):AbortPlayerTradeCommand = AbortPlayerTradeCommand(
     state = PlayerTradeEndState.fromJson( ( json \ "state" ).get )
   )
-}
 
-case class AbortPlayerTradeCommand( state:PlayerTradeEndState ) extends Command {
+case class AbortPlayerTradeCommand( state:PlayerTradeEndState ) extends Command:
 
   def toXML:Node = <AbortPlayerTradeCommand>
     <state>{ state.toXML }</state>
@@ -41,4 +40,3 @@ case class AbortPlayerTradeCommand( state:PlayerTradeEndState ) extends Command 
   override def undoStep( game:Game ):Game = game.setState( state )
 
   //override def toString:String = getClass.getSimpleName + ": " + state
-}

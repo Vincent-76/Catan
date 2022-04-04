@@ -11,7 +11,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object MonopolyState extends StateImpl( "MonopolyState" ) {
+object MonopolyState extends StateImpl( "MonopolyState" ):
   def fromXML( node:Node ):MonopolyState = MonopolyState(
     nextState = State.fromXML( node.childOf( "nextState" ) )
   )
@@ -19,9 +19,9 @@ object MonopolyState extends StateImpl( "MonopolyState" ) {
   def fromJson( json:JsValue ):MonopolyState = MonopolyState(
     nextState = ( json \ "nextState" ).as[State]
   )
-}
 
-case class MonopolyState( nextState:State ) extends State {
+
+case class MonopolyState( nextState:State ) extends State:
 
   def toXML:Node = <MonopolyState>
     <nextState>{ nextState.toXML }</nextState>
@@ -37,4 +37,3 @@ case class MonopolyState( nextState:State ) extends State {
   )
 
   //override def toString:String = getClass.getSimpleName + ": nextState[" + nextState + "]"
-}

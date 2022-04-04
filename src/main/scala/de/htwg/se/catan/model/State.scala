@@ -3,7 +3,6 @@ package de.htwg.se.catan.model
 import Card.ResourceCards
 import de.htwg.se.catan.model.impl.fileio.{ JsonDeserializer, JsonParseError, JsonSerializable, XMLDeserializer, XMLParseError, XMLSerializable }
 import de.htwg.se.catan.model.state._
-import de.htwg.se.catan.util.RichString
 import play.api.libs.json.{ JsResult, JsSuccess, JsValue, Json, Reads, Writes }
 
 import scala.xml.Node
@@ -11,16 +10,16 @@ import scala.xml.Node
 /**
  * @author Vincent76;
  */
-abstract class StateImpl( name:String ) extends DeserializerComponentImpl[State]( name ) {
+abstract class StateImpl( name:String ) extends DeserializerComponentImpl[State]( name ):
   override def init():Unit = State.addImpl( this )
-}
 
-object State extends ClassComponent[State, StateImpl] {
-  implicit val stateWrites:Writes[State] = ( o:State ) => o.toJson
-  implicit val stateReads:Reads[State] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
-}
 
-trait State extends XMLSerializable with JsonSerializable {
+object State extends ClassComponent[State, StateImpl]:
+  given stateWrites:Writes[State] = ( o:State ) => o.toJson
+  given stateReads:Reads[State] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+
+
+trait State extends XMLSerializable with JsonSerializable:
 
   def initGame():Option[Command] = None
 
@@ -71,4 +70,4 @@ trait State extends XMLSerializable with JsonSerializable {
   def monopolyAction( r:Resource ):Option[Command] = None
 
   def endTurn():Option[Command] = None
-}
+

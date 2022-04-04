@@ -7,7 +7,7 @@ import de.htwg.se.catan.model.impl.placement.RobberPlacement
 /**
  * @author Vincent76;
  */
-case class RobberPlaceTUIState( controller:Controller ) extends TUIState {
+case class RobberPlaceTUIState( controller:Controller ) extends TUIState:
 
   override def createGameDisplay:Option[String] = Some(
     GameFieldDisplay.get( controller.game, Some( RobberPlacement.getBuildablePoints( controller.game, controller.onTurn ) ) ).buildGameField
@@ -20,4 +20,3 @@ case class RobberPlaceTUIState( controller:Controller ) extends TUIState {
 
   override def action( commandInput:CommandInput ):Unit =
     controller.placeRobber( commandInput.input.toInt )
-}

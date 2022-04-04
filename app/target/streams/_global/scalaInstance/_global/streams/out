@@ -1,0 +1,2 @@
+[error] Couldn't retrieve `org.scala-lang:scala3-compiler:3.1.1`.
+[error] (app / scalaInstance) Couldn't retrieve `org.scala-lang:scala3-compiler:3.1.1`.

@@ -2,6 +2,7 @@ package de.htwg.se.catan.aview.tui
 
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Info._
 import de.htwg.se.catan.model.state._
 import de.htwg.se.catan.model.{ PlacementPointNotEmpty, Player, _ }
 import de.htwg.se.catan.aview.tui.TUI.InvalidFormat
@@ -14,7 +15,7 @@ import scala.util.Try
 /**
  * @author Vincent76;
  */
-object TUI {
+object TUI:
   val reset:String = Console.RESET
 
   val textOnColor:String = Console.BLACK
@@ -41,7 +42,7 @@ object TUI {
   case class InvalidFormat( input:String ) extends ControllerError
 
 
-  def clear( ):Unit = {
+  def clear( ):Unit =
     /*val os = System.getProperty( "os.name" )
     if ( os.contains( "Windows" ) ) new ProcessBuilder( "cmd", "/c", "cls" ).inheritIO.start.waitFor
     else {
@@ -49,15 +50,13 @@ object TUI {
       Runtime.getRuntime.exec( "reset" )
     }*/
     ( 1 to 50 ).foreach( _ => println() )
-  }
 
   def out( o:Any = "" ):Unit = print( reset + o )
 
   def outln( o:Any = "" ):Unit = println( reset + o )
 
-  def error( o:Any = "" ):Unit = {
+  def error( o:Any = "" ):Unit =
     println( reset + errorColor + o )
-  }
 
   def action( s:String ):Unit = outln( "> " + s + " <" )
 
@@ -79,95 +78,83 @@ object TUI {
     false
   }*/
 
-  def colorOf( playerColor:PlayerColor ):String = playerColor match {
+  def colorOf( playerColor:PlayerColor ):String = playerColor match
     case Green => Console.GREEN
     case Red => Console.MAGENTA
     case Yellow => Console.YELLOW
     case Blue => Console.CYAN
-  }
 
-  def regexIgnoreCase( s:String ):String = {
-    if ( s.nonEmpty )
+  def regexIgnoreCase( s:String ):String =
+    if s.nonEmpty then
       return ( Seq() ++ s.toCharArray ).red( "", ( s:String, c:Char ) => s + "[" + c.toUpper + c.toLower + "]" )
     s
-  }
 
   def errorHighlight( o:Any = "" ):String = reset + o + Console.RED
 
-  def displayName( p:Player, toLength:Int = -1 ):String = {
+  def displayName( p:Player, toLength:Int = -1 ):String =
     val length = if ( toLength >= 0 ) toLength else p.idName.length
     colorOf( p.color ) + p.idName.toLength( length ) + reset
-  }
 
-  def parseResources( resourcesString:String ):ResourceCards = {
+  def parseResources( resourcesString:String ):ResourceCards =
     val parts = resourcesString.split( "\\s*,\\s*" ).toList
     parts.red( ResourceCards.of(), ( cards:ResourceCards, part:String ) => {
       val res = parseResource( part )
-      if ( res.isDefined )
+      if res.isDefined then
         cards.updated( res.get._1, res.get._2 )
       else cards
     } )
-  }
 
-  def parseResource( resourceString:String ):Option[(Resource, Int)] = {
-
+  def parseResource( resourceString:String ):Option[(Resource, Int)] =
     val data = resourceString.splitAt( "[0-9]".r.findFirstMatchIn( resourceString ).map( _.start ).getOrElse( 0 ) )
     val resource = Resource.of( data._1.removeSpaces() )
-    if ( resource.isDefined && Try( data._2.toInt ).isSuccess )
+    if resource.isDefined && Try( data._2.toInt ).isSuccess then
       Some( resource.get, data._2.toInt )
     else Option.empty
-  }
 
-}
 
-class TUI( val controller:Controller ) extends Observer {
+class TUI( val controller:Controller ) extends Observer:
 
   var actionInfo:Option[String] = None
 
   controller.add( this )
   onUpdate( None )
 
-  def onInput( input:String ):Unit = {
+  def onInput( input:String ):Unit =
     val commandInput = CommandInput( input )
     val globalCommand = findGlobalCommand( commandInput )
-    if ( globalCommand.isDefined ) {
-      if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
+    if globalCommand.isDefined then
+      if commandInput.input.matches( globalCommand.get.inputPattern ) then
         globalCommand.get.action( commandInput, controller )
       else
         onError( InvalidFormat( commandInput.input ) )
-    } else {
+    else
       val tuiState = findTUIState( controller.game.state )
       val inputPattern = tuiState.inputPattern
-      if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) )
+      if inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) then
         tuiState.action( commandInput )
       else
         onError( InvalidFormat( commandInput.input ) )
-    }
-  }
 
-  override def onUpdate( info:Option[Info] ):Unit = {
+  override def onUpdate( info:Option[Info] ):Unit =
     val tuiState = findTUIState( controller.game.state )
     TUI.clear()
     val gameDisplay = tuiState.createGameDisplay
-    if ( gameDisplay.isDefined )
+    if gameDisplay.isDefined then
       TUI.out( gameDisplay.get )
     //TUI.outln()
     actionInfo = Some( tuiState.getActionInfo )
-    if( info.isDefined ) {
+    if info.isDefined then
       TUI.outln()
       onInfo( info.get )
-    }
     TUI.outln()
     TUI.action( actionInfo.get )
-  }
 
-  def findGlobalCommand( commandInput:CommandInput ):Option[CommandAction] = {
-    if ( commandInput.command.isDefined )
+  def findGlobalCommand( commandInput:CommandInput ):Option[CommandAction] =
+    if commandInput.command.isDefined then
       return TUI.commands.find( _.command == commandInput.command.get )
     Option.empty
-  }
 
-  def findTUIState( state:State ):TUIState = state match {
+  def findTUIState( state:State ):TUIState = state match
     case s:InitState => InitTUIState( controller )
     case s:InitPlayerState => InitPlayerTUIState( controller )
     case s:InitBeginnerState => InitBeginnerTUIState( s.beginner, s.diceValues, controller )
@@ -186,13 +173,12 @@ class TUI( val controller:Controller ) extends Observer {
     case s:DevRoadBuildingState => DevRoadBuildingTUIState( controller )
     case s:MonopolyState => MonopolyTUIState( controller )
     case _ => ErrorTUIState( controller )
-  }
 
-  override def onInfo( info:Info ):Unit = {
-    info match {
-      case info:DiceInfo => TUI.outln( info.dices._1 + " + " + info.dices._2 + " = " + ( info.dices._1 + info.dices._2 ) )
+  override def onInfo( info:Info ):Unit =
+    info match
+      case DiceInfo( dices ) => TUI.outln( s"${dices._1} + ${dices._2} = ${dices._1 + dices._2}" )
       case GatherInfo( dices, playerResources ) =>
-        TUI.outln( dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) )
+        TUI.outln( s"${dices._1} + ${dices._2} = ${dices._1 + dices._2}" )
         playerResources.foreach( d => {
           TUI.outln( TUI.displayName( controller.player( d._1 ) ) + " " + d._2.toString( "+" ) )
         } )
@@ -218,11 +204,9 @@ class TUI( val controller:Controller ) extends Observer {
       case GameSavedInfo( path ) => TUI.outln( "Game was saved to: " + path )
       case GameLoadedInfo( path ) => TUI.outln( "Game was loaded from: " + path )
       case _ =>
-    }
-  }
 
-  override def onError( t:Throwable ):Unit = {
-    TUI.error( t match {
+  override def onError( t:Throwable ):Unit =
+    TUI.error( t match
       case e:InvalidFormat => "Invalid format: [" + TUI.errorHighlight( e.input ) + "]!"
       case WrongState => "Unable in this state!"
       case InsufficientResources => "Insufficient resources for this action!"
@@ -264,8 +248,6 @@ class TUI( val controller:Controller ) extends Observer {
       case NothingToUndo => "Nothing to undo!"
       case NothingToRedo => "Nothing to redo!"
       case e:ControllerError => e
-      case t:Throwable => t + ": " + t.getMessage
-    } )
-    if ( actionInfo.isDefined ) TUI.action( actionInfo.get )
-  }
-}
+      case t:Throwable => s"$t: ${t.getMessage}"
+    )
+    if actionInfo.isDefined then TUI.action( actionInfo.get )

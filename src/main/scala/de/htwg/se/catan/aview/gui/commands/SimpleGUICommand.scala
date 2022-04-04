@@ -10,7 +10,7 @@ import scalafx.scene.text.TextAlignment
 /**
  * @author Vincent76;
  */
-abstract class SimpleGUICommand( val text:String ) extends GUICommand {
+abstract class SimpleGUICommand( val text:String ) extends GUICommand:
   protected def action( gui:GUI ):Unit
 
   override def getNode( gui:GUI ):Node = new Button( text ) {
@@ -21,4 +21,3 @@ abstract class SimpleGUICommand( val text:String ) extends GUICommand {
     vgrow = Priority.Always
     wrapText = true
   }
-}

@@ -14,27 +14,25 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object PlaceRobberCommand extends CommandImpl( "PlaceRobberCommand" ) {
-  override def fromXML( node:Node ):PlaceRobberCommand = {
+object PlaceRobberCommand extends CommandImpl( "PlaceRobberCommand" ):
+  override def fromXML( node:Node ):PlaceRobberCommand =
     val cmd = PlaceRobberCommand(
       hID = ( node \ "@hID" ).content.toInt,
       state = RobberPlaceState.fromXML( node.childOf( "state" ) )
     )
     cmd.robbedResource = node.childOf( "robbedResource" ).asOption( n => Resource.of( n.content ).get )
     cmd
-  }
 
-  override def fromJson( json:JsValue ):PlaceRobberCommand = {
+  override def fromJson( json:JsValue ):PlaceRobberCommand =
     val cmd = PlaceRobberCommand(
       hID = ( json \ "hID" ).as[Int],
       state = RobberPlaceState.fromJson( ( json \ "state" ).get )
     )
     cmd.robbedResource = ( json \ "robbedResource" ).asOption[Resource]
     cmd
-  }
-}
+    
 
-case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberCommand {
+case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberCommand:
 
   def toXML:Node = <PlaceRobberCommand hID={ hID.toString }>
     <state>{ state.toXML }</state>
@@ -50,18 +48,18 @@ case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberC
 
   private var actualRobber:Option[Hex] = None
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
+  override def doStep( game:Game ):Try[CommandSuccess] =
     val hex = game.gameField.findHex( hID )
-    if( hex.isEmpty )
+    if hex.isEmpty then
       Failure( NonExistentPlacementPoint( hID ) )
-    else if( hex.get == game.gameField.robberHex )
+    else if hex.get == game.gameField.robberHex then
       Failure( PlacementPointNotEmpty( hID ) )
-    else if( !hex.get.isLand )
+    else if !hex.get.isLand then
       Failure( RobberOnlyOnLand )
-    else {
+    else
       actualRobber = Some( game.gameField.robberHex )
       val newGameField = game.gameField.setRobberHex( hex.get )
-      newGameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match {
+      newGameField.adjacentPlayers( hex.get ).filter( _ != game.onTurn ) match
         case Nil => success(
           game.setState( state.nextState )
             .setGameField( newGameField )
@@ -71,14 +69,11 @@ case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberC
           game.setState( RobberStealState( adjacentPlayers, state.nextState ) )
             .setGameField( newGameField )
         )
-      }
-    }
-  }
 
-  override def undoStep( game:Game ):Game = {
+  override def undoStep( game:Game ):Game =
     val h = game.gameField.findHex( hID ).get
     val newGameField = if( actualRobber.isDefined ) game.gameField.setRobberHex( actualRobber.get ) else game.gameField
-    game.gameField.adjacentPlayers( h ).filter( _ != game.onTurn ) match {
+    game.gameField.adjacentPlayers( h ).filter( _ != game.onTurn ) match
       case List( stealPlayerID ) if robbedResource.isDefined =>
         game.setState( state )
           .setGameField( newGameField )
@@ -88,9 +83,6 @@ case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberC
           )
       case _ => game.setState( state )
         .setGameField( newGameField )
-    }
-  }
 
   /*override def toString:String = getClass.getSimpleName + ": hID[" + hID + "], actualRobber[" + actualRobber.useOrElse( _.id, -1 ) +
     "], robbedResources[" + robbedResource.useOrElse( r => r, "-" ) + "], " + state*/
-}

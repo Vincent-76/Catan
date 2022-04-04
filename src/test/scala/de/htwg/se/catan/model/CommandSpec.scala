@@ -67,7 +67,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val game3 = game.copy( playersVal = TreeMap( ( 0 until game.maxPlayers - 1 ).map( i => {
           val pID = new PlayerID( i )
           (pID, ClassicPlayerImpl( pID, Blue, i.toString ))
-        } ).toArray:_* )( PlayerOrdering ) )
+        } ):_* )( PlayerOrdering ) )
         val res = command.doStep( game3 )
         res shouldBe a [Success[_]]
         res.get._2 shouldBe None
@@ -1119,7 +1119,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
       val pID = new PlayerID( 0 )
       val pID1 = new PlayerID( 1 )
       val game = newGame.copy(
-        playersVal = newGame.playersVal + ( pID -> ClassicPlayerImpl( pID, Green, "A" ), pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ) ),
+        playersVal = newGame.playersVal ++ Map( pID -> ClassicPlayerImpl( pID, Green, "A" ), pID1 -> ClassicPlayerImpl( pID1, Blue, "B" ) ),
         turnVal = ClassicTurnImpl( pID )
       )
       "fail because a dev card has already used in this turn" in {

@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object SetInitBeginnerStateCommand extends CommandImpl( "SetInitBeginnerStateCommand" ) {
+object SetInitBeginnerStateCommand extends CommandImpl( "SetInitBeginnerStateCommand" ):
   override def fromXML( node:Node ):SetInitBeginnerStateCommand = SetInitBeginnerStateCommand(
     state = State.fromXML( node.childOf( "state" ) )
   )
@@ -21,9 +21,9 @@ object SetInitBeginnerStateCommand extends CommandImpl( "SetInitBeginnerStateCom
   override def fromJson( json:JsValue ):SetInitBeginnerStateCommand = SetInitBeginnerStateCommand(
     state = ( json \ "state" ).as[State]
   )
-}
 
-case class SetInitBeginnerStateCommand( state:State ) extends Command {
+
+case class SetInitBeginnerStateCommand( state:State ) extends Command:
 
   def toXML:Node = <SetInitBeginnerStateCommand>
     <state>{ state.toXML }</state>
@@ -34,12 +34,10 @@ case class SetInitBeginnerStateCommand( state:State ) extends Command {
     "state" -> state.toJson
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
-    if( game.players.size >= game.minPlayers )
+  override def doStep( game:Game ):Try[CommandSuccess] =
+    if game.players.size >= game.minPlayers then
       success( game.setState( InitBeginnerState() ) )
     else
       Failure( NotEnoughPlayers )
-  }
 
   override def undoStep( game:Game ):Game = game.setState( state )
-}

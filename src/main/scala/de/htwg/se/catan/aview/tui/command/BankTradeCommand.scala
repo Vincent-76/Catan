@@ -8,18 +8,15 @@ import de.htwg.se.catan.aview.tui.{ CommandAction, CommandInput, TUI }
  * @author Vincent76;
  */
 case object BankTradeCommand
-  extends CommandAction( "btrade", List( "giveResource", "getResource" ), "Trade resources with the bank." ) {
+  extends CommandAction( "btrade", List( "giveResource", "getResource" ), "Trade resources with the bank." ):
 
-  override def action( commandInput:CommandInput, controller:Controller ):Unit = {
+  override def action( commandInput:CommandInput, controller:Controller ):Unit =
     val parts = commandInput.input.split( "\\s+", 2 )( 1 ).split( "\\s*-\\s*" )
     controller.bankTrade( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) )
-  }
 
-  override protected def getInputPattern:String = {
+  override protected def getInputPattern:String =
     TUI.regexIgnoreCase( command ) + "\\s+" + TUI.resourcePattern + "-" + TUI.resourcePattern
-  }
 
   override def getSyntax:String = "[" + command + " " +
     parameter.map( p => "<" + p + ">" ).mkString( " - " ) +
     "] with resource: [<" + Resource.impls.map( _.title ).mkString( "|" ) + "> <amount>]"
-}

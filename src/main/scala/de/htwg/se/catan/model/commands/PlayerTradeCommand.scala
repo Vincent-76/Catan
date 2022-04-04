@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object PlayerTradeCommand extends CommandImpl( "PlayerTradeCommand" ) {
+object PlayerTradeCommand extends CommandImpl( "PlayerTradeCommand" ):
   override def fromXML( node:Node ):PlayerTradeCommand = PlayerTradeCommand(
     tradePlayerID = PlayerID.fromXML( node.childOf( "tradePlayerID" ) ),
     state = PlayerTradeEndState.fromXML( node.childOf( "state" ) )
@@ -23,9 +23,9 @@ object PlayerTradeCommand extends CommandImpl( "PlayerTradeCommand" ) {
     tradePlayerID = ( json \ "tradePlayerID" ).as[PlayerID],
     state = PlayerTradeEndState.fromJson( ( json \ "state" ).get )
   )
-}
 
-case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState ) extends Command {
+
+case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState ) extends Command:
 
   def toXML:Node = <PlayerTradeCommand>
     <tradePlayerID>{ tradePlayerID.toXML }</tradePlayerID>
@@ -38,30 +38,25 @@ case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState
     "state" -> state.toJson
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
-    if( !state.decisions.getOrElse( tradePlayerID, false ) )
+  override def doStep( game:Game ):Try[CommandSuccess] =
+    if !state.decisions.getOrElse( tradePlayerID, false ) then
       Failure( InvalidPlayer( tradePlayerID ) )
-    else game.player.trade( state.get, state.give ) match {
+    else game.player.trade( state.get, state.give ) match
       case Failure( _ ) => Failure( InsufficientResources )
-      case Success( newPlayer ) => game.player( tradePlayerID ).trade( state.give, state.get ) match {
+      case Success( newPlayer ) => game.player( tradePlayerID ).trade( state.give, state.get ) match
         case Failure( _ ) => Failure( TradePlayerInsufficientResources )
         case Success( tradePlayer ) => success(
           game.setState( ActionState() )
             .updatePlayers( newPlayer, tradePlayer ),
-          info = Some( ResourceChangeInfo(
+          info = Some( Info.ResourceChangeInfo(
             playerAdd = Map( newPlayer.id -> state.get, tradePlayer.id -> state.give ),
             playerSub = Map( newPlayer.id -> state.give, tradePlayer.id -> state.get )
           ) ) )
-      }
-    }
-  }
 
-  override def undoStep( game:Game ):Game = {
+  override def undoStep( game:Game ):Game =
     val newPlayer = game.player.trade( state.give, state.get ).get
     val tradePlayer = game.player( tradePlayerID ).trade( state.get, state.give ).get
     game.setState( state )
       .updatePlayers( newPlayer, tradePlayer )
-  }
 
   //override def toString:String = getClass.getSimpleName + ": tradePlayerID[" + tradePlayerID + "], " + state
-}

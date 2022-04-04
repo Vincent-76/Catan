@@ -6,7 +6,7 @@ import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, Rob
 import de.htwg.se.catan.model.{ Game, Placement }
 import scalafx.scene.canvas.GraphicsContext
 
-object PlacementOverlay {
+object PlacementOverlay:
   def get( availablePlacements:List[Placement] ):List[PlacementOverlay] = availablePlacements.map {
     case RobberPlacement => RobberPlacementOverlayImpl
     case RoadPlacement => RoadPlacementOverlayImpl
@@ -14,8 +14,6 @@ object PlacementOverlay {
     case CityPlacement => CityPlacementOverlayImpl
     case c => throw new NotImplementedError( "PlacementOverlay[" + c.getClass.getName + "]" )
   }
-}
 
-trait PlacementOverlay {
+trait PlacementOverlay:
   def draw( game:Game, context:GraphicsContext, coords:Coords, hSize:Double ):Unit
-}

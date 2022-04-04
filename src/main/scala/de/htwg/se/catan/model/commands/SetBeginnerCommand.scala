@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object SetBeginnerCommand extends CommandImpl( "SetBeginnerCommand" ) {
+object SetBeginnerCommand extends CommandImpl( "SetBeginnerCommand" ):
   override def fromXML( node:Node ):SetBeginnerCommand = SetBeginnerCommand(
     state = InitBeginnerState.fromXML( node.childOf( "state" ) )
   )
@@ -21,9 +21,9 @@ object SetBeginnerCommand extends CommandImpl( "SetBeginnerCommand" ) {
   override def fromJson( json:JsValue ):SetBeginnerCommand = SetBeginnerCommand(
     state = InitBeginnerState.fromJson( ( json \ "state" ).get )
   )
-}
 
-case class SetBeginnerCommand( state:InitBeginnerState ) extends Command {
+
+case class SetBeginnerCommand( state:InitBeginnerState ) extends Command:
 
   def toXML:Node = <SetBeginnerCommand>
     <state>{ state.toXML }</state>
@@ -36,19 +36,16 @@ case class SetBeginnerCommand( state:InitBeginnerState ) extends Command {
 
   var oldTurn:Option[Turn] = None
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
-    if( state.beginner.isEmpty )
+  override def doStep( game:Game ):Try[CommandSuccess] =
+    if state.beginner.isEmpty then
       Failure( NoUniqueBeginner )
-    else {
+    else
       oldTurn = Some( game.turn )
       success( game.setState( BuildInitSettlementState() )
         .setTurn( game.turn.set( state.beginner.get ) )
       )
-    }
-  }
 
   override def undoStep( game:Game ):Game = game.setState( state )
     .setTurn( oldTurn.getOrElse( game.turn ) )
 
   //override def toString:String = getClass.getSimpleName + ": " + state
-}

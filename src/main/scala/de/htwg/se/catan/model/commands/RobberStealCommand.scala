@@ -14,27 +14,25 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object RobberStealCommand extends CommandImpl( "RobberStealCommand" ) {
-  override def fromXML( node:Node ):RobberStealCommand = {
+object RobberStealCommand extends CommandImpl( "RobberStealCommand" ):
+  override def fromXML( node:Node ):RobberStealCommand =
     val cmd = RobberStealCommand(
       stealPlayerID = PlayerID.fromXML( node.childOf( "stealPlayerID" ) ),
       state = RobberStealState.fromXML( node.childOf( "state" ) )
     )
     cmd.robbedResource = node.childOf( "robbedResource" ).asOption( n => Resource.of( n.content ).get )
     cmd
-  }
 
-  override def fromJson( json:JsValue ):RobberStealCommand = {
+  override def fromJson( json:JsValue ):RobberStealCommand =
     val cmd = RobberStealCommand(
       stealPlayerID = ( json \ "stealPlayerID" ).as[PlayerID],
       state = RobberStealState.fromJson( ( json \ "state" ).get )
     )
     cmd.robbedResource = ( json \ "robbedResource" ).asOption[Resource]
     cmd
-  }
-}
+  
 
-case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) extends RobberCommand {
+case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) extends RobberCommand:
 
   def toXML:Node = <RobberStealCommand>
     <stealPlayerID>{ stealPlayerID.toXML }</stealPlayerID>
@@ -49,20 +47,17 @@ case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) 
     "robbedResources" -> Json.toJson( robbedResource )
   )
 
-  override def doStep( game:Game ):Try[CommandSuccess] = {
-    if( !game.playerHasAdjacentVertex( stealPlayerID, game.gameField.adjacentVertices( game.gameField.robberHex ) ) )
+  override def doStep( game:Game ):Try[CommandSuccess] =
+    if !game.playerHasAdjacentVertex( stealPlayerID, game.gameField.adjacentVertices( game.gameField.robberHex ) ) then
       Failure( NoAdjacentStructure )
     else steal( game, stealPlayerID, state.nextState )
-  }
 
-  override def undoStep( game:Game ):Game = robbedResource match {
+  override def undoStep( game:Game ):Game = robbedResource match
     case Some( r ) => game.setState( state )
       .updatePlayers(
         game.player.removeResourceCard( r ).get,
         game.players( stealPlayerID ).addResourceCard( r )
       )
     case None => game.setState( state )
-  }
 
   //override def toString:String = getClass.getSimpleName + ": robbedResource[" + robbedResource.useOrElse( r => r, "-" ) +  "], stealPlayerID[" + stealPlayerID + "], " + state
-}

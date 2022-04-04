@@ -16,7 +16,7 @@ import scalafx.scene.text.{ Text, TextAlignment }
 /**
  * @author Vincent76;
  */
-case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controller ) extends GUIState {
+case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controller ) extends GUIState:
 
   override def getActions:List[GUICommand] = List( new GUICommand() {
     override def getNode( gui:GUI ):Node = new BorderPane {
@@ -42,4 +42,3 @@ case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controlle
   } )
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player( state.pID ), true )
-}

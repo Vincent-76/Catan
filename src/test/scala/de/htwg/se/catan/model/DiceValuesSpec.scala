@@ -10,24 +10,24 @@ class DiceValuesSpec extends AnyWordSpec with Matchers {
     "static" should {
       "be constructed with of" in {
         DiceValue.of( 1 ) shouldBe None
-        DiceValue.of( 2 ) shouldBe Some( Two )
-        DiceValue.of( 3 ) shouldBe Some( Three )
-        DiceValue.of( 4 ) shouldBe Some( Four )
-        DiceValue.of( 5 ) shouldBe Some( Five )
-        DiceValue.of( 6 ) shouldBe Some( Six )
-        DiceValue.of( 7 ) shouldBe Some( Seven )
-        DiceValue.of( 8 ) shouldBe Some( Eight )
-        DiceValue.of( 9 ) shouldBe Some( Nine )
-        DiceValue.of( 10 ) shouldBe Some( Ten )
-        DiceValue.of( 11 ) shouldBe Some( Eleven )
-        DiceValue.of( 12 ) shouldBe Some( Twelve )
+        DiceValue.of( 2 ) shouldBe Some( DiceValue.Two )
+        DiceValue.of( 3 ) shouldBe Some( DiceValue.Three )
+        DiceValue.of( 4 ) shouldBe Some( DiceValue.Four )
+        DiceValue.of( 5 ) shouldBe Some( DiceValue.Five )
+        DiceValue.of( 6 ) shouldBe Some( DiceValue.Six )
+        DiceValue.of( 7 ) shouldBe Some( DiceValue.Seven )
+        DiceValue.of( 8 ) shouldBe Some( DiceValue.Eight )
+        DiceValue.of( 9 ) shouldBe Some( DiceValue.Nine )
+        DiceValue.of( 10 ) shouldBe Some( DiceValue.Ten )
+        DiceValue.of( 11 ) shouldBe Some( DiceValue.Eleven )
+        DiceValue.of( 12 ) shouldBe Some( DiceValue.Twelve )
         DiceValue.of( 13 ) shouldBe None
       }
     }
     "created" should {
       "have a string representation" in {
-        Two.toString shouldBe "02"
-        Eleven.toString shouldBe "11"
+        DiceValue.Two.toString shouldBe "02"
+        DiceValue.Eleven.toString shouldBe "11"
       }
     }
   }

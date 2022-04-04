@@ -12,7 +12,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object InitBeginnerState extends StateImpl( "InitBeginnerState" ) {
+object InitBeginnerState extends StateImpl( "InitBeginnerState" ):
   def fromXML( node:Node ):InitBeginnerState = InitBeginnerState(
     beginner = node.childOf( "beginner" ).asOption( n => PlayerID.fromXML( n ) ),
     diceValues = node.childOf( "diceValues" ).asMap( n => PlayerID.fromXML( n ), _.content.toInt ),
@@ -24,11 +24,11 @@ object InitBeginnerState extends StateImpl( "InitBeginnerState" ) {
     diceValues = ( json \ "diceValues" ).asMap[PlayerID, Int],
     counter = ( json \ "counter" ).as[Int]
   )
-}
+
 
 case class InitBeginnerState( beginner:Option[PlayerID] = None,
                               diceValues:Map[PlayerID, Int] = Map.empty,
-                              counter:Int = 1 ) extends State {
+                              counter:Int = 1 ) extends State:
 
   def toXML:Node = <InitBeginnerState counter={ counter.toString }>
     <beginner>{ beginner.toXML( _.toXML ) }</beginner>
@@ -52,5 +52,3 @@ case class InitBeginnerState( beginner:Option[PlayerID] = None,
 
   /*override def toString:String = getClass.getSimpleName + ": beginner[" + beginner.useOrElse( pID => pID, "-" ) +
     "], DiceValues[" + diceValues.map( d => d._1 + ": " + d._2 ).mkString( ", " ) + "], counter[" + counter + "]"*/
-
-}

@@ -30,7 +30,7 @@ class XMLSpec extends AnyWordSpec with Matchers {
         DesertArea().check( DesertArea )
       }
       "ResourceArea" in {
-        ResourceArea( Wood, Six ).check( ResourceArea )
+        ResourceArea( Wood, DiceValue.Six ).check( ResourceArea )
       }
       "ResourceCards" in {
         val r = ResourceCards.of( wood = 1 )
@@ -72,7 +72,7 @@ class XMLSpec extends AnyWordSpec with Matchers {
         val hexList = List(
           Hex( 0, 0, 0, DesertArea() ),
           Hex( 1, 0, 1, WaterArea() ),
-          Hex( 2, 0, 2, ResourceArea( Wood, Three ) )
+          Hex( 2, 0, 2, ResourceArea( Wood, DiceValue.Three ) )
         )
         val vertex = Vertex(
           0,

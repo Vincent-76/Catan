@@ -11,7 +11,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object BuildState extends StateImpl( "BuildState" ) {
+object BuildState extends StateImpl( "BuildState" ):
   def fromXML( node:Node ):BuildState = BuildState(
     structure = StructurePlacement.of( ( node \ "@structure" ).content ).get
   )
@@ -19,9 +19,9 @@ object BuildState extends StateImpl( "BuildState" ) {
   def fromJson( json:JsValue ):BuildState = BuildState(
     structure = ( json \ "structure" ).as[StructurePlacement]
   )
-}
 
-case class BuildState( structure:StructurePlacement ) extends State {
+
+case class BuildState( structure:StructurePlacement ) extends State:
 
   def toXML:Node = <BuildState structure={ structure.title } />.copy( label = BuildState.name )
 
@@ -35,4 +35,4 @@ case class BuildState( structure:StructurePlacement ) extends State {
   )
 
   //override def toString:String = getClass.getSimpleName + ": StructurePlacement[" + structure.title + "]"
-}
+

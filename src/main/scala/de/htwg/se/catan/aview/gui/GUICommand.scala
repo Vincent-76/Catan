@@ -5,6 +5,5 @@ import scalafx.scene.Node
 /**
  * @author Vincent76;
  */
-trait GUICommand {
+trait GUICommand:
   def getNode( gui:GUI ):Node
-}

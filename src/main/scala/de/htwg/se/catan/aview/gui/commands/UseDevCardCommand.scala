@@ -12,7 +12,7 @@ import scalafx.scene.layout.{ HBox, Pane, VBox }
 /**
  * @author Vincent76;
  */
-case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" ) {
+case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" ):
 
   override protected def action( gui:GUI ):Unit =
     new CustomDialog( gui, "Use a Development Card", ButtonType.Cancel ) {
@@ -36,4 +36,3 @@ case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" )
     n.disable = !gui.controller.player.devCards.exists( _.usable )
     n
   } )
-}

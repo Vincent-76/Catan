@@ -11,7 +11,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class InitGUIState( controller:Controller ) extends GUIState {
+case class InitGUIState( controller:Controller ) extends GUIState:
   override def getDisplayState:DisplayState = new InitDisplayState {
     override def getDisplayPane:Pane = new VBox {
       spacing = 10
@@ -28,4 +28,3 @@ case class InitGUIState( controller:Controller ) extends GUIState {
       )
     }
   }
-}

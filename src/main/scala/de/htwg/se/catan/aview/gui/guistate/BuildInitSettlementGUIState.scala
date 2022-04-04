@@ -8,7 +8,7 @@ import de.htwg.se.catan.model.impl.placement.SettlementPlacement
 /**
  * @author Vincent76;
  */
-case class BuildInitSettlementGUIState( controller:Controller ) extends GUIState {
+case class BuildInitSettlementGUIState( controller:Controller ) extends GUIState:
 
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( SettlementPlacement.getBuildablePoints( controller.game, controller.onTurn, any = true ) ) {
@@ -16,4 +16,3 @@ case class BuildInitSettlementGUIState( controller:Controller ) extends GUIState
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, false )
-}

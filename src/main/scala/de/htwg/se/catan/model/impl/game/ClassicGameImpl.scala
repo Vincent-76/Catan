@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.resourceCardsReads
 import de.htwg.se.catan.model._
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
 import de.htwg.se.catan.model.impl.fileio.JsonSerializable
@@ -11,6 +12,7 @@ import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSe
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.state.InitState
 import de.htwg.se.catan.util._
+import de.htwg.se.catan.model.impl.fileio.jsonSerializableWrites
 import play.api.libs.json.{ JsResult, JsSuccess, JsValue, Json, Reads, Writes }
 
 import scala.collection.immutable.{ List, SortedMap, TreeMap }
@@ -20,7 +22,7 @@ import scala.xml.Node
 /**
  * @author Vincent76;
  */
-object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
+object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ):
 
   val stackResourceAmount:Int = 19
   val availablePlacements:List[Placement] = List(
@@ -44,7 +46,7 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
       node.childOf( "players" ).asMap(
         n => PlayerID.fromXML( n ),
         n => Player.fromXML( n )
-      ).toArray:_*
+      ).toIndexedSeq:_*
     )( PlayerOrdering ),
     bonusCardsVal = node.childOf( "bonusCards" ).asMap(
       n => BonusCard.of( n.content ).get,
@@ -67,12 +69,12 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
     stateVal = ( json \ "state" ).as[State],
     resourceStack = ( json \ "resourceStack" ).as[ResourceCards],
     developmentCards = ( json \ "developmentCards"  ).asList[DevelopmentCard],
-    playersVal = TreeMap( ( json \ "players" ).asMap[PlayerID, Player].toArray:_* )( PlayerOrdering ),
+    playersVal = TreeMap( ( json \ "players" ).asMap[PlayerID, Player].toIndexedSeq:_* )( PlayerOrdering ),
     bonusCardsVal = ( json \ "bonusCards" ).asMapC( _.as[BonusCard], _.asOptionC( _.asTuple[PlayerID, Int] ) ),
     winnerVal = ( json \ "winner" ).asOpt[PlayerID],
     roundVal = ( json \ "round" ).as[Int]
   )
-}
+  
 
 case class ClassicGameImpl( gameFieldVal:GameField,
                             turnVal:Turn,
@@ -87,7 +89,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
                             bonusCardsVal:Map[BonusCard, Option[(PlayerID, Int)]] = BonusCard.impls.map( (_, None) ).toMap,
                             winnerVal:Option[PlayerID] = None,
                             roundVal:Int = 1
-                          ) extends Game {
+                          ) extends Game:
 
   @Inject
   def this(
@@ -96,14 +98,14 @@ case class ClassicGameImpl( gameFieldVal:GameField,
             @Named( "seed" ) seed:Int,
             playerFactory:PlayerFactory,
             @Named( "playerFactoryClass" ) playerFactoryClass:String,
-            @Named( "availablePlacements" ) availablePlacements:List[Placement]
+            @Named( "availablePlacements" ) availablePlacements:Any
           ) = this(
     gameFieldVal = gameField,
     turnVal = turn,
     seedVal = seed,
     playerFactory = playerFactory,
     playerFactoryClass = playerFactoryClass,
-    availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.contains ),
+    availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.asInstanceOf[List[Placement]].contains ),
     developmentCards = DevelopmentCard.getStack( new Random( seed ) ),
   )
 
@@ -208,43 +210,39 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def previousTurn( pID:PlayerID = onTurn ):PlayerID = playersVal.keys.find( _.id == pID.id - 1 ).getOrElse( playersVal.lastKey )
 
 
-  def addPlayer( playerColor:PlayerColor, name:String ):ClassicGameImpl = {
+  def addPlayer( playerColor:PlayerColor, name:String ):ClassicGameImpl =
     val pID = new PlayerID( playersVal.size )
     //val p = ClassicPlayerImpl( pID, playerColor, name )
     val p = playerFactory.create( pID, playerColor, name )
     copy( playersVal = playersVal + (pID -> p) )
-  }
 
-  def addPlayerF( playerColor:PlayerColor, name:String ):Try[ClassicGameImpl] = {
-    if( playersVal.exists( _._2.color == playerColor ) )
+  def addPlayerF( playerColor:PlayerColor, name:String ):Try[ClassicGameImpl] =
+    if playersVal.exists( _._2.color == playerColor ) then
       Failure( PlayerColorIsAlreadyInUse( playerColor ) )
-    else if( playersVal.exists( _._2.name ^= name ) )
+    else if playersVal.exists( _._2.name ^= name ) then
       Failure( PlayerNameAlreadyExists( name ) )
     else Success( addPlayer( playerColor, name ) )
-  }
 
   def removeLastPlayer( ):ClassicGameImpl = copy( playersVal = playersVal.init )
 
 
   def rollDice( r:Random ):Int = r.nextInt( 6 ) + 1
 
-  def rollDices( ):(Int, Int) = {
+  def rollDices( ):(Int, Int) =
     val r = new Random( seedVal * round )
     (rollDice( r ), rollDice( r ))
-  }
 
 
   def hasStackResources( resources:ResourceCards ):Boolean = resourceStack.has( resources )
 
-  def getAvailableResourceCards( resources:ResourceCards ):(ResourceCards, ResourceCards) = {
+  def getAvailableResourceCards( resources:ResourceCards ):(ResourceCards, ResourceCards) =
     resources.red( (resources, resourceStack), ( cards:(ResourceCards, ResourceCards), r:Resource, amount:Int ) => {
       val available = cards._2.getOrElse( r, 0 )
-      if( available >= amount )
+      if available >= amount then
         (cards._1, cards._2.updated( r, available - amount ))
       else
         (cards._1.updated( r, available ), cards._2.updated( r, 0 ))
     } )
-  }
 
   /*def getAvailableResourceCards( resources:ResourceCards, stack:ResourceCards = resourceStack ):(ResourceCards, ResourceCards) = {
     resources.red( (resources, stack), ( cards:(ResourceCards, ResourceCards), r:Resource, amount:Int ) => {
@@ -259,35 +257,32 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def drawResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):(ClassicGameImpl, ResourceCards) =
     drawResourceCards( pID, ResourceCards.ofResource( r, amount ) )
 
-  def drawResourceCards( pID:PlayerID, cards:ResourceCards ):(ClassicGameImpl, ResourceCards) = {
+  def drawResourceCards( pID:PlayerID, cards:ResourceCards ):(ClassicGameImpl, ResourceCards) =
     val (available, newStack) = getAvailableResourceCards( cards )
-    val newGame = if( available.amount > 0 ) {
+    val newGame = if available.amount > 0 then
       val newPlayer = playersVal( pID ).addResourceCards( available )
       copy(
         playersVal = playersVal.updated( newPlayer.id, newPlayer ),
         resourceStack = newStack
       )
-    } else this
+    else this
     (newGame, available)
-  }
 
   def dropResourceCards( pID:PlayerID, r:Resource, amount:Int = 1 ):Try[ClassicGameImpl] =
     dropResourceCards( pID, ResourceCards.ofResource( r, amount ) )
 
-  def dropResourceCards( pID:PlayerID, cards:ResourceCards ):Try[ClassicGameImpl] = {
-    playersVal( pID ).removeResourceCards( cards ) match {
+  def dropResourceCards( pID:PlayerID, cards:ResourceCards ):Try[ClassicGameImpl] =
+    playersVal( pID ).removeResourceCards( cards ) match
       case Success( nPlayer ) => Success( copy(
         playersVal = playersVal.updated( pID, nPlayer ),
         resourceStack = resourceStack.add( cards )
       ) )
       case f => f.rethrow
-    }
-  }
 
-  def drawDevCard( pID:PlayerID ):Try[ClassicGameImpl] = {
-    if( developmentCards.isEmpty )
+  def drawDevCard( pID:PlayerID ):Try[ClassicGameImpl] =
+    if developmentCards.isEmpty then
       Failure( DevStackIsEmpty )
-    else dropResourceCards( pID, DevelopmentCard.cardCost ) match {
+    else dropResourceCards( pID, DevelopmentCard.cardCost ) match
       case Success( newGame ) =>
         val newPlayer = newGame.playersVal( pID ).addDevCard( developmentCards.head )
         Success( newGame.copy(
@@ -296,8 +291,6 @@ case class ClassicGameImpl( gameFieldVal:GameField,
           developmentCards = developmentCards.tail
         ) )
       case Failure( e ) => Failure( e )
-    }
-  }
 
   def addDevCard( devCard:DevelopmentCard ):ClassicGameImpl = copy( developmentCards = devCard +: developmentCards )
 
@@ -308,16 +301,15 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def getPlayerDisplayVictoryPoints( pID:PlayerID ):Int =
     getPlayerBonusCards( pID ).red( player( pID ).victoryPoints, ( points:Int, bonusCard:BonusCard ) => points + bonusCard.bonus )
 
-  def getPlayerVictoryPoints( pID:PlayerID ):Int = {
+  def getPlayerVictoryPoints( pID:PlayerID ):Int =
     getPlayerDisplayVictoryPoints( pID ) + player( pID ).devCards.count( _ == GreatHallCard )
-  }
 
   def getBankTradeFactor( playerID:PlayerID, r:Resource ):Int =
     gameField.vertexList.red( defaultBankTradeFactor, ( factor:Int, v:Vertex ) => {
-      if( v.building.isDefined && v.building.get.owner == playerID && v.port.isDefined )
-        if( v.port.get.specific.isDefined && v.port.get.specific.get == r )
+      if v.building.isDefined && v.building.get.owner == playerID && v.port.isDefined then
+        if v.port.get.specific.isDefined && v.port.get.specific.get == r then
           specifiedPortFactor
-        else if( v.port.get.specific.isEmpty && unspecifiedPortFactor < factor )
+        else if v.port.get.specific.isEmpty && unspecifiedPortFactor < factor then
           unspecifiedPortFactor
         else factor
       else factor
@@ -327,35 +319,30 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def roadBuildable( edge:Edge, pID:PlayerID ):Boolean = (playerHasAdjacentEdge( pID, gameField.adjacentEdges( edge ) ) ||
     playerHasAdjacentVertex( pID, gameField.adjacentVertices( edge ) )) && (edge.h1.isLand || edge.h2.isLand)
 
-  private def roadLength( pID:PlayerID, e:Edge, count:Int = 1, previous:List[Edge] = List.empty ):Int = {
+  private def roadLength( pID:PlayerID, e:Edge, count:Int = 1, previous:List[Edge] = List.empty ):Int =
     val lengths = gameField.adjacentEdges( e )
       .filter( e => e.road.isDefined && e.road.get.owner == pID && !previous.contains( e ) )
       .map( e2 => roadLength( pID, e2, count + 1, previous :+ e ) )
-    if( lengths.isEmpty )
+    if lengths.isEmpty then
       count
     else lengths.max
-  }
 
-  def getLongestRoadLength( pID:PlayerID ):Int = {
+  def getLongestRoadLength( pID:PlayerID ):Int =
     val lengths = gameField.edgeList.filter( e => e.road.isDefined && e.road.get.owner == pID ).map( e => roadLength( pID, e ) )
-    if( lengths.nonEmpty ) lengths.max else 0
-  }
+    if lengths.nonEmpty then lengths.max else 0
 
-  def getBuildableRoadSpotsForSettlement( vID:Int ):List[Edge] = {
+  def getBuildableRoadSpotsForSettlement( vID:Int ):List[Edge] =
     val vertex = gameField.findVertex( vID )
-    if( vertex.isDefined && vertex.get.building.isDefined )
+    if vertex.isDefined && vertex.get.building.isDefined then
       gameField.adjacentEdges( vertex.get ).filter( e => (e.h1.isLand || e.h2.isLand) && e.road.isEmpty )
     else List.empty
-  }
 
 
-  def noBuildingInRange( v:Vertex ):Boolean = {
+  def noBuildingInRange( v:Vertex ):Boolean =
     gameField.adjacentEdges( v ).foreach( e1 => {
       gameField.adjacentVertices( e1 ).filter( _ != v ).foreach( v1 => {
-        if( v1.building.nonEmpty )
+        if v1.building.nonEmpty then
           return false
       } )
     } )
     true
-  }
-}

@@ -6,9 +6,9 @@ import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.{ Card, DevelopmentCard, Game, Resource }
 import de.htwg.se.catan.util._
 
-case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDisplay {
+case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDisplay:
 
-  def buildPlayerDisplay( game:Game ):String = {
+  def buildPlayerDisplay( game:Game ):String =
     val nameLength = game.players.map( _._2.idName.length ).max
     TUI.displayName( player, nameLength ) +
       " Resources[" + player.resources.amount.toLength( 2 ) + "]" +
@@ -16,9 +16,8 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
       " DevCards[" + player.devCards.size.toLength( 2 ) + "]" +
       " UsedDevCards[" + DevelopmentCard.impls.flatMap( c => (0 until player.usedDevCards( c )).map( _ => c ) ).map( _.title ).mkString( "|" ) + "] " +
       game.getPlayerBonusCards( player.id ).mkString( " " )
-  }
 
-  def buildTurnPlayerDisplay( game:Game ):String = {
+  def buildTurnPlayerDisplay( game:Game ):String =
     val resourceNameLength = Resource.impls.map( _.title.length ).max
     TUI.displayName( player ) +
       "\nVictory Points: " + game.getPlayerVictoryPoints( player.id ) +
@@ -27,5 +26,3 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
       "\nDevelopment Cards: [" + player.devCards.map( _.title ).mkString( "|" ) + "]" +
       "\nUsed Dev Cards:    [" + player.usedDevCards.map( _.title ).mkString( "|" ) + "]" +
       game.getPlayerBonusCards( player.id ).map( c => "\n" + c.title ).mkString
-  }
-}

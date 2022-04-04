@@ -10,18 +10,18 @@ import scala.util.{ Success, Try }
  * @author Vincent76;
  */
 
-abstract class CommandImpl( name:String ) extends DeserializerComponentImpl[Command]( name ) {
+abstract class CommandImpl( name:String ) extends DeserializerComponentImpl[Command]( name ):
   override def init():Unit = Command.addImpl( this )
-}
 
-object Command extends ClassComponent[Command, CommandImpl] {
+
+object Command extends ClassComponent[Command, CommandImpl]:
   type CommandSuccess = (Game, Option[Info])
 
-  implicit val stateWrites:Writes[Command] = ( o:Command ) => o.toJson
-  implicit val stateReads:Reads[Command] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
-}
+  given stateWrites:Writes[Command] = ( o:Command ) => o.toJson
+  given stateReads:Reads[Command] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
 
-trait Command extends XMLSerializable with JsonSerializable {
+
+trait Command extends XMLSerializable with JsonSerializable:
 
   def success( game:Game, info:Option[Info] = None ):Success[CommandSuccess] =
     Success( (game, info) )
@@ -29,4 +29,3 @@ trait Command extends XMLSerializable with JsonSerializable {
   def doStep( game:Game ):Try[CommandSuccess]
 
   def undoStep( game:Game ):Game
-}

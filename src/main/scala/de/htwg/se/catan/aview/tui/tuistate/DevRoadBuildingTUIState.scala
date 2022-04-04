@@ -7,7 +7,7 @@ import de.htwg.se.catan.model.impl.placement.RoadPlacement
 /**
  * @author Vincent76;
  */
-case class DevRoadBuildingTUIState( controller:Controller ) extends TUIState {
+case class DevRoadBuildingTUIState( controller:Controller ) extends TUIState:
 
   override def createGameDisplay:Option[String] = Some(
     GameFieldDisplay.get( controller.game, Some( RoadPlacement.getBuildablePoints( controller.game, controller.onTurn ) ) ).buildGameField
@@ -19,4 +19,3 @@ case class DevRoadBuildingTUIState( controller:Controller ) extends TUIState {
 
   override def action( commandInput:CommandInput ):Unit =
     controller.devBuildRoad( commandInput.input.toInt )
-}

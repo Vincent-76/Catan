@@ -8,7 +8,7 @@ import de.htwg.se.catan.model.Player
 /**
  * @author Vincent76;
  */
-case class BuildGUIState( state:BuildState, controller:Controller ) extends GUIState {
+case class BuildGUIState( state:BuildState, controller:Controller ) extends GUIState:
 
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( state.structure.getBuildablePoints( controller.game, controller.onTurn ) ) {
@@ -16,4 +16,3 @@ case class BuildGUIState( state:BuildState, controller:Controller ) extends GUIS
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
-}

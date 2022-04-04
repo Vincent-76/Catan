@@ -6,7 +6,7 @@ import de.htwg.se.catan.model.{ Clay, Desert, Ore, Resource, Sheep, Water, Wheat
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.util._
 
-object ClassicGameDisplayImpl extends GameDisplay[ClassicGameImpl] {
+object ClassicGameDisplayImpl extends GameDisplay[ClassicGameImpl]:
 
   val legend:Vector[(String, String)] = Vector(
     (colorOf( Water ) + " ", "Water"),
@@ -24,12 +24,9 @@ object ClassicGameDisplayImpl extends GameDisplay[ClassicGameImpl] {
     (generalPort, "3:1 exchange port"),
   )
 
-  protected def doBuildGameLegend( game:ClassicGameImpl ):Vector[(String, String)] = {
+  protected def doBuildGameLegend( game:ClassicGameImpl ):Vector[(String, String)] =
     val legend = game.resourceStack.red( this.legend :+ ("", ""), ( l:Vector[(String, String)], r:Resource, amount:Int ) => {
       l :+ (r.title + " Stack", amount.toString)
     } ) :+ ("Dev Stack", game.developmentCards.size.toString)
     val titleLength = legend.map( _._1.length ).max
     legend.map( d => (d._1.toLength( titleLength ), d._2) )
-  }
-
-}

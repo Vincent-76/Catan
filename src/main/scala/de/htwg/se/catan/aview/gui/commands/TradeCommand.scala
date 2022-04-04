@@ -11,7 +11,7 @@ import scalafx.scene.text.{ Text, TextAlignment }
 /**
  * @author Vincent76;
  */
-abstract class TradeCommand( title:String ) extends SimpleGUICommand( title ) {
+abstract class TradeCommand( title:String ) extends SimpleGUICommand( title ):
 
   override def action( gui:GUI ):Unit = new CustomDialog( gui, title, ButtonType.Cancel ) {
     headerText = "Select resources to trade"
@@ -53,4 +53,3 @@ abstract class TradeCommand( title:String ) extends SimpleGUICommand( title ) {
   }.show()
 
   def onTrade( gui:GUI, give:ResourceCards, get:ResourceCards ):Unit
-}

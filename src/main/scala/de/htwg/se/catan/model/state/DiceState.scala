@@ -10,13 +10,13 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object DiceState extends StateImpl( "DiceState" ) {
+object DiceState extends StateImpl( "DiceState" ):
   def fromXML( node:Node ):DiceState = DiceState()
 
   def fromJson( json:JsValue ):DiceState = DiceState()
-}
 
-case class DiceState() extends State {
+
+case class DiceState() extends State:
 
   def toXML:Node = <DiceState />.copy( label = DiceState.name )
 
@@ -34,4 +34,4 @@ case class DiceState() extends State {
   )
 
   //override def toString:String = getClass.getSimpleName
-}
+

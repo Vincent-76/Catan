@@ -9,7 +9,7 @@ import scalafx.scene.layout.{ ColumnConstraints, GridPane, Pane, VBox }
 import scalafx.scene.paint.Color
 import scalafx.scene.text.{ Text, TextAlignment }
 
-class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl] {
+class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl]:
 
   val resourceStacks:Map[Resource, Text] = Resource.impls.map( r => {
     (r, new Text( "0" ) {
@@ -60,7 +60,7 @@ class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl] {
         fitWidth = 40
         preserveRatio = true
       },
-      if( r.isDefined ) resourceStacks( r.get ) else devStack
+      if r.isDefined then resourceStacks( r.get ) else devStack
     )
   }
 
@@ -68,4 +68,3 @@ class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl] {
     resourceStacks.foreach( d => d._2.text = game.resourceStack( d._1 ).toString )
     devStack.text = game.developmentCards.size.toString
   }
-}

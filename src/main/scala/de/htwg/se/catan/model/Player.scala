@@ -1,10 +1,10 @@
 package de.htwg.se.catan.model
 
-import de.htwg.se.catan.model.Card._
-import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNodeSeq
-import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLDeserializer, XMLSerializable }
-import de.htwg.se.catan.util._
-import play.api.libs.json._
+import de.htwg.se.catan.model.Card.*
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
+import de.htwg.se.catan.model.impl.fileio.{ JsonDeserializer, JsonSerializable, XMLDeserializer, XMLSerializable }
+import de.htwg.se.catan.util.*
+import play.api.libs.json.*
 
 import scala.util.Try
 import scala.xml.Node
@@ -13,25 +13,33 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object PlayerID extends XMLDeserializer[PlayerID] {
+object PlayerID extends XMLDeserializer[PlayerID] with JsonDeserializer[PlayerID]:
+  given playerIDWrites:Writes[PlayerID] = ( o:PlayerID ) => o.toJson
+  given playerIDReads:Reads[PlayerID] =( json:JsValue ) => JsSuccess( fromJson( json ) )
+  
   def fromXML( node:Node ):PlayerID = PlayerID(
     id = ( node \ "@id" ).content.toInt
   )
 
-  implicit val playerIDWrites:Writes[PlayerID] = Json.writes[PlayerID]
-  implicit val playerIDReads:Reads[PlayerID] = Json.reads[PlayerID]
-}
+  def fromJson( json:JsValue ):PlayerID = PlayerID(
+    id = ( json  \ "id" ).as[Int]
+  )
+  
 
-case class PlayerID /*private[Game]*/ ( id:Int ) extends XMLSerializable {
+case class PlayerID /*private[Game]*/ ( id:Int ) extends XMLSerializable with JsonSerializable:
 
   def toXML:Node = <PlayerID id={ id.toString } />
 
-  override def toString:String = id.toString;
-}
+  def toJson:JsValue = Json.obj(
+    "id" -> Json.toJson( id )
+  )
 
-object PlayerColor extends ObjectComponent[PlayerColor] {
-  implicit val playerColorWrites:Writes[PlayerColor] = ( playerColor:PlayerColor ) => Json.toJson( playerColor.title )
-  implicit val playerColorReads:Reads[PlayerColor] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
+  override def toString:String = id.toString;
+
+
+object PlayerColor extends ObjectComponent[PlayerColor]:
+  given playerColorWrites:Writes[PlayerColor] = ( playerColor:PlayerColor ) => Json.toJson( playerColor.title )
+  given playerColorReads:Reads[PlayerColor] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   Green.init()
   Blue.init()
@@ -40,17 +48,15 @@ object PlayerColor extends ObjectComponent[PlayerColor] {
 
   def of( cString:String ):Option[PlayerColor] = impls.find( _.title ^= cString )
 
-  def availableColors( players:Iterable[PlayerColor] = Vector.empty ):Seq[PlayerColor] = {
+  def availableColors( players:Iterable[PlayerColor] = Vector.empty ):Seq[PlayerColor] =
     players.red( impls.toList.sortBy( _.title ), ( c:Seq[PlayerColor], p:PlayerColor ) => {
       c.removed( p )
     } )
-  }
 
-}
 
-sealed abstract class PlayerColor( val title:String ) extends ComponentImpl {
+sealed abstract class PlayerColor( val title:String ) extends ComponentImpl:
   override def init():Unit = PlayerColor.addImpl( this )
-}
+
 
 case object Green extends PlayerColor( "Green" )
 
@@ -61,21 +67,20 @@ case object Yellow extends PlayerColor( "Yellow" )
 case object Red extends PlayerColor( "Red" )
 
 
-trait PlayerFactory {
+trait PlayerFactory:
   def create( pID:PlayerID, color:PlayerColor, name:String ):Player
-}
 
-abstract class PlayerImpl( name:String ) extends DeserializerComponentImpl[Player]( name ) {
+
+abstract class PlayerImpl( name:String ) extends DeserializerComponentImpl[Player]( name ):
   override def init():Unit = Player.addImpl( this )
-}
 
-object Player extends ClassComponent[Player, PlayerImpl] {
-  implicit val turnWrites:Writes[Player] = ( o:Player ) => o.toJson
 
-  implicit val turnReads:Reads[Player] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
-}
+object Player extends ClassComponent[Player, PlayerImpl]:
+  given turnWrites:Writes[Player] = ( o:Player ) => o.toJson
+  given turnReads:Reads[Player] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+  
 
-trait Player extends XMLSerializable with JsonSerializable {
+trait Player extends XMLSerializable with JsonSerializable:
 
   def id:PlayerID
   def name:String
@@ -104,4 +109,4 @@ trait Player extends XMLSerializable with JsonSerializable {
   def addStructure( structure:StructurePlacement ):Player
   def randomHandResource( ):Option[Resource]
   def useDevCard( devCard:DevelopmentCard ):Try[Player]
-}
+

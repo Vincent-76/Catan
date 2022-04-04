@@ -8,7 +8,7 @@ import scalafx.scene.layout.StackPane
 /**
  * @author Vincent76;
  */
-class GlowButton( title:String ) extends StackPane {
+class GlowButton( title:String ) extends StackPane:
   styleClass.add( "glowButton" )
   padding = Insets( 2 )
   children = new Label( title ) {
@@ -16,4 +16,3 @@ class GlowButton( title:String ) extends StackPane {
   }
   onMouseEntered = _ => effect = new Glow( 0.7 )
   onMouseExited = _ => effect = null
-}

@@ -8,7 +8,7 @@ import de.htwg.se.catan.model.Player
 /**
  * @author Vincent76;
  */
-case class ActionGUIState( controller:Controller ) extends GUIState {
+case class ActionGUIState( controller:Controller ) extends GUIState:
 
   override def getActions:List[GUICommand] = List(
     BuildCommand,
@@ -20,4 +20,3 @@ case class ActionGUIState( controller:Controller ) extends GUIState {
   )
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
-}

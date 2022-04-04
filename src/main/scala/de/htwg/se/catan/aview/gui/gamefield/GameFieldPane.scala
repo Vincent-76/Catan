@@ -7,15 +7,14 @@ import scalafx.scene.layout.{ BorderPane, StackPane }
 /**
  * @author Vincent76;
  */
-object GameFieldPane {
+object GameFieldPane:
   val padding:Double = 1
 
   def mult( v:Double, hSize:Double ):Int = ( v * ( hSize / 45 ) ).toInt
 
   type Coords = Map[Hex, (Double, Double)]
-}
 
-class GameFieldPane( val fieldPane:GameFieldCanvas[_], placements:List[PlacementOverlay] ) extends BorderPane {
+class GameFieldPane( val fieldPane:GameFieldCanvas[_], placements:List[PlacementOverlay] ) extends BorderPane:
 
   val overlayPane = new OverlayPane( placements )
   val interactionPane:InteractionPane = new InteractionPane
@@ -23,24 +22,22 @@ class GameFieldPane( val fieldPane:GameFieldCanvas[_], placements:List[Placement
   var coords:Coords = Map.empty
   var hSize:Double = 0
 
-  object GameFieldContainer extends StackPane {
+  object GameFieldContainer extends StackPane:
     children = List(
       fieldPane,
       overlayPane,
       interactionPane
     )
-  }
 
-  private def getChildSize( gameField:GameField ):(Double, Double) = {
+  private def getChildSize( gameField:GameField ):(Double, Double) =
     val hexes = gameField.fieldWidth
     val ratio = ( ( 1 / ( hexes * Math.sqrt( 3 ) ) ) * ( ( 2d / 4 ) + ( hexes * ( 6d / 4 ) ) ) ) / 1
-    if ( width.value < height.value / ratio )
+    if width.value < height.value / ratio then
       (width.value - 20, ( width.value - 20 ) * ratio)
     else
       (( height.value - 20 ) / ratio, height.value - 20)
-  }
 
-  def updateAll( game:Game ):Unit = {
+  def updateAll( game:Game ):Unit =
     val size = getChildSize( game.gameField )
     center = GameFieldContainer
     GameFieldContainer.minWidth = size._1
@@ -55,10 +52,7 @@ class GameFieldPane( val fieldPane:GameFieldCanvas[_], placements:List[Placement
     overlayPane.width = size._1
     overlayPane.height = size._2
     updateOverlay( game )
-  }
 
-  def updateOverlay( game:Game ):Unit = {
+  def updateOverlay( game:Game ):Unit =
     overlayPane.update( game, coords, hSize )
     interactionPane.update( coords, hSize )
-  }
-}

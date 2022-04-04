@@ -6,8 +6,7 @@ import de.htwg.se.catan.aview.gui.GUI
 /**
  * @author Vincent76;
  */
-case object BankTradeCommand extends TradeCommand( "Bank Trade" ) {
+case object BankTradeCommand extends TradeCommand( "Bank Trade" ):
 
   override def onTrade( gui:GUI, give:ResourceCards, get:ResourceCards ):Unit =
     gui.controller.bankTrade( give, get )
-}

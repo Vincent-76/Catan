@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model.state
 
 import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.resourceCardsReads
 import de.htwg.se.catan.model.commands.{ AbortPlayerTradeCommand, PlayerTradeCommand }
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq }
@@ -13,7 +14,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object PlayerTradeEndState extends StateImpl( "PlayerTradeEndState" ) {
+object PlayerTradeEndState extends StateImpl( "PlayerTradeEndState" ):
   def fromXML( node:Node ):PlayerTradeEndState = PlayerTradeEndState(
     give = ResourceCards.fromXML( node.childOf( "give" ) ),
     get = ResourceCards.fromXML( node.childOf( "get" ) ),
@@ -25,11 +26,11 @@ object PlayerTradeEndState extends StateImpl( "PlayerTradeEndState" ) {
     get = ( json \ "get" ).as[ResourceCards],
     decisions = ( json \ "decisions" ).asMap[PlayerID, Boolean]
   )
-}
+
 
 case class PlayerTradeEndState( give:ResourceCards,
                                 get:ResourceCards,
-                                decisions:Map[PlayerID, Boolean] ) extends State {
+                                decisions:Map[PlayerID, Boolean] ) extends State:
 
   def toXML:Node = <PlayerTradeEndState>
     <give>{ give.toXML( _.title, _.toString ) }</give>
@@ -54,4 +55,4 @@ case class PlayerTradeEndState( give:ResourceCards,
 
   /*override def toString:String = getClass.getSimpleName + ": Give[" + give + "], Get[" + get +
     "], Decisions[" + decisions.map( d => d._1.id + ": " + d._2 ).mkString( ", " ) + "]"*/
-}
+

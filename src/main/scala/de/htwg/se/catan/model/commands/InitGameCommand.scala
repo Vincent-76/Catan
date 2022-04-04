@@ -12,13 +12,13 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object InitGameCommand extends CommandImpl( "InitGameCommand" ) {
+object InitGameCommand extends CommandImpl( "InitGameCommand" ):
   override def fromXML( node:Node ):InitGameCommand = InitGameCommand()
 
   override def fromJson( json:JsValue ):InitGameCommand = InitGameCommand()
-}
 
-case class InitGameCommand() extends Command {
+
+case class InitGameCommand() extends Command:
 
   def toXML:Node = <InitGameCommand />.copy( label = InitGameCommand.name )
 
@@ -31,4 +31,3 @@ case class InitGameCommand() extends Command {
   )
 
   def undoStep( game:Game ):Game = game.setState( InitState() )
-}

@@ -8,7 +8,7 @@ import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
 
-object ClassicTurnImpl extends TurnImpl( "ClassicTurnImpl" ) {
+object ClassicTurnImpl extends TurnImpl( "ClassicTurnImpl" ):
   def fromXML( node:Node ):ClassicTurnImpl = ClassicTurnImpl(
     playerIDVal = PlayerID.fromXML( node.childOf( "playerID" ) ),
     usedDevCardVal = ( node \ "@usedDevCard" ).content.toBoolean,
@@ -20,11 +20,11 @@ object ClassicTurnImpl extends TurnImpl( "ClassicTurnImpl" ) {
     usedDevCardVal = ( json \ "usedDevCard" ).as[Boolean],
     drawnDevCardsVal = ( json \ "drawnDevCards" ).asList[DevelopmentCard]
   )
-}
+
 
 case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
                             usedDevCardVal:Boolean = false,
-                            drawnDevCardsVal:List[DevelopmentCard] = List.empty ) extends Turn {
+                            drawnDevCardsVal:List[DevelopmentCard] = List.empty ) extends Turn:
 
   @Inject
   def this( ) = this( new PlayerID( -1 ) )
@@ -56,5 +56,3 @@ case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
   def getLastDrawnDevCard:Option[DevelopmentCard] = drawnDevCardsVal.lastOption
 
   def set( playerID:PlayerID ):Turn = ClassicTurnImpl( playerID )
-
-}

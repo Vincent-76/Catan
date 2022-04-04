@@ -9,7 +9,6 @@ import de.htwg.se.catan.util._
  */
 
 case object SaveCommand
-  extends CommandAction( "save", List.empty, "Saves the game." ) {
+  extends CommandAction( "save", List.empty, "Saves the game." ):
 
   override def action( commandInput:CommandInput, controller:Controller ):Unit = controller.saveGame()
-}

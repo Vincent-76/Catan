@@ -17,23 +17,22 @@ import scala.io.StdIn
 /**
  * @author Vincent76;
  */
-object Catan {
+object Catan:
   val debug = false
   CatanModule.init()
   val injector:Injector = Guice.createInjector( new CatanModule( test = false ) )
   val controller:Controller = injector.getInstance( classOf[Controller] )
   val tui:TUI = new TUI( controller )
 
-  def main( args:Array[String] ):Unit = {
-    val gui:Option[GUIApp] = if( args.contains( "gui" ) )
+  def main( args:Array[String] ):Unit =
+    val gui:Option[GUIApp] = if args.contains( "gui" ) then
       Some( new GUIApp( controller ) )
     else None
     var input:String = ""
-    do {
+    input = StdIn.readLine()
+    tui.onInput( input )
+    while input != "exit" do
       input = StdIn.readLine()
       tui.onInput( input )
-    } while( input != "exit" )
     if( gui.isDefined )
       gui.get.exit()
-  }
-}

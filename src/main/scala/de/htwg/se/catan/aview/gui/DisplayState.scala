@@ -8,16 +8,13 @@ import scalafx.scene.layout.Pane
  */
 sealed trait DisplayState
 
-trait InitDisplayState extends DisplayState {
+trait InitDisplayState extends DisplayState:
   def getDisplayPane:Pane
 
-
-}
 
 trait FieldDisplayState extends DisplayState
 
 case object FieldDisplayState extends FieldDisplayState
 
-abstract class FieldInputDisplayState( val points:List[PlacementPoint] ) extends FieldDisplayState {
+abstract class FieldInputDisplayState( val points:List[PlacementPoint] ) extends FieldDisplayState:
   def action( id:Int ):Unit
-}

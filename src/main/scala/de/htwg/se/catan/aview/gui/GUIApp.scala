@@ -4,6 +4,7 @@ import de.htwg.se.catan.aview.gui.guistate._
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.Info._
 import de.htwg.se.catan.model.state._
 import de.htwg.se.catan.util.{ Observer, _ }
 import javafx.geometry.Side
@@ -18,29 +19,27 @@ import scalafx.scene.paint.Color
 /**
  * @author Vincent76;
  */
-object GUIApp {
+object GUIApp:
   val stoneBackground:Background = getBackground( "/stone_background.png" )
   val woodBackground:Background = getBackground( "/wood_background.png" )
   val resourceIcons:Map[Resource, Image] = Resource.impls.map( r => (r, new Image( "/resources/" + r.title.toLowerCase + ".png" )) ).toMap
   val devCardIcon:Image = new Image( "/resources/dev.png" )
 
 
-  private def getBackground( url:String ):Background = {
+  private def getBackground( url:String ):Background =
     val tile:Image = new Image( url )
     val backgroundPosition = new BackgroundPosition( Side.LEFT, 0, false, Side.TOP, 0, false )
     val backgroundImage = new BackgroundImage( tile, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, backgroundPosition,
       new BackgroundSize( 80, 80, false, false, false, false ) )
     new Background( new javafx.scene.layout.Background( backgroundImage ) )
-  }
 
-  def colorOf( playerColor:PlayerColor ):Color = playerColor match {
+  def colorOf( playerColor:PlayerColor ):Color = playerColor match
     case Green => Color.Green.brighter
     case Red => Color.Red
     case Yellow => Color.Yellow.darker
     case Blue => Color.CornflowerBlue
-  }
 
-  def colorOf( f:FieldType ):Color = f match {
+  def colorOf( f:FieldType ):Color = f match
     case Water => Color.DodgerBlue
     case Desert => Color.Wheat
     case Wood => Color.Sienna
@@ -49,38 +48,31 @@ object GUIApp {
     case Wheat => Color.Khaki
     case Ore => Color.DarkGray
     case _ => Color.Black
-  }
 
-  def middleOf( p1:(Double, Double), p2:(Double, Double) ):(Double, Double) = {
+  def middleOf( p1:(Double, Double), p2:(Double, Double) ):(Double, Double) =
     val a = (p2._1 - p1._1, p2._2 - p1._2)
     (p1._1 + a._1 / 2, p1._2 + a._2 / 2)
-  }
 
-  def middleOf( p1:(Double, Double), p2:(Double, Double), p3:(Double, Double) ):(Double, Double) = {
+  def middleOf( p1:(Double, Double), p2:(Double, Double), p3:(Double, Double) ):(Double, Double) =
     val a = (p2._1 - p1._1, p2._2 - p1._2)
     val m = (p1._1 + a._1 / 2, p1._2 + a._2 / 2)
     val r = Math.sqrt( Math.pow( a._1, 2 ) + Math.pow( a._2, 2 ) ) / (2 * Math.sqrt( 3 ))
     val v = (p3._1 - m._1, p3._2 - m._2)
     val vl = Math.sqrt( Math.pow( v._1, 2 ) + Math.pow( v._2, 2 ) )
     (m._1 + r / vl * v._1, m._2 + r / vl * v._2)
-  }
 
-  implicit class RichColor( val color:Color ) {
+  implicit class RichColor( val color:Color ):
     def toHex:String = "#%02X%02X%02X".format(
       (color.red * 255).toInt,
       (color.green * 255).toInt,
       (color.blue * 255).toInt )
-  }
 
-}
 
-class GUIApp( val controller:Controller ) extends Observer {
-  val gui:GUI = new GUI( this, controller )
-  val thread:Thread = new Thread {
-    override def run( ):Unit = {
+class GUIApp( val controller:Controller ) extends Observer:
+  val gui:GUIWrap = new GUIWrap( this, controller )
+  val thread:Thread = new Thread:
+    override def run( ):Unit = 
       gui.main( Array() )
-    }
-  }
   thread.start()
 
   controller.add( this )
@@ -89,7 +81,7 @@ class GUIApp( val controller:Controller ) extends Observer {
   def exit( ):Unit = gui.stopApp()
 
 
-  def getGUIState( state:State ):Option[GUIState] = state match {
+  def getGUIState( state:State ):Option[GUIState] = state match
     case s:InitState => Some( InitGUIState( controller ) )
     case s:InitPlayerState => Some( InitPlayerGUIState( controller ) )
     case s:InitBeginnerState => Some( InitBeginnerGUIState( s, controller ) )
@@ -108,21 +100,19 @@ class GUIApp( val controller:Controller ) extends Observer {
     case s:DevRoadBuildingState => Some( DevRoadBuildingGUIState( controller ) )
     case s:MonopolyState => Some( MonopolyGUIState( controller ) )
     case _ => None
-  }
 
 
-  override def onUpdate( info:Option[Info] ):Unit = {
+  override def onUpdate( info:Option[Info] ):Unit =
     gui.update( getGUIState( controller.game.state ) )
-    if( info.isDefined )
+    if info.isDefined then
       onInfo( info.get )
-  }
 
-  override def onInfo( info:Info ):Unit = info match {
-    case info:DiceInfo =>
-      gui.showInfoDialog( info.dices._1 + " + " + info.dices._2 + " = " + (info.dices._1 + info.dices._2) )
+  override def onInfo( info:Info ):Unit = info match
+    case DiceInfo( dices ) =>
+      gui.showInfoDialog( s"${dices._1} + ${dices._2} = ${dices._1 + dices._2}" )
     case GatherInfo( dices, playerResources ) =>
       gui.showInfo( playerResources.map( d => controller.player( d._1 ).name.toLength( controller.game.maxPlayerNameLength ) + "  " + d._2.toString( "+" ) ).mkString( "\n" ) )
-      gui.showInfoDialog( dices._1 + " + " + dices._2 + " = " + (dices._1 + dices._2), Some(
+      gui.showInfoDialog( s"${dices._1} + ${dices._2} = ${dices._1 + dices._2}", Some(
         playerResources.toList.sortBy( _._1.id ).map( d => {
           controller.player( d._1 ).name.toLength( controller.game.maxPlayerNameLength ) + "  " + d._2.toString( "+" )
         } ).mkString( "\n" )
@@ -157,11 +147,10 @@ class GUIApp( val controller:Controller ) extends Observer {
     case GameSavedInfo( path ) => gui.showInfoDialog( "Game saved", text = Some( path ) )
     case GameLoadedInfo( path ) => gui.showInfoDialog( "Game loaded", text = Some( path ) )
     case _ =>
-  }
 
 
-  override def onError( t:Throwable ):Unit = {
-    val text = t match {
+  override def onError( t:Throwable ):Unit =
+    val text = t match
       case WrongState => "Unable in this state!"
       case InsufficientResources => "Insufficient resources for this action!"
       case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
@@ -202,14 +191,10 @@ class GUIApp( val controller:Controller ) extends Observer {
       case NothingToUndo => "Nothing to undo!"
       case NothingToRedo => "Nothing to redo!"
       case e:ControllerError => "Unknown error!"
-      case t:Throwable => t + ": " + t.getMessage
-    }
+      case t:Throwable => s"$t: ${t.getMessage}"
     Platform.runLater {
-      new Alert( AlertType.Warning ) {
+      new Alert( AlertType.Warning ):
         initOwner( gui.stage )
         headerText = text
-      }.showAndWait()
+      .showAndWait()
     }
-  }
-
-}

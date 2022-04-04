@@ -15,7 +15,7 @@ import scala.util.Try
  */
 class ResourceSelector( maximum:ResourceCards = Map.empty,
                         initial:ResourceCards = Map.empty,
-                        maxAmount:Option[Int] = Option.empty ) extends TilePane {
+                        maxAmount:Option[Int] = Option.empty ) extends TilePane:
 
   val counter:List[(Resource, ResourceCounter)] = Resource.impls.toList.sortBy( _.index ).map( r => (r, new ResourceCounter( r, initial.getOrElse( r, 0 ) )) )
 
@@ -57,7 +57,7 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
     }
   } )
 
-  class ResourceCounter( r:Resource, i:Int = 0 ) extends Text( i.toString ) {
+  class ResourceCounter( r:Resource, i:Int = 0 ) extends Text( i.toString ):
     style = "-fx-font-size: 14"
 
     def value:Int = Try( text.value.toInt ).getOrElse( 0 )
@@ -66,21 +66,16 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
 
     def decrement( ):Unit = setValue( value - 1 )
 
-    def setValue( v:Int ):Unit = {
-      if( v <= 0 )
+    def setValue( v:Int ):Unit =
+      if v <= 0 then
         set( 0 )
       else if( maximum.contains( r ) && v > maximum( r ) )
         set( maximum( r ) )
-      else {
+      else
         val amount = counter.filter( _._1 != r ).map( _._2.value ).sum
-        if( maxAmount.isDefined && v + amount > maxAmount.get )
+        if maxAmount.isDefined && v + amount > maxAmount.get then
           set( maxAmount.get - amount )
         else
           set( v )
-      }
-    }
 
     private def set( v:Int ):Unit = text = v.toString
-  }
-
-}

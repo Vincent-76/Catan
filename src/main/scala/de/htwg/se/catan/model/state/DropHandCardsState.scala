@@ -13,7 +13,7 @@ import scala.xml.Node
  * @author Vincent76;
  */
 
-object DropHandCardsState extends StateImpl( "DropHandCardsState" ) {
+object DropHandCardsState extends StateImpl( "DropHandCardsState" ):
   def fromXML( node:Node ):DropHandCardsState = DropHandCardsState(
     pID = PlayerID.fromXML( node.childOf( "pID" ) ),
     dropped = node.childOf( "dropped" ).asList( n => PlayerID.fromXML( n ) )
@@ -23,9 +23,9 @@ object DropHandCardsState extends StateImpl( "DropHandCardsState" ) {
     pID = ( json \ "pID" ).as[PlayerID],
     dropped = ( json \ "dropped" ).asList[PlayerID]
   )
-}
 
-case class DropHandCardsState( pID:PlayerID, dropped:List[PlayerID] = List.empty ) extends State {
+
+case class DropHandCardsState( pID:PlayerID, dropped:List[PlayerID] = List.empty ) extends State:
 
   def toXML:Node = <DropHandCardsState>
     <pID>{ pID.toXML }</pID>
@@ -43,4 +43,4 @@ case class DropHandCardsState( pID:PlayerID, dropped:List[PlayerID] = List.empty
   )
 
   //override def toString:String = getClass.getSimpleName + ": pID[" + pID + "], dropped[" + dropped.mkString( ", " ) + "]"
-}
+

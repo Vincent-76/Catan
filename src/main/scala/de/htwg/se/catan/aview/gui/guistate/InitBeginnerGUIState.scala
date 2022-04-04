@@ -14,7 +14,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller ) extends GUIState {
+case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller ) extends GUIState:
   override def getDisplayState:DisplayState = new InitDisplayState {
     override def getDisplayPane:Pane = new VBox {
       spacing = 10
@@ -36,10 +36,10 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
             }, 1, d._2 )
           } )
         }
-      ) ++ (if( state.beginner.isDefined )
+      ) ++ (if state.beginner.isDefined then
         beginnerInfo( state.beginner.get )
-      else {
-        (if( state.diceValues.nonEmpty )
+      else
+        (if state.diceValues.nonEmpty then
           List( new Text( "Tie, roll again." ) {
             fill = Color.White
             style = "-fx-font-size: 20"
@@ -48,7 +48,7 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
           styleClass.add( "button" )
           onAction = _ => controller.diceOutBeginner()
         }
-      })
+      )
     }
 
     private def beginnerInfo( beginner:PlayerID ):List[Node] = List(
@@ -62,4 +62,3 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
       }
     )
   }
-}

@@ -16,7 +16,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) extends GUIState {
+case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) extends GUIState:
 
   override def getActions:List[GUICommand] = List( ( gui:GUI ) => new BorderPane {
     vgrow = Priority.Always
@@ -75,4 +75,3 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
   }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player( state.pID ), true )
-}
