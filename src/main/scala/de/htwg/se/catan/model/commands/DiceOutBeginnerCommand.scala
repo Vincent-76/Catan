@@ -39,11 +39,11 @@ case class DiceOutBeginnerCommand( state:InitBeginnerState ) extends Command:
       Failure( UniqueBeginnerExists )
     else
       val values = if state.diceValues.isEmpty then
-        val r = new Random( game.seed * 1000 )
+        val r = Random( game.seed * 1000 )
         game.players.map( d => (d._1, game.rollDice( r )) )
       else
         val max = state.diceValues.maxBy( _._2 )._2
-        val r = new Random( game.seed * state.counter * -1 )
+        val r = Random( game.seed * state.counter * -1 )
         state.diceValues.map( d => (d._1, if d._2 < max then 0 else game.rollDice( r )) )
       val maxValue = values.maxBy( _._2 )
       val beginners = values.count( _._2 >= maxValue._2 )

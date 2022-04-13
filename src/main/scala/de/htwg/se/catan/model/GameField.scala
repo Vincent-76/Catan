@@ -137,7 +137,7 @@ case class Edge /*private[GameField]*/( id:Int, h1:Hex, h2:Hex, port:Option[Port
 
   //private def copy( ):Unit = {}
 
-  def setRoad( road:Option[Road] ):Edge = new Edge( id, h1, h2, port, road )
+  def setRoad( road:Option[Road] ):Edge = Edge( id, h1, h2, port, road )
 
 
 object Vertex:
@@ -181,4 +181,4 @@ case class Vertex /*private[GameField]*/( id:Int, h1:Hex, h2:Hex, h3:Hex, port:O
 
   //private def copy( ):Unit = {}
 
-  def setBuilding( building:Option[Building] ):Vertex = new Vertex( id, h1, h2, h3, port, building )
+  def setBuilding( building:Option[Building] ):Vertex = Vertex( id, h1, h2, h3, port, building )

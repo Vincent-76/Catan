@@ -22,12 +22,12 @@ object ClassicTurnImpl extends TurnImpl( "ClassicTurnImpl" ):
   )
 
 
-case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
+case class ClassicTurnImpl( playerIDVal:PlayerID = PlayerID( -1 ),
                             usedDevCardVal:Boolean = false,
                             drawnDevCardsVal:List[DevelopmentCard] = List.empty ) extends Turn:
 
   @Inject
-  def this( ) = this( new PlayerID( -1 ) )
+  def this( ) = this( PlayerID( -1 ) )
 
   def toXML:Node = <ClassicTurnImpl usedDevCard={ usedDevCardVal.toString }>
     <playerID>{ playerIDVal.toXML }</playerID>

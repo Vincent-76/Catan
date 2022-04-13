@@ -100,7 +100,7 @@ class CatanModule( val test:Boolean = false ) extends AbstractModule:
     bind( classOf[GameField] ).toInstance( ClassicGameFieldImpl( seed ) )
     val playerClass = classOf[ClassicPlayerImpl]
     bind( classOf[String] ).annotatedWith( Names.named( "playerFactoryClass" ) ).toInstance( playerClass.getSimpleName )
-    install( new FactoryModuleBuilder()
+    install( FactoryModuleBuilder()
         .implement( classOf[Player], playerClass )
         .build( classOf[PlayerFactory] )
     )

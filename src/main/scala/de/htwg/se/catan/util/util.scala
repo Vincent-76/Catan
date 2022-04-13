@@ -147,11 +147,11 @@ extension[T]( option:Option[T] )
 extension[T]( t:Try[T] )
   def throwable:Throwable = t match
     case Failure( e ) => e
-    case _ => throw new NullPointerException
+    case _ => throw NullPointerException()
 
   def rethrow[B:ClassTag]( implicit ct:ClassTag[B] ):Failure[B] = t match
     case f:Failure[T] => f.asInstanceOf[Failure[B]]
-    case _ => throw new NullPointerException
+    case _ => throw NullPointerException()
 
   def failureOption:Option[Throwable] = t match
     case Failure( t ) => Some( t )

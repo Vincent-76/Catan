@@ -56,7 +56,7 @@ class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl]:
   private def createStack( r:Option[Resource] ):Pane = new VBox() {
     alignment = Pos.Center
     children = List(
-      new ImageView( if( r.isDefined ) GUIApp.resourceIcons( r.get ) else GUIApp.devCardIcon ) {
+      new ImageView( if r.isDefined then GUIApp.resourceIcons( r.get ) else GUIApp.devCardIcon ) {
         fitWidth = 40
         preserveRatio = true
       },

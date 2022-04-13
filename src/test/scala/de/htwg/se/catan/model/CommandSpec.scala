@@ -112,7 +112,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         command.undoStep( game ) shouldBe game
         val res = command.doStep( game )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[BankTradedInfo]]
+        res.get._2 shouldBe a [Some[Info.BankTradedInfo]]
         res.get._1.player( pID ).resources shouldBe
           playerResources.add( ResourceCards.of( sheep = -4, clay = 3, wheat = -8 ) )
         command.undoStep( res.get._1 ).player( pID ).resources shouldBe playerResources
@@ -153,7 +153,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = BuildCommand( edge.id, BuildState( RoadPlacement ) )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[BuiltInfo]]
+        res.get._2 shouldBe a [Some[Info.BuiltInfo]]
         res.get._1.state shouldBe a [ActionState]
         res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available - 1
         val resEdge = res.get._1.gameField.findEdge( edge.id )
@@ -226,7 +226,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = BuildCommand( vertex.id, BuildState( SettlementPlacement ) )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[BuiltInfo]]
+        res.get._2 shouldBe a [Some[Info.BuiltInfo]]
         res.get._1.state shouldBe a [ActionState]
         res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available - 1
         val resVertex = res.get._1.gameField.findVertex( vertex.id )
@@ -263,7 +263,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = BuildCommand( vertex.id, BuildState( CityPlacement ) )
         val res = command.doStep( game2 )
         res shouldNot be( None )
-        res.get._2 shouldBe a [Some[BuiltInfo]]
+        res.get._2 shouldBe a [Some[Info.BuiltInfo]]
         res.get._1.state shouldBe a [ActionState]
         res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( CityPlacement ) shouldBe CityPlacement.available - 1
         res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( SettlementPlacement ) shouldBe SettlementPlacement.available
@@ -441,7 +441,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = BuildInitSettlementCommand( vertex.get.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[GotResourcesInfo]]
+        res.get._2 shouldBe a [Some[Info.GotResourcesInfo]]
         res.get._1.state shouldBe BuildInitRoadState( vertex.get.id )
         res.get._1.player.resources.filter( _._2 > 0 ) shouldBe List( vertex.get.h1, vertex.get.h2, vertex.get.h3 )
           .filter( _.area.f.isInstanceOf[Resource] )
@@ -466,7 +466,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = BuyDevCardCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[DrawnDevCardInfo]]
+        res.get._2 shouldBe a [Some[Info.DrawnDevCardInfo]]
         res.get._1.player.devCards should have size 1
         res.get._1.player.resources shouldBe ResourceCards.of()
         res.get._1.turn.drawnDevCards should have size 1
@@ -511,7 +511,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = DevBuildRoadCommand( edge.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[BuiltInfo]]
+        res.get._2 shouldBe a [Some[Info.BuiltInfo]]
         res.get._1.state shouldBe DevRoadBuildingState( nextState, 1 )
         res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe RoadPlacement.available - 1
         val resEdge = res.get._1.gameField.findEdge( edge.id )
@@ -533,7 +533,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = DevBuildRoadCommand( edge.id, state2 )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[BuiltInfo]]
+        res.get._2 shouldBe a [Some[Info.BuiltInfo]]
         res.get._1.state shouldBe nextState
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state2
@@ -547,7 +547,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = DevBuildRoadCommand( edge.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[InsufficientStructuresInfo]]
+        res.get._2 shouldBe a [Some[Info.InsufficientStructuresInfo]]
         res.get._1.state shouldBe nextState
         res.get._1.player.asInstanceOf[ClassicPlayerImpl].structures( RoadPlacement ) shouldBe 0
         val undoRes = command.undoStep( res.get._1 )
@@ -564,7 +564,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = DevBuildRoadCommand( edge.get.id, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[NoPlacementPointsInfo]]
+        res.get._2 shouldBe a [Some[Info.NoPlacementPointsInfo]]
         res.get._1.state shouldBe nextState
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
@@ -636,7 +636,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = DropHandCardsCommand( state, dropResources )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[LostResourcesInfo]]
+        res.get._2 shouldBe a [Some[Info.LostResourcesInfo]]
         res.get._1.state shouldBe DropHandCardsState( pID1, List( pID ) )
         Success( res.get._1.player.resources ) shouldBe game2.player.resources.subtract( dropResources )
         val undoRes = command.undoStep( res.get._1 )
@@ -650,7 +650,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = DropHandCardsCommand( state, dropResources )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[LostResourcesInfo]]
+        res.get._2 shouldBe a [Some[Info.LostResourcesInfo]]
         res.get._1.state shouldBe a [RobberPlaceState]
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
@@ -705,7 +705,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         undoRes1.state shouldBe state
         val res = command.doStep( game )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[ResourceChangeInfo]]
+        res.get._2 shouldBe a [Some[Info.ResourceChangeInfo]]
         res.get._1.state shouldBe nextState
         res.get._1.player.resources shouldBe ResourceCards.of( wood = 3 )
         res.get._1.player( pID2 ).resources shouldBe ResourceCards.of()
@@ -763,7 +763,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = PlaceRobberCommand( 19, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[ResourceChangeInfo]]
+        res.get._2 shouldBe a [Some[Info.ResourceChangeInfo]]
         res.get._1.state shouldBe nextState
         res.get._1.player.resources shouldBe ResourceCards.of( wood = 1 )
         res.get._1.player( pID1 ).resources shouldBe ResourceCards.of()
@@ -828,7 +828,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = PlayerTradeCommand( pID2, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[ResourceChangeInfo]]
+        res.get._2 shouldBe a [Some[Info.ResourceChangeInfo]]
         res.get._1.state shouldBe ActionState()
         res.get._1.player.resources shouldBe ResourceCards.of( clay = 1 )
         res.get._1.player( pID2 ).resources shouldBe ResourceCards.of( wood = 1 )
@@ -938,7 +938,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = RollDicesCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[DiceInfo]]
+        res.get._2 shouldBe a [Some[Info.DiceInfo]]
         res.get._1.state shouldBe a [RobberPlaceState]
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
@@ -948,7 +948,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = RollDicesCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[DiceInfo]]
+        res.get._2 shouldBe a [Some[Info.DiceInfo]]
         res.get._1.state shouldBe DropHandCardsState( pID )
         val undoRes = command.undoStep( res.get._1 )
         undoRes.state shouldBe state
@@ -965,7 +965,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = RollDicesCommand( state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[GatherInfo]]
+        res.get._2 shouldBe a [Some[Info.GatherInfo]]
         res.get._1.state shouldBe ActionState()
         res.get._1.player( pID ).resources shouldBe ResourceCards.of()
         res.get._1.player( pID1 ).resources shouldBe ResourceCards.of( clay = 1 )
@@ -1047,7 +1047,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         val command = SetBuildStateCommand( RoadPlacement, state )
         val res = command.doStep( game2 )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[LostResourcesInfo]]
+        res.get._2 shouldBe a [Some[Info.LostResourcesInfo]]
         res.get._1.state shouldBe BuildState( RoadPlacement )
         res.get._1.player.resources shouldBe ResourceCards.of()
         val undoRes = command.undoStep( res.get._1 )
@@ -1265,7 +1265,7 @@ class CommandSpec extends AnyWordSpec with Matchers {
         undoRes1.state shouldBe state
         val res = command.doStep( game )
         res shouldBe a [Success[_]]
-        res.get._2 shouldBe a [Some[GotResourcesInfo]]
+        res.get._2 shouldBe a [Some[Info.GotResourcesInfo]]
         res.get._1.state shouldBe nextState
         Success( res.get._1.asInstanceOf[ClassicGameImpl].resourceStack ) shouldBe game.resourceStack.subtract( resources )
         res.get._1.player.resources shouldBe resources

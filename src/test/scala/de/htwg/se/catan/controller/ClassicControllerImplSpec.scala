@@ -50,8 +50,8 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
         controller.redoAction()
         observer.error shouldBe Some( NothingToRedo )
         controller.endTurn()
-        controller.update( Some( DiceInfo( 1, 2 ) ) )
-        observer.updateInfo shouldBe Some( DiceInfo( 1, 2 ) )
+        controller.update( Some( Info.DiceInfo( 1, 2 ) ) )
+        observer.updateInfo shouldBe Some( Info.DiceInfo( 1, 2 ) )
       }
       "save and load game" in {
         val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )

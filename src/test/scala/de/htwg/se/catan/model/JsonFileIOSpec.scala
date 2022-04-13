@@ -5,6 +5,7 @@ import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.commands.InitGameCommand
 import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, JsonParseError, JsonSerializable }
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
+import de.htwg.se.catan.model.impl.fileio.jsonSerializableWrites
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

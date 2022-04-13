@@ -106,7 +106,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     playerFactory = playerFactory,
     playerFactoryClass = playerFactoryClass,
     availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.asInstanceOf[List[Placement]].contains ),
-    developmentCards = DevelopmentCard.getStack( new Random( seed ) ),
+    developmentCards = DevelopmentCard.getStack( Random( seed ) ),
   )
 
   def this( gameField:GameField, turn:Turn, seed:Int, playerFactory:PlayerFactory, playerFactoryClass:String ) =
@@ -211,7 +211,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
 
   def addPlayer( playerColor:PlayerColor, name:String ):ClassicGameImpl =
-    val pID = new PlayerID( playersVal.size )
+    val pID = PlayerID( playersVal.size )
     //val p = ClassicPlayerImpl( pID, playerColor, name )
     val p = playerFactory.create( pID, playerColor, name )
     copy( playersVal = playersVal + (pID -> p) )
@@ -229,7 +229,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
   def rollDice( r:Random ):Int = r.nextInt( 6 ) + 1
 
   def rollDices( ):(Int, Int) =
-    val r = new Random( seedVal * round )
+    val r = Random( seedVal * round )
     (rollDice( r ), rollDice( r ))
 
 

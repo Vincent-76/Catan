@@ -3,6 +3,7 @@ package de.htwg.se.catan.model
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.resourceCardsReads
 import de.htwg.se.catan.model.commands._
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl

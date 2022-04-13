@@ -182,7 +182,7 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ):
 
 
   def apply( seed:Int ):ClassicGameFieldImpl =
-    val random = new Random( seed )
+    val random = Random( seed )
     val hexagons = createHexagons( random )
     val edges = createEdges( hexagons, random )
     val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area.isInstanceOf[DesertArea] ).get.get
@@ -246,9 +246,9 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ):
           } )
           if adjacent < 6 then
             val (hex, portAreas, waterAreas) = if port && (res._2._1 != areas._1 || res._2._2 != areas._2 || random.nextBoolean()) then
-              (new Hex( data.get._1, data.get._2, data.get._3, res._2._1.head ), res._2._1.tail, res._2._2)
+              (Hex( data.get._1, data.get._2, data.get._3, res._2._1.head ), res._2._1.tail, res._2._2)
             else
-              (new Hex( data.get._1, data.get._2, data.get._3, res._2._2.head ), res._2._1, res._2._2.tail)
+              (Hex( data.get._1, data.get._2, data.get._3, res._2._2.head ), res._2._1, res._2._2.tail)
             //val hex = Hex( data.get._1, data.get._2, data.get._3, res._2._1.head )
             (res1.updated( i, res1( i ) :+ Some( hex ) ), (portAreas, waterAreas, res._2._3, res._2._4))
           else
@@ -258,7 +258,7 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ):
             val (area, numbers) = res._2._3.head match
               case Some( x ) => (ResourceArea( x, res._2._4( numberIndex ) ), res._2._4.removeAt( numberIndex ))
               case _ => (DesertArea(), res._2._4)
-            val hex = Some( new Hex( data.get._1, data.get._2, data.get._3, area ) )
+            val hex = Some( Hex( data.get._1, data.get._2, data.get._3, area ) )
             (res1.updated( i, res1( i ) :+ hex ), (res._2._1, res._2._2, res._2._3.tail, numbers))
         else
           (res1.updated( i, res1( i ) :+ None ), res._2)
@@ -317,7 +317,7 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ):
           createPortEdge( m, h, h, nHex.get, hexagons, random )
         else if isPortHex( nHex.get ) && h.area.isInstanceOf[LandArea] then
           createPortEdge( m, nHex.get, h, nHex.get, hexagons, random )
-        else new Edge( m.size, h, nHex.get )
+        else Edge( m.size, h, nHex.get )
       ))
     else m
 
@@ -336,17 +336,17 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ):
         val edge = m.get( if h.id < portHex.id then (h, portHex) else (portHex, h) )
         if edge.isDefined then
           if edge.get.port.isDefined then
-            return new Edge( m.size, h1, h2 )
+            return Edge( m.size, h1, h2 )
           else false
         else true
       } )
       random.element( l ).use( h => {
         if h.get == landHex then
-          new Edge( m.size, h1, h2, port )
+          Edge( m.size, h1, h2, port )
         else
-          new Edge( m.size, h1, h2 )
+          Edge( m.size, h1, h2 )
       } )
-    else new Edge( m.size, h1, h2, port )
+    else Edge( m.size, h1, h2, port )
 
 
   def createVertices( hexagons:Hexagons, edges:Edges ):Vertices =
@@ -362,7 +362,7 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ):
     val hex1 = findHex( c1._1, c1._2, hexagons )
     val hex2 = findHex( c2._1, c2._2, hexagons )
     if hex1.isDefined && hex2.isDefined then
-      m + ((h, hex1.get, hex2.get) -> new Vertex( m.size, h, hex1.get, hex2.get, getPortEdge( h, hex1.get, hex2.get, edges ) ))
+      m + ((h, hex1.get, hex2.get) -> Vertex( m.size, h, hex1.get, hex2.get, getPortEdge( h, hex1.get, hex2.get, edges ) ))
     else m
 
   private def getPortEdge( h1:Hex, h2:Hex, h3:Hex, edges:Edges ):Option[Port] =

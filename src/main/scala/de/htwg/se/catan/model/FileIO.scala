@@ -13,7 +13,7 @@ object FileIO extends ObjectComponent[FileIO]:
     val extension = path.substring( path.lastIndexOf( "." ) + 1 )
     impls.find( _.extension ^= extension ) match
       case Some( impl ) => impl.load( path )
-      case _ => throw new NotImplementedError( "Loader for extension: '" + extension + "'!" )
+      case _ => throw NotImplementedError( "Loader for extension: '" + extension + "'!" )
 
 
 abstract class FileIO( val extension:String ) extends ComponentImpl:
@@ -21,7 +21,7 @@ abstract class FileIO( val extension:String ) extends ComponentImpl:
 
   def getFileName:String =
     File( CatanModule.savegamePath ).createDirectory().path + File.separator +
-    "Catan_" + new SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" )
+    "Catan_" + SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" )
       .format( Calendar.getInstance().getTime ) + "_savegame." + extension
 
   def load( path:String ):(Game, List[Command], List[Command])

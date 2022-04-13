@@ -20,13 +20,13 @@ import scala.io.StdIn
 object Catan:
   val debug = false
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = false ) )
+  val injector:Injector = Guice.createInjector( CatanModule( test = false ) )
   val controller:Controller = injector.getInstance( classOf[Controller] )
-  val tui:TUI = new TUI( controller )
+  val tui:TUI = TUI( controller )
 
   def main( args:Array[String] ):Unit =
     val gui:Option[GUIApp] = if args.contains( "gui" ) then
-      Some( new GUIApp( controller ) )
+      Some( GUIApp( controller ) )
     else None
     var input:String = ""
     input = StdIn.readLine()
@@ -34,5 +34,5 @@ object Catan:
     while input != "exit" do
       input = StdIn.readLine()
       tui.onInput( input )
-    if( gui.isDefined )
+    if gui.isDefined then
       gui.get.exit()
