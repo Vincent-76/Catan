@@ -29,6 +29,10 @@ lazy val root = project
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.1",
     libraryDependencies += ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" ).cross( CrossVersion.for3Use2_13 ) ,
 
+    libraryDependencies += ( "com.typesafe.akka" %% "akka-http" % "10.2.9" ).cross( CrossVersion.for3Use2_13 ),
+    libraryDependencies += ( "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
+    libraryDependencies += ( "com.typesafe.akka" %% "akka-stream" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
+
     coverageExcludedPackages := "de.htwg.se.catan.aview.*",
     coverageExcludedFiles := ".*(Catan|CatanModule)",
 
@@ -63,7 +67,7 @@ lazy val osName = System.getProperty("os.name") match {
   case n if n.startsWith("Linux") => "linux"
   case n if n.startsWith("Mac") => "mac"
   case n if n.startsWith("Windows") => "win"
-  case _ => throw Exception("Unknown platform!")
+  case _ => throw new Exception("Unknown platform!")
 }
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
