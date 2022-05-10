@@ -1,9 +1,9 @@
 package de.htwg.se.catan.aview.gui.gamefield
 
 import de.htwg.se.catan.aview.gui.impl.placement.RobberPlacementOverlayImpl
-import de.htwg.se.catan.aview.gui.{ FieldInputDisplayState, GUIApp }
+import de.htwg.se.catan.aview.gui.{ FieldInputDisplayState, GUI, GUIApp }
 import de.htwg.se.catan.model.{ Edge, Hex, Vertex }
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.scene.layout.{ AnchorPane, StackPane }
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
@@ -30,9 +30,9 @@ class InteractionPane extends AnchorPane:
           val p = coords( h )
           (h.id, (p._1, p._2 - RobberPlacementOverlayImpl.robberDist * hSize))
         case e:Edge =>
-          (e.id, GUIApp.middleOf( coords( e.h1 ), coords( e.h2 ) ))
+          (e.id, GUI.middleOf( coords( e.h1 ), coords( e.h2 ) ))
         case v:Vertex =>
-          (v.id, GUIApp.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) ))
+          (v.id, GUI.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) ))
       }.map( p => {
         new StackPane {
           children = List(

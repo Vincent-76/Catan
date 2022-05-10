@@ -4,6 +4,7 @@ import Card.ResourceCards
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
+import de.htwg.se.catan.model.error.{ InsufficientResources, InsufficientStructures, InsufficientDevCards }
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

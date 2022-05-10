@@ -3,6 +3,7 @@ package de.htwg.se.catan.model.commands
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
+import de.htwg.se.catan.model.info.ResourceChangeInfo
 import de.htwg.se.catan.model.state.MonopolyState
 import de.htwg.se.catan.model.{ Player, * }
 import de.htwg.se.catan.util.*
@@ -55,7 +56,7 @@ case class MonopolyCommand( resource:Resource, state:MonopolyState ) extends Com
     success(
       game.setState( state.nextState )
         .updatePlayers( ( newData._1 :+ game.player.addResourceCard( resource, amount ) ):_* ),
-      info = Some( Info.ResourceChangeInfo(
+      info = Some( ResourceChangeInfo(
         playerAdd = Map( game.onTurn -> ResourceCards.ofResource( resource, amount ) ),
         playerSub = newData._2.map( d => (d._1, ResourceCards.ofResource( resource, d._2 )) )
       ) )

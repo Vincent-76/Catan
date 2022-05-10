@@ -31,7 +31,7 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
               radius = 12
               //stroke = Color.White
               strokeWidth = 2
-              stroke = GUIApp.colorOf( player.color )
+              stroke = GUI.colorOf( player.color )
               fill = Color.Transparent
             },
             new Text( game.getPlayerVictoryPoints( player.id ).toString ) {
@@ -43,7 +43,7 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
         new Label( player.name ) {
           styleClass.add( "playerInfoName" )
           style = "-fx-font-size: 22;"
-          textFill = GUIApp.colorOf( player.color )
+          textFill = GUI.colorOf( player.color )
         }
       )
     },
@@ -58,7 +58,7 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
           hgrow = Priority.Always
           alignment = Pos.Center
           children = List(
-            new ImageView( GUIApp.resourceIcons( d._1._1 ) ) {
+            new ImageView( GUI.resourceIcons( d._1._1 ) ) {
               fitWidth = 40
               preserveRatio = true
             },

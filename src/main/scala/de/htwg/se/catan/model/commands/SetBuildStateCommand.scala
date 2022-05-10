@@ -2,9 +2,11 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.state.BuildState
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.error.{ InsufficientStructures, NoPlacementPoints, UnavailableStructure }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.model.info.LostResourcesInfo
+import de.htwg.se.catan.util.*
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
@@ -48,7 +50,7 @@ case class SetBuildStateCommand( structure:StructurePlacement, state:State ) ext
     else game.dropResourceCards( game.onTurn, structure.resources ) match
       case Success( newGame ) => success(
         newGame.setState( BuildState( structure ) ),
-        info = Some( Info.LostResourcesInfo( game.onTurn, structure.resources ) )
+        info = Some( LostResourcesInfo( game.onTurn, structure.resources ) )
       )
       case f => f.rethrow
 

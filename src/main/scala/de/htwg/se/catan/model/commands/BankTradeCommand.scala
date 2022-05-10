@@ -1,11 +1,13 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.Card.resourceCardsReads
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.error.{ InsufficientBankResources, InsufficientResources }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.model.info.BankTradedInfo
+import de.htwg.se.catan.util.*
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
@@ -67,7 +69,7 @@ case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Com
       game.drawResourceCards( game.onTurn, get )._1.dropResourceCards( game.onTurn, giveResources ) match
         case Success( newGame ) => success(
           newGame,
-          Some( Info.BankTradedInfo( game.onTurn, giveResources, get ) ) )
+          Some( BankTradedInfo( game.onTurn, giveResources, get ) ) )
         //case f => f.rethrow
 
   override def undoStep( game:Game ):Game = giveResources match

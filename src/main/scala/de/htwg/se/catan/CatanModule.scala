@@ -13,7 +13,9 @@ import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
+import de.htwg.se.catan.model.info.*
 import de.htwg.se.catan.model.state.*
+import de.htwg.se.catan.model.error.*
 import net.codingwell.scalaguice.ScalaModule
 
 import scala.util.Random
@@ -74,6 +76,56 @@ object CatanModule:
     SetPlayerTradeStateCommand.init()
     UseDevCardCommand.init()
     YearOfPlentyCommand.init()
+
+    BankTradedInfo.init()
+    BuiltInfo.init()
+    DiceInfo.init()
+    DrawnDevCardInfo.init()
+    GameEndInfo.init()
+    GameLoadedInfo.init()
+    GameSavedInfo.init()
+    GatherInfo.init()
+    GotResourcesInfo.init()
+    InsufficientStructuresInfo.init()
+    LostResourcesInfo.init()
+    NoPlacementPointsInfo.init()
+    ResourceChangeInfo.init()
+
+    AlreadyUsedDevCardInTurnImpl.init()
+    DevCardDrawnInTurn.init()
+    DevStackIsEmptyImpl.init()
+    FailImpl.init()
+    InconsistentDataImpl.init()
+    InsufficientBankResourcesImpl.init()
+    InsufficientDevCards.init()
+    InsufficientResourcesImpl.init()
+    InsufficientStructures.init()
+    InvalidDevCard.init()
+    InvalidPlacementPoint.init()
+    InvalidPlayer.init()
+    InvalidPlayerColor.init()
+    InvalidPlayerID.init()
+    InvalidResourceAmount.init()
+    NoAdjacentStructureImpl.init()
+    NoConnectedStructures.init()
+    NonExistentPlacementPoint.init()
+    NoPlacementPoints.init()
+    NotEnoughPlayersImpl.init()
+    NothingToRedoImpl.init()
+    NothingToUndoImpl.init()
+    NoUniqueBeginnerImpl.init()
+    PlacementPointNotEmpty.init()
+    PlayerColorIsAlreadyInUse.init()
+    PlayerNameAlreadyExists.init()
+    PlayerNameEmptyImpl.init()
+    PlayerNameTooLong.init()
+    RobberOnlyOnLandImpl.init()
+    SettlementRequired.init()
+    TooCloseToBuilding.init()
+    TradePlayerInsufficientResourcesImpl.init()
+    UnavailableStructure.init()
+    UniqueBeginnerExistsImpl.init()
+    WrongStateImpl.init()
 
     Structure.init()
     Area.init()

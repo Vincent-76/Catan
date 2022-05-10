@@ -22,10 +22,10 @@ abstract class ComponentImpl:
   def init():Unit
 
 
-trait DeserializerComponentImpl[+T]( var name:String ) extends ComponentImpl with XMLDeserializer[T] with JsonDeserializer[T]
+trait DeserializerComponentImpl[+T]( val name:String ) extends ComponentImpl with XMLDeserializer[T] with JsonDeserializer[T]
 
 
-abstract class ClassComponent[T, I <: DeserializerComponentImpl[T]] extends Component[I] with XMLDeserializer[T] with JsonDeserializer[T]:
+trait ClassComponent[T, I <: DeserializerComponentImpl[T]] extends Component[I] with XMLDeserializer[T] with JsonDeserializer[T]:
 
   def findImpl( name:String ):I | String = impls.find( _.name ^= name ) match
     case Some( v ) => v

@@ -7,6 +7,7 @@ import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state.{ ActionState, InitState }
+import de.htwg.se.catan.model.error.{ PlayerColorIsAlreadyInUse, PlayerNameAlreadyExists, InsufficientResources, DevStackIsEmpty }
 import de.htwg.se.catan.util._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

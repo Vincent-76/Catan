@@ -1,9 +1,10 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
+import de.htwg.se.catan.model.error.UniqueBeginnerExists
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
 import de.htwg.se.catan.model.state.InitBeginnerState
-import de.htwg.se.catan.model.{ Command, _ }
+import de.htwg.se.catan.model.{ Command, * }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Random, Try }

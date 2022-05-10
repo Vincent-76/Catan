@@ -3,8 +3,8 @@ package de.htwg.se.catan.aview.tui.tuistate
 import de.htwg.se.catan.aview.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Card._
-import de.htwg.se.catan.model.InvalidPlayerID
 import de.htwg.se.catan.model.state.RobberStealState
+import de.htwg.se.catan.model.error.InvalidPlayerID
 
 /**
  * @author Vincent76;

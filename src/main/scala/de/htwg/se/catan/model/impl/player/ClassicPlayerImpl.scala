@@ -2,12 +2,13 @@ package de.htwg.se.catan.model.impl.player
 
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
-import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.Card.resourceCardsReads
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLSequence }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.model.error.{ InsufficientDevCards, InsufficientStructures }
+import de.htwg.se.catan.util.*
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Random, Success, Try }

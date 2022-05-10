@@ -1,7 +1,7 @@
 package de.htwg.se.catan.aview.gui.impl.placement
 
 import de.htwg.se.catan.Catan
-import de.htwg.se.catan.aview.gui.GUIApp
+import de.htwg.se.catan.aview.gui.{ GUI, GUIApp }
 import de.htwg.se.catan.aview.gui.gamefield.GameFieldPane.Coords
 import de.htwg.se.catan.aview.gui.gamefield.{ GameFieldPane, PlacementOverlay }
 import de.htwg.se.catan.model.Game
@@ -19,20 +19,20 @@ object RoadPlacementOverlayImpl extends PlacementOverlay:
         game.gameField.adjacentVertices( e ) match
           case List( vertex1, vertex2 ) =>
             val r = getRoadCoordinates(
-              GUIApp.middleOf( coords( vertex1.h1 ), coords( vertex1.h2 ), coords( vertex1.h3 ) ),
-              GUIApp.middleOf( coords( vertex2.h1 ), coords( vertex2.h2 ), coords( vertex2.h3 ) )
+              GUI.middleOf( coords( vertex1.h1 ), coords( vertex1.h2 ), coords( vertex1.h3 ) ),
+              GUI.middleOf( coords( vertex2.h1 ), coords( vertex2.h2 ), coords( vertex2.h3 ) )
             )
             if e.road.isDefined then
               context.stroke = Color.Black
               context.lineWidth = GameFieldPane.mult( 7, hSize )
               context.strokeLine( r._1._1, r._1._2, r._2._1, r._2._2 )
-              context.stroke = GUIApp.colorOf( game.player( e.road.get.owner ).color )
+              context.stroke = GUI.colorOf( game.player( e.road.get.owner ).color )
               context.lineWidth = GameFieldPane.mult( 5, hSize )
               context.strokeLine( r._1._1, r._1._2, r._2._1, r._2._2 )
             if Catan.debug then
               context.fill = Color.White
               context.font = Font.font( Font.default.getFamily, GameFieldPane.mult( 10, hSize ) )
-              val c = GUIApp.middleOf( r._1, r._2 )
+              val c = GUI.middleOf( r._1, r._2 )
               context.fillText( e.id.toString, c._1, c._2 )
           case _ =>
     } )

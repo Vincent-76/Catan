@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview.gui
 
 import de.htwg.se.catan.model.{Game, KnightCard, Player}
 import de.htwg.se.catan.model.Card._
-import de.htwg.se.catan.aview.gui.GUIApp._
+import de.htwg.se.catan.aview.gui.GUI._
 import scalafx.geometry.Insets
 import scalafx.scene.control.Label
 import scalafx.scene.layout.{AnchorPane, ColumnConstraints, GridPane, HBox, Priority, RowConstraints, StackPane, VBox}
@@ -14,20 +14,20 @@ import scalafx.scene.text.Text
  * @author Vincent76;
  */
 class PlayerInfoPane( game:Game, p:Player ) extends AnchorPane:
-  background = GUIApp.woodBackground
+  background = GUI.woodBackground
   margin = Insets( 0, 10, 10, 10 )
   style = "-fx-border-color: #000000"
   /*effect = new DropShadow {
     offsetX = 0
     offsetY = 0
-    color = GUIApp.colorOf( p.color )
+    color = GUI.colorOf( p.color )
     width = 5
     height = 5
   }*/
   val main:VBox = getInfoBox
   val bonusCards:VBox = new VBox:
     children = game.bonusCards.filter( d => d._2.isDefined && d._2.get._1 == p.id ).map( d => new StackPane:
-      style = "-fx-border-color: " + GUIApp.colorOf( p.color ).toHex + "; -fx-border-width: 0 0 1 1; -fx-background-color: #5a5a5a"
+      style = "-fx-border-color: " + GUI.colorOf( p.color ).toHex + "; -fx-border-width: 0 0 1 1; -fx-background-color: #5a5a5a"
       minWidth = 20
       minHeight = 20
       children = new Text( d._1.title.replaceAll( "[a-z\\s]", "" ) ):
@@ -52,7 +52,7 @@ class PlayerInfoPane( game:Game, p:Player ) extends AnchorPane:
                 radius = 9
                 //stroke = Color.White
                 strokeWidth = 2
-                stroke = GUIApp.colorOf( p.color )
+                stroke = GUI.colorOf( p.color )
                 fill = Color.Transparent
               ,
               new Text( game.getPlayerDisplayVictoryPoints( p.id ).toString ):
@@ -61,7 +61,7 @@ class PlayerInfoPane( game:Game, p:Player ) extends AnchorPane:
             )
           ,
           new Label( p.name ):
-            textFill = GUIApp.colorOf( p.color )
+            textFill = GUI.colorOf( p.color )
             style = "-fx-font-size: 16;"
             styleClass.add( "playerInfoName" )
             //effect = new Glow( 0.7 )

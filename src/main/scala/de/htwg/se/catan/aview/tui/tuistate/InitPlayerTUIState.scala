@@ -1,8 +1,9 @@
 package de.htwg.se.catan.aview.tui.tuistate
 
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.{ InvalidPlayerColor, PlayerColor }
+import de.htwg.se.catan.model.PlayerColor
 import de.htwg.se.catan.aview.tui.{ CommandInput, TUI, TUIState }
+import de.htwg.se.catan.model.error.InvalidPlayerColor
 
 /**
  * @author Vincent76;

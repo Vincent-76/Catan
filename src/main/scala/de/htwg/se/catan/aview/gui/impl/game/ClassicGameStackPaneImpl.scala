@@ -1,8 +1,8 @@
 package de.htwg.se.catan.aview.gui.impl.game
 
-import de.htwg.se.catan.aview.gui.{ GUIApp, GameStackPane }
+import de.htwg.se.catan.aview.gui.{ GUI, GUIApp, GameStackPane }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
 import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{ ColumnConstraints, GridPane, Pane, VBox }
@@ -56,7 +56,7 @@ class ClassicGameStackPaneImpl extends GameStackPane[ClassicGameImpl]:
   private def createStack( r:Option[Resource] ):Pane = new VBox() {
     alignment = Pos.Center
     children = List(
-      new ImageView( if r.isDefined then GUIApp.resourceIcons( r.get ) else GUIApp.devCardIcon ) {
+      new ImageView( if r.isDefined then GUI.resourceIcons( r.get ) else GUI.devCardIcon ) {
         fitWidth = 40
         preserveRatio = true
       },

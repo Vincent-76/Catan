@@ -3,9 +3,11 @@ package de.htwg.se.catan.model.commands
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.Card.resourceCardsReads
+import de.htwg.se.catan.model.error.InvalidResourceAmount
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode }
+import de.htwg.se.catan.model.info.LostResourcesInfo
 import de.htwg.se.catan.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
-import de.htwg.se.catan.model.{ Command, CommandImpl, Game, Info, InvalidResourceAmount }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game, Info }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
@@ -48,7 +50,7 @@ case class DropHandCardsCommand( state:DropHandCardsState, cards:ResourceCards )
         val nextState = newGame.checkHandCardsInOrder( game.players( state.pID ), state.dropped :+ state.pID ) match
           case Some( p ) => DropHandCardsState( p.id, state.dropped :+ state.pID )
           case None => RobberPlaceState( ActionState() )
-        success( newGame.setState( nextState ), Some( Info.LostResourcesInfo( state.pID, cards ) ) )
+        success( newGame.setState( nextState ), Some( LostResourcesInfo( state.pID, cards ) ) )
       //case f => f.rethrow
 
   override def undoStep( game:Game ):Game = game.setState( state ).drawResourceCards( state.pID, cards )._1

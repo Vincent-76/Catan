@@ -17,7 +17,7 @@ abstract class TradeCommand( title:String ) extends SimpleGUICommand( title ):
     headerText = "Select resources to trade"
     content = new VBox {
       spacing = 10
-      val give = new ResourceSelector( gui.controller.player.resources )
+      val give = new ResourceSelector( gui.game.player.resources )
       val get = new ResourceSelector()
       children = List(
         new VBox {

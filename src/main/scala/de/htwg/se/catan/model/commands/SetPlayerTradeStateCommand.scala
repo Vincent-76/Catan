@@ -3,9 +3,10 @@ package de.htwg.se.catan.model.commands
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.Card.resourceCardsReads
+import de.htwg.se.catan.model.error.InsufficientResources
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode }
 import de.htwg.se.catan.model.state.{ PlayerTradeEndState, PlayerTradeState }
-import de.htwg.se.catan.model.{ Command, CommandImpl, Game, InsufficientResources, State }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game, State }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }

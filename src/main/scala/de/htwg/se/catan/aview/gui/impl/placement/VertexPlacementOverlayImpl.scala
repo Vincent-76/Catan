@@ -1,7 +1,7 @@
 package de.htwg.se.catan.aview.gui.impl.placement
 
 import de.htwg.se.catan.Catan
-import de.htwg.se.catan.aview.gui.GUIApp
+import de.htwg.se.catan.aview.gui.{ GUI, GUIApp }
 import de.htwg.se.catan.aview.gui.gamefield.GameFieldPane.Coords
 import de.htwg.se.catan.aview.gui.gamefield.{ GameFieldPane, PlacementOverlay }
 import de.htwg.se.catan.model.{ Building, Game }
@@ -16,9 +16,9 @@ abstract class VertexPlacementOverlayImpl[T <: Building] extends PlacementOverla
     context.lineWidth = 1
     game.gameField.vertexList.foreach( v => {
       if Catan.debug || v.building.isDefined then
-        val c = GUIApp.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) )
+        val c = GUI.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) )
         if v.building.isDefined && doDraw( v.building.get ) then
-          context.fill = GUIApp.colorOf( game.player( v.building.get.owner ).color )
+          context.fill = GUI.colorOf( game.player( v.building.get.owner ).color )
           val p = points( hSize, c )
           context.fillPolygon( p )
           context.strokePolygon( p )

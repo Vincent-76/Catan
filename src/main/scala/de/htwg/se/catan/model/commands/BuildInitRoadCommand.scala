@@ -3,8 +3,9 @@ package de.htwg.se.catan.model.commands
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
+import de.htwg.se.catan.model.error.InvalidPlacementPoint
 import de.htwg.se.catan.model.state.{ BuildInitRoadState, BuildInitSettlementState, NextPlayerState }
-import de.htwg.se.catan.model.{ Command, CommandImpl, Game, InvalidPlacementPoint }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game }
 import de.htwg.se.catan.util._
 import play.api.libs.json.{ JsValue, Json }
 

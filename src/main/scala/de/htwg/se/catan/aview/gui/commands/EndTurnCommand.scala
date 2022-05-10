@@ -7,4 +7,4 @@ import de.htwg.se.catan.aview.gui.GUI
  */
 case object EndTurnCommand extends SimpleGUICommand( "End Turn" ):
 
-  override protected def action( gui:GUI ):Unit = gui.controller.endTurn()
+  override protected def action( gui:GUI ):Unit = gui.api.endTurn()

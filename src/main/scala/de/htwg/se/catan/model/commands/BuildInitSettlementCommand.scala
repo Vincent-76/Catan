@@ -1,12 +1,13 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model.Card._
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.Card.*
+import de.htwg.se.catan.model.*
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.SettlementPlacement
+import de.htwg.se.catan.model.info.GotResourcesInfo
 import de.htwg.se.catan.model.state.{ BuildInitRoadState, BuildInitSettlementState }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.util.*
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Success, Try }
@@ -48,7 +49,7 @@ case class BuildInitSettlementCommand( vID:Int, state:BuildInitSettlementState )
           success(
             game.setState( BuildInitRoadState( vID ) )
               .drawResourceCards( game.onTurn, resources )._1,
-            Some( Info.GotResourcesInfo( game.onTurn, resources ) )
+            Some( GotResourcesInfo( game.onTurn, resources ) )
           )
         else success( game.setState( BuildInitRoadState( vID ) ), None )
       case f => f.rethrow

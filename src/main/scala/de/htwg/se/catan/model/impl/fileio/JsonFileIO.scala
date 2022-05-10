@@ -1,7 +1,8 @@
 package de.htwg.se.catan.model.impl.fileio
 
 import de.htwg.se.catan.model.{ Command, FileIO, Game }
-import play.api.libs.json.{ JsArray, JsDefined, JsLookupResult, JsNull, JsValue, Json, Reads, Writes }
+import play.api.libs.json.JsValue.jsValueToJsLookup
+import play.api.libs.json.{ JsArray, JsDefined, JsLookupResult, JsNull, JsSuccess, JsValue, Json, Reads, Writes }
 
 import java.io.{ File, PrintWriter }
 import scala.io.Source

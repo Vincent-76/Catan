@@ -1,11 +1,12 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
+import de.htwg.se.catan.model.info.{ GatherInfo, DiceInfo }
 import de.htwg.se.catan.model.state.{ ActionState, DropHandCardsState, RobberPlaceState }
-import de.htwg.se.catan.model.{ Card, _ }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.model.{ Card, * }
+import de.htwg.se.catan.util.*
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Success, Try }
@@ -44,8 +45,8 @@ case class RollDicesCommand( state:State ) extends Command:
     DiceValue.of( dices._1 + dices._2 ) match
       //case None => Failure( Fail )
       case Some( DiceValue.Seven ) => game.checkHandCardsInOrder() match
-        case Some( p ) => Success( game.setState( DropHandCardsState( p.id ) ), Some( Info.DiceInfo( dices ) ) )
-        case None => Success( game.setState( RobberPlaceState( ActionState() ) ), Some( Info.DiceInfo( dices ) ) )
+        case Some( p ) => Success( game.setState( DropHandCardsState( p.id ) ), Some( DiceInfo( dices ) ) )
+        case None => Success( game.setState( RobberPlaceState( ActionState() ) ), Some( DiceInfo( dices ) ) )
       case Some( n:DiceValue ) =>
         val playerResources = game.gameField.hexList.red( Map.empty[PlayerID, ResourceCards], ( resources:Map[PlayerID, ResourceCards], h:Hex ) => {
           if h != game.gameField.robberHex then h.area match 
@@ -77,7 +78,7 @@ case class RollDicesCommand( state:State ) extends Command:
         availablePlayerResources = if drawn.isEmpty then None else Some( drawn )
         success(
           newGame.setState( ActionState() ),
-          info = Some( Info.GatherInfo( dices, playerResources ) )
+          info = Some( GatherInfo( dices, playerResources ) )
         )
 
   override def undoStep( game:Game ):Game = availablePlayerResources match

@@ -3,8 +3,9 @@ package de.htwg.se.catan.model.commands
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
+import de.htwg.se.catan.model.info.{ NoPlacementPointsInfo, InsufficientStructuresInfo, BuiltInfo }
 import de.htwg.se.catan.model.state.DevRoadBuildingState
-import de.htwg.se.catan.model.{ Command, _ }
+import de.htwg.se.catan.model.{ Command, * }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
@@ -43,13 +44,13 @@ case class DevBuildRoadCommand( eID:Int, state:DevRoadBuildingState ) extends Co
       case Failure( t ) => Failure( t )
       case Success( newGame ) =>
         val (nextState, info) = if !newGame.player.hasStructure( RoadPlacement ) then
-          (state.nextState, Info.InsufficientStructuresInfo( newGame.onTurn, RoadPlacement ))
+          (state.nextState, InsufficientStructuresInfo( newGame.onTurn, RoadPlacement ))
         else if RoadPlacement.getBuildablePoints( newGame, newGame.onTurn ).isEmpty then
-          (state.nextState, Info.NoPlacementPointsInfo( newGame.onTurn, RoadPlacement ))
+          (state.nextState, NoPlacementPointsInfo( newGame.onTurn, RoadPlacement ))
         else if state.roads == 0 then
-          (DevRoadBuildingState( state.nextState, state.roads + 1 ), Info.BuiltInfo( RoadPlacement, eID ))
+          (DevRoadBuildingState( state.nextState, state.roads + 1 ), BuiltInfo( RoadPlacement, eID ))
         else
-          (state.nextState, Info.BuiltInfo( RoadPlacement, eID ))
+          (state.nextState, BuiltInfo( RoadPlacement, eID ))
         success( newGame.setState( nextState ), info = Some( info ) )
 
   override def undoStep( game:Game ):Game = game.setState( state )

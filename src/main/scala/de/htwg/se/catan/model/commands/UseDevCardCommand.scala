@@ -1,11 +1,12 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
+import de.htwg.se.catan.model.error.{ AlreadyUsedDevCardInTurn, DevCardDrawnInTurn, InsufficientStructures, NoPlacementPoints }
 import de.htwg.se.catan.model.state.{ DevRoadBuildingState, MonopolyState, RobberPlaceState, YearOfPlentyState }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.util.*
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }

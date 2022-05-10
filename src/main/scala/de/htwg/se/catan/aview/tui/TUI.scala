@@ -2,9 +2,10 @@ package de.htwg.se.catan.aview.tui
 
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Card._
-import de.htwg.se.catan.model.Info._
+import de.htwg.se.catan.model.info._
+import de.htwg.se.catan.model.error._
 import de.htwg.se.catan.model.state._
-import de.htwg.se.catan.model.{ PlacementPointNotEmpty, Player, _ }
+import de.htwg.se.catan.model._
 import de.htwg.se.catan.aview.tui.TUI.InvalidFormat
 import de.htwg.se.catan.aview.tui.command.{ ExitCommand, HelpCommand, LoadCommand, RedoCommand, SaveCommand, UndoCommand }
 import de.htwg.se.catan.aview.tui.tuistate._
@@ -39,7 +40,7 @@ object TUI:
     LoadCommand
   )
 
-  case class InvalidFormat( input:String ) extends ControllerError
+  case class InvalidFormat( input:String ) extends Throwable
 
 
   def clear( ):Unit =
@@ -117,7 +118,7 @@ class TUI( val controller:Controller ) extends Observer:
   var actionInfo:Option[String] = None
 
   controller.add( this )
-  onUpdate( None )
+  onUpdate( controller.game, None )
 
   def onInput( input:String ):Unit =
     val commandInput = CommandInput( input )
@@ -135,7 +136,7 @@ class TUI( val controller:Controller ) extends Observer:
       else
         onError( InvalidFormat( commandInput.input ) )
 
-  override def onUpdate( info:Option[Info] ):Unit =
+  override def onUpdate( game:Game, info:Option[Info] ):Unit =
     val tuiState = findTUIState( controller.game.state )
     TUI.clear()
     val gameDisplay = tuiState.createGameDisplay
@@ -227,8 +228,8 @@ class TUI( val controller:Controller ) extends Observer:
       case NoPlacementPoints( structure ) =>
         "No available placement points for structure " + TUI.errorHighlight( structure.title ) + "!"
       case InvalidResourceAmount( amount ) => "Invalid resource amount: " + TUI.errorHighlight( amount ) + "!"
-      case InvalidTradeResources( give, get ) =>
-        "Invalid trade resources: " + TUI.errorHighlight( give.title ) + " <-> " + TUI.errorHighlight( get.title ) + "!"
+      /*case InvalidTradeResources( give, get ) =>
+        "Invalid trade resources: " + TUI.errorHighlight( give.title ) + " <-> " + TUI.errorHighlight( get.title ) + "!"*/
       case InvalidDevCard( devCard ) => "Invalid dev card: [" + TUI.errorHighlight( devCard ) + "]!"
       case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + TUI.errorHighlight( devCard.title ) + "!"
       case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
@@ -247,7 +248,7 @@ class TUI( val controller:Controller ) extends Observer:
       case InvalidPlayer( playerID ) => "Invalid player with id: " + TUI.errorHighlight( playerID ) + "!"
       case NothingToUndo => "Nothing to undo!"
       case NothingToRedo => "Nothing to redo!"
-      case e:ControllerError => e
+      case e:CustomError => e
       case t:Throwable => s"$t: ${t.getMessage}"
     )
     if actionInfo.isDefined then TUI.action( actionInfo.get )

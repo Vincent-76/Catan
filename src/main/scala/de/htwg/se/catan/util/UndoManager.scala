@@ -1,7 +1,8 @@
 package de.htwg.se.catan.util
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model.{ Command, Game, NothingToRedo, NothingToUndo }
+import de.htwg.se.catan.model.{ Command, Game }
+import de.htwg.se.catan.model.error.{ NothingToUndo, NothingToRedo }
 
 import scala.util.{ Failure, Success, Try }
 

@@ -3,15 +3,17 @@ package de.htwg.se.catan.controller
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.error.{ NothingToUndo, NothingToRedo }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.placement.RoadPlacement
 import de.htwg.se.catan.model.impl.player.ClassicPlayerImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
-import de.htwg.se.catan.model.state._
-import de.htwg.se.catan.model.{ KnightCard, _ }
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.model.info.DiceInfo
+import de.htwg.se.catan.model.state.*
+import de.htwg.se.catan.model.{ KnightCard, * }
+import de.htwg.se.catan.util.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -26,7 +28,7 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
     var info:Option[Info] = None
     var error:Option[Throwable] = None
 
-    override def onUpdate(info: Option[Info]): Unit = this.updateInfo = info
+    override def onUpdate( game:Game, info: Option[Info]): Unit = this.updateInfo = info
 
     override def onInfo(info: Info): Unit = this.info = Some( info )
 
@@ -50,8 +52,8 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
         controller.redoAction()
         observer.error shouldBe Some( NothingToRedo )
         controller.endTurn()
-        controller.update( Some( Info.DiceInfo( 1, 2 ) ) )
-        observer.updateInfo shouldBe Some( Info.DiceInfo( 1, 2 ) )
+        controller.update( controller.game, Some( DiceInfo( 1, 2 ) ) )
+        observer.updateInfo shouldBe Some( DiceInfo( 1, 2 ) )
       }
       "save and load game" in {
         val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )

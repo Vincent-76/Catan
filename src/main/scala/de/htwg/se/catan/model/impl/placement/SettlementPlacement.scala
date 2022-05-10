@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model.impl.placement
 
 import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.error.{ NonExistentPlacementPoint, PlacementPointNotEmpty, NoConnectedStructures, TooCloseToBuilding }
 import de.htwg.se.catan.util._
 
 import scala.util.{ Failure, Success, Try }

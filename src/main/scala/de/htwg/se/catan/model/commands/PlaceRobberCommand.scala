@@ -4,7 +4,8 @@ import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLOption }
 import de.htwg.se.catan.model.state.{ RobberPlaceState, RobberStealState }
-import de.htwg.se.catan.model.{ Hex, _ }
+import de.htwg.se.catan.model.error.{ NonExistentPlacementPoint, PlacementPointNotEmpty, RobberOnlyOnLand }
+import de.htwg.se.catan.model.{ Hex, * }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }

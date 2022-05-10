@@ -1,9 +1,11 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
+import de.htwg.se.catan.model.error.{ InsufficientResources, InvalidPlayer, TradePlayerInsufficientResources }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
+import de.htwg.se.catan.model.info.ResourceChangeInfo
 import de.htwg.se.catan.model.state.{ ActionState, PlayerTradeEndState }
-import de.htwg.se.catan.model.{ Command, _ }
+import de.htwg.se.catan.model.{ Command, * }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
@@ -48,7 +50,7 @@ case class PlayerTradeCommand( tradePlayerID:PlayerID, state:PlayerTradeEndState
         case Success( tradePlayer ) => success(
           game.setState( ActionState() )
             .updatePlayers( newPlayer, tradePlayer ),
-          info = Some( Info.ResourceChangeInfo(
+          info = Some( ResourceChangeInfo(
             playerAdd = Map( newPlayer.id -> state.get, tradePlayer.id -> state.give ),
             playerSub = Map( newPlayer.id -> state.give, tradePlayer.id -> state.get )
           ) ) )

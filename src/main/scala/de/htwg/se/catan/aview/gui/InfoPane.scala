@@ -16,21 +16,21 @@ class InfoPane( gui:GUI ) extends BorderPane:
   vgrow = Priority.Always
   val undoButton:Button = new Button( "<-" ):
     vgrow = Priority.Always
-    onAction = _ => gui.controller.undoAction()
+    onAction = _ => gui.api.undoAction()
   val redoButton:Button = new Button( "->" ):
     vgrow = Priority.Always
-    onAction = _ => gui.controller.redoAction()
+    onAction = _ => gui.api.redoAction()
   val saveButton:Button = new Button( "S" ):
     vgrow = Priority.Always
-    onAction = _ => gui.controller.saveGame()
+    onAction = _ => gui.api.saveGame()
   val loadButton:Button = new Button( "L" ):
     vgrow = Priority.Always
     onAction = _ => {
       val fileChooser = new FileChooser():
         title = "Load savegame"
-      val file = fileChooser.showOpenDialog( gui.guiWrap.stage )
+      val file = fileChooser.showOpenDialog( GUIApp.stage )
       if file != null then
-        gui.controller.loadGame( file.getAbsolutePath )
+        gui.api.loadGame( file.getAbsolutePath )
     }
   right = new VBox:
     vgrow = Priority.Always
@@ -72,9 +72,9 @@ class InfoPane( gui:GUI ) extends BorderPane:
   def setBackground( ):Unit =
     val l = textArea.lookup( ".content" )
     if l != null && l.isInstanceOf[Region] then
-      l.asInstanceOf[Region].setBackground( GUIApp.woodBackground ) // "-fx-background-image: url( \"/wood_background.png\" );"
+      l.asInstanceOf[Region].setBackground( GUI.woodBackground ) // "-fx-background-image: url( \"/wood_background.png\" );"
 
   def update( ):Unit =
-    undoButton.disable = !gui.controller.hasUndo
-    redoButton.disable = !gui.controller.hasRedo
+    undoButton.disable = !gui.api.hasUndo
+    redoButton.disable = !gui.api.hasRedo
 

@@ -1,5 +1,6 @@
 name := "Catan"
 version := "1.0"
+organization := "de.htwg.se.catan"
 
 val scala2Version = "2.13.8"
 val scala3Version = "3.1.1"
@@ -27,20 +28,20 @@ lazy val root = project
     libraryDependencies += ( "net.codingwell" %% "scala-guice" % "5.0.2" ).cross( CrossVersion.for3Use2_13 ),
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.1",
-    libraryDependencies += ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" ).cross( CrossVersion.for3Use2_13 ) ,
+    libraryDependencies += ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" ).cross( CrossVersion.for3Use2_13 ),
 
     libraryDependencies += ( "com.typesafe.akka" %% "akka-http" % "10.2.9" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-stream" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
 
     coverageExcludedPackages := "de.htwg.se.catan.aview.*",
-    coverageExcludedFiles := ".*(Catan|CatanModule)",
+    coverageExcludedFiles := ".*(Catan|CatanModule|Requests)",
 
     // To make the default compiler and REPL use Dotty
     scalaVersion := scala3Version,
     // To cross compile with Scala 3 and Scala 2
     crossScalaVersions := Seq( scala3Version, scala2Version )
-  ).dependsOn( model, util, tui, gui )
+  ).aggregate( model, util, tui, gui )
 
 /*libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
 

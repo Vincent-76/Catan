@@ -13,8 +13,8 @@ class PlayerListPane( gui:GUI ) extends GridPane:
   columnConstraints = List( new ColumnConstraints:
     percentWidth = 100
   )
-  rowConstraints = ( 1 to gui.controller.game.maxPlayers ).map( _ => new RowConstraints:
-    percentHeight = 100 / gui.controller.game.maxPlayers
+  rowConstraints = ( 1 to gui.game.maxPlayers ).map( _ => new RowConstraints:
+    percentHeight = 100 / gui.game.maxPlayers
   )
 
   def update( game:Game ):Unit =

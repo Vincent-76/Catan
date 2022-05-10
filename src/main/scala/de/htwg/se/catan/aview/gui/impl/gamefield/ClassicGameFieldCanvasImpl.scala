@@ -81,7 +81,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl]:
     h.area match
       case a:LandArea =>
         graphicsContext2D.drawImage( tileImg, points( 4 )._1, center._2 - hSize, hWidth, hSize * 2 )
-        //graphicsContext2D.fill = GUIApp.colorOf( h.area.f )
+        //graphicsContext2D.fill = GUI.colorOf( h.area.f )
         //graphicsContext2D.fillPolygon( points )
         //graphicsContext2D.lineWidth = GameFieldCanvas.hexBorderWidth
         //graphicsContext2D.stroke = Color.Black.brighter
@@ -108,7 +108,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl]:
       val image = if w.port.isDefined then
         /*graphicsContext2D.font = Font.font( Font.default.getFamily, FontWeight.Bold, GameFieldPane.mult( 14, hSize ) )
         if ( w.port.get.specific.isDefined ) {
-          graphicsContext2D.fill = GUIApp.colorOf( w.port.get.specific.get )
+          graphicsContext2D.fill = GUI.colorOf( w.port.get.specific.get )
           graphicsContext2D.fillText( w.port.get.specific.get.title, center._1, center._2 )
         } else {
           graphicsContext2D.fill = Color.Black
@@ -117,7 +117,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl]:
         graphicsContext2D.stroke = Color.SaddleBrown.darker.darker
         graphicsContext2D.lineWidth = GameFieldPane.mult( 4, hSize )
         gameField.adjacentVertices( h ).filter( _.port == w.port ).foreach( v => {
-          val m = GUIApp.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) )
+          val m = GUI.middleOf( coords( v.h1 ), coords( v.h2 ), coords( v.h3 ) )
           val a = (center._1 - m._1, center._2 - m._2)
           graphicsContext2D.strokeLine( m._1, m._2,
             m._1 + GameFieldCanvas.portLength * a._1,
@@ -146,7 +146,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl]:
         portImages( w.port.get.specific )( rotNr )
       else waterTileImage
       graphicsContext2D.drawImage( image, hexCorner( hSize, center, 4 )._1, center._2 - hSize, hWidth, hSize * 2 )
-    //graphicsContext2D.stroke = GUIApp.colorOf( Water ).darker.darker.darker
+    //graphicsContext2D.stroke = GUI.colorOf( Water ).darker.darker.darker
     //graphicsContext2D.lineWidth = GameFieldCanvas.hexBorderWidth
     //graphicsContext2D.strokePolygon( ( 0 to 5 ).map( i => hexCorner( hSize, center, i ) ) )
     case _ =>

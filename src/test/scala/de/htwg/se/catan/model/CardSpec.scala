@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model
 
-import Card._
+import de.htwg.se.catan.model.error.InsufficientResources
+import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.CatanModule
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

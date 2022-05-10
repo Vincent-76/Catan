@@ -2,8 +2,9 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
+import de.htwg.se.catan.model.error.NoUniqueBeginner
 import de.htwg.se.catan.model.state.{ BuildInitSettlementState, InitBeginnerState }
-import de.htwg.se.catan.model.{ Command, CommandImpl, Game, NoUniqueBeginner, Turn }
+import de.htwg.se.catan.model.{ Command, CommandImpl, Game, Turn }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Try }

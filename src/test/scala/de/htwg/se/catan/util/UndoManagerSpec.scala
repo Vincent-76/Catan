@@ -4,7 +4,8 @@ import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.commands.{ AddPlayerCommand, InitGameCommand }
 import de.htwg.se.catan.model.state.InitPlayerState
-import de.htwg.se.catan.model.{ Game, Green, NothingToRedo, NothingToUndo, PlayerNameEmpty }
+import de.htwg.se.catan.model.{ Game, Green }
+import de.htwg.se.catan.model.error.{ NothingToUndo, NothingToRedo, PlayerNameEmpty }
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

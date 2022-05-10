@@ -2,10 +2,12 @@ package de.htwg.se.catan.controller.controllerBaseImpl
 
 import com.google.inject.Inject
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.error.WrongState
+import de.htwg.se.catan.model.info.{ GameEndInfo, GameLoadedInfo, GameSavedInfo }
 import de.htwg.se.catan.util.UndoManager
 
-import scala.util.{ Failure, Success }
+import scala.util.{ Failure, Success, Try }
 
 /**
  * @author Vincent76;
@@ -27,33 +29,34 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
       case Some( p ) => Some( p.id )
       case None => Option.empty
 
-  private def actionDone( newGame:Game, /*command:Command, newRedoStack:List[Command],*/ info:Option[Info] ):Unit =
+  private def actionDone( newGame:Game, /*command:Command, newRedoStack:List[Command],*/ info:Option[Info] ):ActionResult =
     gameVal = newGame
     /*undoStack = command :: undoStack
     redoStack = newRedoStack*/
     checkWinner( game ) match
       case None =>
-        update( info )
+        update( game, info )
         //if ( info.isDefined ) info( info.get )
       case Some( pID ) =>
         gameVal = game.setWinner( pID )
-        exit( Some( Info.GameEndInfo( pID ) ) )
+        exit( Some( GameEndInfo( pID ) ) )
+      ActionResult( newGame, info )
 
-  def action( command:Option[Command] ):Unit =
+  def action( command:Option[Command] ):Try[ActionResult] =
     if command.isEmpty then
-      error( WrongState )
+      Failure( error( WrongState ) )
     else undoManager.doStep( command.get, game ) match
-      case Success( (game, info) ) => actionDone( game, info )
-      case Failure( t ) => error( t )
+      case Success( (game, info) ) => Success( actionDone( game, info ) )
+      case Failure( t ) => Failure( error( t ) )
     /*else command.get.doStep( this.game ) match {
       case Success( (game, info) ) => actionDone( game, command.get, Nil, info )
       case Failure( t ) =>
         error( t )
     }*/
 
-  def undoAction():Unit = undoManager.undoStep( game ) match
-    case Success( newGame ) => actionDone( newGame, None )
-    case Failure( t ) => error( t )
+  def undoAction():Try[ActionResult] = undoManager.undoStep( game ) match
+    case Success( newGame ) => Success( actionDone( newGame, None ) )
+    case Failure( t ) => Failure( error( t ) )
     /*undoStack match {
     case Nil => error( NothingToUndo )
     case head :: stack =>
@@ -63,9 +66,9 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
       update()
   }*/
 
-  def redoAction():Unit = undoManager.redoStep( game ) match
-    case Success( (newGame, info) ) => actionDone( newGame, info )
-    case Failure( t ) => error( t )
+  def redoAction():Try[ActionResult] = undoManager.redoStep( game ) match
+    case Success( (newGame, info) ) => Success( actionDone( newGame, info ) )
+    case Failure( t ) => Failure( error( t ) )
     /*redoStack match {
     case Nil => error( NothingToRedo )
     case head :: stack =>
@@ -75,17 +78,23 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
 
   def saveGame():String =
     val path = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
-    update( info = Some( Info.GameSavedInfo( path ) ) )
+    update( game, info = Some( GameSavedInfo( path ) ) )
     path
 
-  def loadGame( path:String ):Unit =
-    val (newGame, undoStack, redoStack) = FileIO.load( path )
-    gameVal = newGame
-    undoManager.clear()
-    undoManager.undoStack = undoStack
-    undoManager.redoStack = redoStack
-    update( info = Some( Info.GameLoadedInfo( path ) ) )
+  def loadGame( path:String ):Try[ActionResult] =
+    try {
+      val (newGame, undoStack, redoStack) = FileIO.load( path )
+      gameVal = newGame
+      undoManager.clear()
+      undoManager.undoStack = undoStack
+      undoManager.redoStack = redoStack
+      val info:Option[Info] = Some( GameLoadedInfo( path ) )
+      update( newGame, info = info )
+      Success( ActionResult( newGame, info ) )
+    } catch {
+      case t:Throwable => Failure( t )
+    }
 
   def exit( info:Option[Info] = None ):Unit =
     running = false
-    update( info )
+    update( gameVal, info )

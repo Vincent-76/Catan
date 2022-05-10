@@ -2,6 +2,7 @@ package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.Command.CommandSuccess
+import de.htwg.se.catan.model.info.ResourceChangeInfo
 import de.htwg.se.catan.model._
 
 import scala.util.Try
@@ -24,7 +25,7 @@ abstract class RobberCommand( ) extends Command:
             game.players( stealPlayerID ).removeResourceCard( r ).get,
             game.player.addResourceCard( r )
           ),
-        info = Some( Info.ResourceChangeInfo(
+        info = Some( ResourceChangeInfo(
           playerAdd = Map( game.onTurn -> ResourceCards.ofResource( r ) ),
           playerSub = Map( stealPlayerID -> ResourceCards.ofResource( r ) )
         ) ) )

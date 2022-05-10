@@ -5,6 +5,7 @@ import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.state.{ ActionState, BuildState }
 import de.htwg.se.catan.model.{ BonusCard, _ }
+import de.htwg.se.catan.model.info.BuiltInfo
 import de.htwg.se.catan.util._
 import play.api.libs.json.{ JsValue, Json }
 
@@ -47,7 +48,7 @@ case class BuildCommand( id:Int, state:BuildState ) extends Command:
         actualBonusCards = Some( game.bonusCards )
         success(
           newGame.setState( ActionState() ),
-          Some( Info.BuiltInfo( state.structure, id ) )
+          Some( BuiltInfo( state.structure, id ) )
         )
       case f => f.rethrow
 

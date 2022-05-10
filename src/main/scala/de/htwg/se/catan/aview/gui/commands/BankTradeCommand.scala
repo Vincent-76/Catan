@@ -9,4 +9,4 @@ import de.htwg.se.catan.aview.gui.GUI
 case object BankTradeCommand extends TradeCommand( "Bank Trade" ):
 
   override def onTrade( gui:GUI, give:ResourceCards, get:ResourceCards ):Unit =
-    gui.controller.bankTrade( give, get )
+    gui.api.bankTrade( give, get )

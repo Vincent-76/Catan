@@ -1,11 +1,11 @@
 package de.htwg.se.catan.aview.gui.util
 
-import de.htwg.se.catan.aview.gui.GUIApp
+import de.htwg.se.catan.aview.gui.{ GUI, GUIApp }
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.Resource
 import scalafx.geometry.{ Orientation, Pos }
 import scalafx.scene.image.ImageView
-import scalafx.scene.layout._
+import scalafx.scene.layout.*
 import scalafx.scene.text.Text
 
 import scala.util.Try
@@ -33,9 +33,9 @@ class ResourceSelector( maximum:ResourceCards = Map.empty,
       children = List(
         new Text( if( maximum.contains( d._1 ) ) "Max: " + maximum( d._1 ) else "" ) {
           style = "-fx-font-size: 14"
-          fill = GUIApp.colorOf( d._1 ).darker.darker
+          fill = GUI.colorOf( d._1 ).darker.darker
         },
-        new ImageView( GUIApp.resourceIcons( d._1 ) ) {
+        new ImageView( GUI.resourceIcons( d._1 ) ) {
           fitWidth = 40
           preserveRatio = true
         },

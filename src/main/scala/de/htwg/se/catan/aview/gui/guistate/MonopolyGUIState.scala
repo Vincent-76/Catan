@@ -1,7 +1,6 @@
 package de.htwg.se.catan.aview.gui.guistate
 
-import de.htwg.se.catan.aview.gui.{ GUICommand, GUIState }
-import de.htwg.se.catan.controller.Controller
+import de.htwg.se.catan.aview.gui.{ GUI, GUICommand, GUIState }
 import de.htwg.se.catan.model.{ Player, Resource }
 import scalafx.geometry.{ Insets, Pos }
 import scalafx.scene.control.Label
@@ -12,7 +11,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class MonopolyGUIState( controller:Controller ) extends GUIState:
+case class MonopolyGUIState( gui:GUI ) extends GUIState:
 
   override def getActions:List[GUICommand] = List( _ => new BorderPane {
     vgrow = Priority.Always
@@ -32,9 +31,9 @@ case class MonopolyGUIState( controller:Controller ) extends GUIState:
         children = new Label( r.title )
         onMouseEntered = _ => effect = new Glow( 0.7 )
         onMouseExited = _ => effect = null
-        onMouseClicked = _ => controller.monopolyAction( r )
+        onMouseClicked = _ => gui.api.monopolyAction( r )
       } )
     }
   } )
 
-  override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )
+  override def playerDisplayed:Option[(Player, Boolean)] = Some( gui.game.player, true )

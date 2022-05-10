@@ -1,13 +1,22 @@
 package de.htwg.se.catan.model
 
-import Card.ResourceCards
+import de.htwg.se.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
+import play.api.libs.json.{ JsSuccess, JsValue, Json, Reads, Writes }
 
 /**
  * @author Vincent76;
  */
-enum Info:
+/*enum Info:
+  given infoWrites:Writes[Info] = ( info:Info ) => Json.obj(
+    "ordinal" -> Json.toJson( info.ordinal ),
+    "data" -> info match
+      case i:Info.GatherInfo => Json.obj(
+        "dices" -> Json.toJson( dices ),
+        "playerResources" -> Json.toJson( playerResources )
+      )
+  )
 
-  case DiceInfo( dices:(Int, Int) ) extends Info  
+  case DiceInfo( dices:(Int, Int) ) extends Info 
   case GatherInfo( dices:(Int, Int), playerResources:Map[PlayerID, ResourceCards] ) extends Info  
   case GotResourcesInfo( pID:PlayerID, cards:ResourceCards ) extends Info  
   case LostResourcesInfo( pID:PlayerID, cards:ResourceCards ) extends Info  
@@ -19,4 +28,16 @@ enum Info:
   case NoPlacementPointsInfo( pID:PlayerID, structure:StructurePlacement ) extends Info
   case GameEndInfo( winner:PlayerID ) extends Info
   case GameSavedInfo( path:String ) extends Info
-  case GameLoadedInfo( path:String ) extends Info
+  case GameLoadedInfo( path:String ) extends Info*/
+
+
+abstract class InfoImpl( name:String ) extends DeserializerComponentImpl[Info]( name ):
+  override def init():Unit = Info.addImpl( this )
+
+
+object Info extends ClassComponent[Info, InfoImpl]:
+  given stateWrites:Writes[Info] = ( o:Info ) => o.toJson
+  given stateReads:Reads[Info] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+
+
+trait Info extends XMLSerializable with JsonSerializable

@@ -1,10 +1,12 @@
 package de.htwg.se.catan.model.commands
 
-import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.Card.resourceCardsReads
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.error.InvalidResourceAmount
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode }
+import de.htwg.se.catan.model.info.GotResourcesInfo
 import de.htwg.se.catan.model.state.YearOfPlentyState
 import play.api.libs.json.{ JsValue, Json }
 
@@ -50,7 +52,7 @@ case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState
       drawnResources = Some( availableResources )
       success(
         game.setState( state.nextState ).drawResourceCards( game.onTurn, availableResources )._1,
-        info = Some( Info.GotResourcesInfo( game.onTurn, availableResources ) )
+        info = Some( GotResourcesInfo( game.onTurn, availableResources ) )
       )
 
   override def undoStep( game:Game ):Game = (drawnResources match

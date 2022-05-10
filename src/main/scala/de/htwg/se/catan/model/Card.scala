@@ -1,6 +1,7 @@
 package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.Card.ResourceCards
+import de.htwg.se.catan.model.error.InsufficientResources
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonValue
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq }
 import de.htwg.se.catan.util._

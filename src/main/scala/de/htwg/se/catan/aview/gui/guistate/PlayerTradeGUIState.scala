@@ -2,7 +2,6 @@ package de.htwg.se.catan.aview.gui.guistate
 
 import de.htwg.se.catan.aview.gui.util.{ ActionHeader, FlowGridPane }
 import de.htwg.se.catan.aview.gui.{ GUI, GUIApp, GUICommand, GUIState }
-import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.Card._
 import de.htwg.se.catan.model.Player
 import de.htwg.se.catan.model.state.PlayerTradeState
@@ -16,12 +15,12 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) extends GUIState:
+case class PlayerTradeGUIState( state:PlayerTradeState, gui:GUI ) extends GUIState:
 
   override def getActions:List[GUICommand] = List( ( gui:GUI ) => new BorderPane {
     vgrow = Priority.Always
     //val p:Player = controller.player( state.pID )
-    top = new ActionHeader( "Do you want to trade with " + controller.player.name + "?" )
+    top = new ActionHeader( "Do you want to trade with " + gui.game.player.name + "?" )
     center = new VBox {
       spacing = 10
       alignment = Pos.Center
@@ -44,10 +43,10 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
       alignmentInParent = Pos.Center
       children = List(
         new Button( "Yes" ) {
-          onAction = _ => gui.controller.playerTradeDecision( true )
+          onAction = _ => gui.api.playerTradeDecision( true )
         },
         new Button( "No" ) {
-          onAction = _ => gui.controller.playerTradeDecision( false )
+          onAction = _ => gui.api.playerTradeDecision( false )
         }
       )
     }
@@ -62,7 +61,7 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
       hgrow = Priority.Always
       alignment = Pos.Center
       children = List(
-        new ImageView( GUIApp.resourceIcons( d._1 ) ) {
+        new ImageView( GUI.resourceIcons( d._1 ) ) {
           fitWidth = 40
           preserveRatio = true
         },
@@ -74,4 +73,4 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
     } ) )
   }
 
-  override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player( state.pID ), true )
+  override def playerDisplayed:Option[(Player, Boolean)] = Some( gui.game.player( state.pID ), true )

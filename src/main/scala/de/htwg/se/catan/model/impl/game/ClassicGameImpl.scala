@@ -3,15 +3,16 @@ package de.htwg.se.catan.model.impl.game
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import de.htwg.se.catan.CatanModule
-import de.htwg.se.catan.model.Card._
+import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.Card.resourceCardsReads
-import de.htwg.se.catan.model._
-import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.error.{ PlayerNameAlreadyExists, PlayerColorIsAlreadyInUse, DevStackIsEmpty }
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.*
 import de.htwg.se.catan.model.impl.fileio.JsonSerializable
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2 }
 import de.htwg.se.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import de.htwg.se.catan.model.state.InitState
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.util.*
 import de.htwg.se.catan.model.impl.fileio.jsonSerializableWrites
 import play.api.libs.json.{ JsResult, JsSuccess, JsValue, Json, Reads, Writes }
 
@@ -71,7 +72,7 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ):
     developmentCards = ( json \ "developmentCards"  ).asList[DevelopmentCard],
     playersVal = TreeMap( ( json \ "players" ).asMap[PlayerID, Player].toIndexedSeq:_* )( PlayerOrdering ),
     bonusCardsVal = ( json \ "bonusCards" ).asMapC( _.as[BonusCard], _.asOptionC( _.asTuple[PlayerID, Int] ) ),
-    winnerVal = ( json \ "winner" ).asOpt[PlayerID],
+    winnerVal = ( json \ "winner" ).asOption[PlayerID],
     roundVal = ( json \ "round" ).as[Int]
   )
   

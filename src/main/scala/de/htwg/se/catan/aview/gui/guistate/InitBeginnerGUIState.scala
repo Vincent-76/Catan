@@ -1,6 +1,6 @@
 package de.htwg.se.catan.aview.gui.guistate
 
-import de.htwg.se.catan.aview.gui.{ DisplayState, GUIApp, GUIState, InitDisplayState }
+import de.htwg.se.catan.aview.gui.{ GUI, DisplayState, GUIApp, GUIState, InitDisplayState }
 import de.htwg.se.catan.controller.Controller
 import de.htwg.se.catan.model.PlayerID
 import de.htwg.se.catan.model.state.InitBeginnerState
@@ -14,7 +14,7 @@ import scalafx.scene.text.Text
 /**
  * @author Vincent76;
  */
-case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller ) extends GUIState:
+case class InitBeginnerGUIState( state:InitBeginnerState, gui:GUI ) extends GUIState:
   override def getDisplayState:DisplayState = new InitDisplayState {
     override def getDisplayPane:Pane = new VBox {
       spacing = 10
@@ -23,9 +23,9 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
         new GridPane {
           alignment = Pos.Center
           state.diceValues.filter( _._2 > 0 ).toList.zipWithIndex.foreach( d => {
-            val p = controller.player( d._1._1 )
+            val p = gui.game.player( d._1._1 )
             add( new Text( p.name ) {
-              fill = GUIApp.colorOf( p.color )
+              fill = GUI.colorOf( p.color )
               //effect = new Glow( 1.0 )
               styleClass.add( "initBeginnerName" )
             }, 0, d._2 )
@@ -46,19 +46,19 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
           } )
         else Nil) :+ new Button( "Roll the dices" ) {
           styleClass.add( "button" )
-          onAction = _ => controller.diceOutBeginner()
+          onAction = _ => gui.api.diceOutBeginner()
         }
       )
     }
 
     private def beginnerInfo( beginner:PlayerID ):List[Node] = List(
-      new Text( controller.player( beginner ).name + " begins." ) {
-        fill = Color.White //GUIApp.colorOf( controller.player( beginner ).color )
+      new Text( gui.game.player( beginner ).name + " begins." ) {
+        fill = Color.White //GUI.colorOf( controller.player( beginner ).color )
         style = "-fx-font-size: 20"
       },
       new Button( "Continue" ) {
         styleClass.add( "button" )
-        onAction = _ => controller.setBeginner()
+        onAction = _ => gui.api.setBeginner()
       }
     )
   }

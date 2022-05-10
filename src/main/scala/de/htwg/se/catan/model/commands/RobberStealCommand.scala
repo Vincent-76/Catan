@@ -1,7 +1,8 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
+import de.htwg.se.catan.model.error.NoAdjacentStructure
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLOption }
 import de.htwg.se.catan.model.state.RobberStealState

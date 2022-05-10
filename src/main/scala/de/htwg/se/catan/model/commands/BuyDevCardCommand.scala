@@ -1,8 +1,9 @@
 package de.htwg.se.catan.model.commands
 
 import de.htwg.se.catan.model.Command.CommandSuccess
-import de.htwg.se.catan.model._
+import de.htwg.se.catan.model.*
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNode
+import de.htwg.se.catan.model.info.DrawnDevCardInfo
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.util.{ Failure, Success, Try }
@@ -35,7 +36,7 @@ case class BuyDevCardCommand( state:State ) extends Command:
 
   override def doStep( game:Game ):Try[CommandSuccess] = game.drawDevCard( game.onTurn ) match
     case Failure( t ) => Failure( t )
-    case Success( newGame ) => Success( newGame, Some( Info.DrawnDevCardInfo( newGame.onTurn, newGame.turn.getLastDrawnDevCard.get ) ) )
+    case Success( newGame ) => Success( newGame, Some( DrawnDevCardInfo( newGame.onTurn, newGame.turn.getLastDrawnDevCard.get ) ) )
 
   override def undoStep( game:Game ):Game =
     val newGame = game.drawResourceCards( game.onTurn, DevelopmentCard.cardCost )._1

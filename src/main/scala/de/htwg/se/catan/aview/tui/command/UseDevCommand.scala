@@ -1,9 +1,10 @@
 package de.htwg.se.catan.aview.tui.command
 
 import de.htwg.se.catan.controller.Controller
-import de.htwg.se.catan.model.{ Card, DevelopmentCard, InvalidDevCard }
+import de.htwg.se.catan.model.{ Card, DevelopmentCard }
 import de.htwg.se.catan.aview.tui.TUI.InvalidFormat
 import de.htwg.se.catan.aview.tui.{ CommandAction, CommandInput, TUI }
+import de.htwg.se.catan.model.error.InvalidDevCard
 
 /**
  * @author Vincent76;
