@@ -1,0 +1,25 @@
+services:
+  catan:
+    image: vince76/catan:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    stdin_open: true
+    ports:
+      - "80:80"
+    environment:
+      - CATAN_HOST=0.0.0.0
+      - CATAN_PORT=80
+
+  gui:
+    image: vince76/catan_gui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-GUI
+    stdin_open: false
+    environment:
+      - DISPLAY=host.docker.internal:0.0
+      - CATAN_HOST=0.0.0.0
+      - CATAN_PORT=80
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix

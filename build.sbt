@@ -10,6 +10,9 @@ val util = project.in( file( "de.htwg.se.catan.util" ) )
 val tui = project.in( file( "de.htwg.se.catan.aview.tui" ) )
 val gui = project.in( file( "de.htwg.se.catan.aview.gui" ) )
 
+mainClass in (Compile, packageBin) := Some( "de.htwg.se.catan.Catan" )
+mainClass in (Compile, run) := Some( "de.htwg.se.catan.Catan" )
+
 lazy val root = project
   .in( file(".") )
   .settings(
@@ -41,7 +44,7 @@ lazy val root = project
     scalaVersion := scala3Version,
     // To cross compile with Scala 3 and Scala 2
     crossScalaVersions := Seq( scala3Version, scala2Version )
-  ).aggregate( model, util, tui, gui )
+  ).aggregate( model, util, tui )
 
 /*libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
 

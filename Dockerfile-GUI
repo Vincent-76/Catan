@@ -1,0 +1,17 @@
+FROM hseeberger/scala-sbt:17.0.2_1.6.2_3.1.1
+ENV DISPLAY=host.docker.internal:0.0
+RUN apt-get update && apt-get install -y libxrender1 libxtst6 libxi6 libgl1-mesa-glx libgtk-3-0 openjfx libgl1-mesa-dri libgl1-mesa-dev
+WORKDIR /Catan
+ADD . /Catan
+RUN chmod +x /Catan/run.sh
+#RUN sbt compile && sbt test
+#ENTRYPOINT ["/Catan/run.sh"]
+CMD sbt "runMain de.htwg.se.catan.aview.gui.GUIApp"
+
+
+#docker build -f Dockerfile-GUI -t vince76/catan_gui .
+#docker run -it vince76/catan_gui
+
+#docker run -it --rm -e DISPLAY=host.docker.internal:0.0 vince76/catan_gui
+
+

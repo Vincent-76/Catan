@@ -34,9 +34,9 @@ object Catan:
     else None*/
     var input:String = ""
     input = StdIn.readLine()
-    tui.onInput( input )
+    if input != null then tui.onInput( input )
     while input != "exit" do
       input = StdIn.readLine()
-      tui.onInput( input )
+      if input != null then tui.onInput( input )
     /*if gui.isDefined then
       gui.get.exit()*/

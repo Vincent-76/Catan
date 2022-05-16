@@ -7,14 +7,6 @@ import play.api.libs.json.{ JsSuccess, JsValue, Json, Reads, Writes }
  * @author Vincent76;
  */
 /*enum Info:
-  given infoWrites:Writes[Info] = ( info:Info ) => Json.obj(
-    "ordinal" -> Json.toJson( info.ordinal ),
-    "data" -> info match
-      case i:Info.GatherInfo => Json.obj(
-        "dices" -> Json.toJson( dices ),
-        "playerResources" -> Json.toJson( playerResources )
-      )
-  )
 
   case DiceInfo( dices:(Int, Int) ) extends Info 
   case GatherInfo( dices:(Int, Int), playerResources:Map[PlayerID, ResourceCards] ) extends Info  

@@ -21,8 +21,8 @@ import scala.util.{ Failure, Success, Try }
  * @author Vincent76
  */
 object Requests:
-  val interface:String = "0.0.0.0"
-  val port:Int = 80
+  val interface:String = sys.env.getOrElse( "CATAN_HOST", "0.0.0.0" )
+  val port:Int = sys.env.getOrElse( "CATAN_PORT", 80 ).toString.toInt
 
 class Requests( controller: Controller ):
 
