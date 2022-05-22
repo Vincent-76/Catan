@@ -16,6 +16,7 @@ import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.info.*
 import de.htwg.se.catan.model.state.*
 import de.htwg.se.catan.model.error.*
+import de.htwg.se.catan.model.impl.slick.SlickImpl
 import net.codingwell.scalaguice.ScalaModule
 
 import scala.util.Random
@@ -132,6 +133,7 @@ object CatanModule:
 
     XMLFileIO.init()
     JsonFileIO.init()
+    SlickImpl.init()
 
 class CatanModule( val test:Boolean = false ) extends AbstractModule:
 
@@ -144,7 +146,7 @@ class CatanModule( val test:Boolean = false ) extends AbstractModule:
 
   override def configure( ):Unit =
     bind( classOf[Controller] ).to( classOf[ClassicControllerImpl] )
-    bind( classOf[FileIO] ).toInstance( JsonFileIO )
+    bind( classOf[FileIO] ).toInstance( SlickImpl )
     bind( classOf[Game] ).to( classOf[ClassicGameImpl] )
     bind( classOf[Turn] ).to( classOf[ClassicTurnImpl] )
     val seed = if( test ) 1 else Random.nextInt( Int.MaxValue / 1000 )

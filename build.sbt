@@ -10,14 +10,13 @@ val util = project.in( file( "de.htwg.se.catan.util" ) )
 val tui = project.in( file( "de.htwg.se.catan.aview.tui" ) )
 val gui = project.in( file( "de.htwg.se.catan.aview.gui" ) )
 
-mainClass in (Compile, packageBin) := Some( "de.htwg.se.catan.Catan" )
-mainClass in (Compile, run) := Some( "de.htwg.se.catan.Catan" )
-
 lazy val root = project
   .in( file(".") )
   .settings(
     /*name := "scala3-cross",
     version := "0.1.0",*/
+    Compile / packageBin / mainClass := Some( "de.htwg.se.catan.Catan" ),
+    Compile / run / mainClass := Some( "de.htwg.se.catan.Catan" ),
 
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
 
@@ -36,6 +35,18 @@ lazy val root = project
     libraryDependencies += ( "com.typesafe.akka" %% "akka-http" % "10.2.9" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-stream" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
+    libraryDependencies += "com.github.slick.slick" % "slick_3" % "nafg~dottyquery-SNAPSHOT",
+    libraryDependencies +="mysql" % "mysql-connector-java" % "8.0.24",
+    //libraryDependencies += ( "ch.qos.logback" % "logback-classic" % "1.2.11" ).cross( CrossVersion.for3Use2_13 ),
+    /*libraryDependencies ++= Seq(
+      ( "com.typesafe.slick" %% "slick" % "3.3.3" ).cross( CrossVersion.for3Use2_13 ),
+      "ch.qos.logback" % "logback-classic" % "1.2.11",
+      // "org.slf4j" % "slf4j-nop" % "1.6.4",
+    ),*/
+
+    resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
+    resolvers += ( "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/" ).withAllowInsecureProtocol( true ),
+    resolvers += "jitpack" at "https://jitpack.io",
 
     coverageExcludedPackages := "de.htwg.se.catan.aview.*",
     coverageExcludedFiles := ".*(Catan|CatanModule|Requests)",
@@ -43,8 +54,19 @@ lazy val root = project
     // To make the default compiler and REPL use Dotty
     scalaVersion := scala3Version,
     // To cross compile with Scala 3 and Scala 2
-    crossScalaVersions := Seq( scala3Version, scala2Version )
-  ).aggregate( model, util, tui )
+    crossScalaVersions := Seq( scala3Version, scala2Version ),
+  )/*.dependsOn( `slick` )*/.aggregate( model, util, tui )
+
+/*lazy val `slick` = project.in( file( "de.htwg.se.catan.model.impl.slick" ) ).settings(
+  scalaVersion := scala2Version,
+  libraryDependencies ++= Seq(
+    "com.typesafe.slick" %% "slick" % "3.3.3",
+    "ch.qos.logback" % "logback-classic" % "1.2.11",
+    // "org.slf4j" % "slf4j-nop" % "1.6.4",
+  ),
+  resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
+  resolvers += ( "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/" ).withAllowInsecureProtocol( true ),
+).aggregate( model, util )*/
 
 /*libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
 

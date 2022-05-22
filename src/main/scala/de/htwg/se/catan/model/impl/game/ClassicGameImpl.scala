@@ -69,7 +69,7 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ):
     availablePlacementsVal = ( json \ "availablePlacements" ).asList[Placement],
     stateVal = ( json \ "state" ).as[State],
     resourceStack = ( json \ "resourceStack" ).as[ResourceCards],
-    developmentCards = ( json \ "developmentCards"  ).asList[DevelopmentCard],
+    developmentCards = ( json \ "developmentCards" ).asList[DevelopmentCard],
     playersVal = TreeMap( ( json \ "players" ).asMap[PlayerID, Player].toIndexedSeq:_* )( PlayerOrdering ),
     bonusCardsVal = ( json \ "bonusCards" ).asMapC( _.as[BonusCard], _.asOptionC( _.asTuple[PlayerID, Int] ) ),
     winnerVal = ( json \ "winner" ).asOption[PlayerID],

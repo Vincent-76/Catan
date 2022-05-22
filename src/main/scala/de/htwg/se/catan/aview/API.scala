@@ -19,7 +19,7 @@ import scala.util.{ Failure, Success, Try }
  */
 object API:
   val interface:String = sys.env.getOrElse( "CATAN_HOST", "0.0.0.0" )
-  val port:Int = sys.env.getOrElse( "CATAN_PORT", 80 ).toString.toInt
+  val port:Int = sys.env.getOrElse( "CATAN_PORT", 8080 ).toString.toInt
 
 class API extends Observable:
   given system:ActorSystem[Nothing] = ActorSystem( Behaviors.empty, "SingleRequest" )
