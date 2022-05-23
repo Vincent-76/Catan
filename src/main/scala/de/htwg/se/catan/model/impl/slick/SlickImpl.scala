@@ -7,8 +7,9 @@ import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonValue
 import de.htwg.se.catan.model.Card.resourceCardsReads
+import de.htwg.se.catan.util._
 import play.api.libs.json.Json
-import slick.dbio.DatabaseAction
+import slick.dbio.{ DBIO, DatabaseAction }
 import slick.jdbc.JdbcBackend
 import slick.lifted.{ Query, TableQuery }
 import slick.jdbc.JdbcBackend.Database
@@ -27,16 +28,16 @@ object SlickImpl extends FileIO( "slick" ):
   private def getConnection:Database = Database.forURL( "jdbc:mysql://localhost:3306/test?useSSL=false", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = "" )
 
   override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String = game match
-    case g:ClassicGameImpl => saveClassicGame( g ).map( _.toString ).get
+    case g:ClassicGameImpl => saveClassicGame( g, undoStack, redoStack ).map( _.toString ).get
     case _ => throw NotImplementedError( game.getClass.toString )
 
-  def saveClassicGame( game:ClassicGameImpl ):Try[Int] = Try {
+  def saveClassicGame( game:ClassicGameImpl, undoStack:List[Command], redoStack:List[Command] ):Try[Int] = Try {
     val db = getConnection
     val t = Try {
       val gameQuery:TableQuery[SlickClassicGame] = TableQuery[SlickClassicGame]
-      val tableAction = gameQuery.schema.createIfNotExists
-      Await.result( db.run( tableAction ), Duration.Inf )
-      val insertAction = gameQuery.returning( gameQuery.map( _.id ) ) += (
+      val commandQuery:TableQuery[SlickCommand] = TableQuery[SlickCommand]
+      Await.result( db.run( ( gameQuery.schema ++ commandQuery.schema ).createIfNotExists ), Duration.Inf )
+      val gameID = Await.result( db.run( gameQuery.returning( gameQuery.map( _.id ) ) += (
         0,
         Json.stringify( game.gameFieldVal.toJson ),
         Json.stringify( game.turnVal.toJson ),
@@ -50,8 +51,13 @@ object SlickImpl extends FileIO( "slick" ):
         Json.stringify( Json.toJson( game.bonusCards ) ),
         Json.stringify( Json.toJson( game.winner ) ),
         game.round
+      ) ), Duration.Inf )
+      val action = DBIO.seq(
+        commandQuery ++= undoStack.zipWithIndex.map( d => (0, gameID, true, d._2, Json.stringify( d._1.toJson )) ),
+        commandQuery ++= redoStack.zipWithIndex.map( d => (0, gameID, false, d._2, Json.stringify( d._1.toJson )) )
       )
-      Await.result( db.run( insertAction ), Duration.Inf )
+      Await.result( db.run( action ), Duration.Inf )
+      gameID
     }
     db.close()
     t.get
@@ -65,6 +71,8 @@ object SlickImpl extends FileIO( "slick" ):
         val gameID = id.toInt
         val query = sql"""SELECT * FROM ClassicGame WHERE id = $gameID""".as[(Int, String, String, Int, String, String, String, String, String, String, String, String, Int)]
         val gameData = Await.result( db.run( query ), Duration.Inf ).head
+        val commandQuery = sql"""SELECT * FROM Command WHERE gameID = $gameID""".as[(Int, Int, Boolean, Int, String)]
+        val commandData = Await.result( db.run( commandQuery ), Duration.Inf )
 
         /*val gameQuery = TableQuery[SlickClassicGame]
         val query = gameQuery.filter( _.id === gameID ).take( 1 )
@@ -72,7 +80,15 @@ object SlickImpl extends FileIO( "slick" ):
         val f = db.run( r )
         val gameDatas = Await.result( f, Duration.Inf )
         val gameData = gameDatas.head
-        print( gameData._1 )*/
+        print( gameData._1 )
+        val cQuery = TableQuery[SlickCommand].filter( _.gameID == gameID )
+        val commandData = Await.result( db.run( cQuery.result ), Duration.Inf )*/
+
+        val (undoList, redoList) = commandData.sortBy( - _._4 ).red( (List.empty[Command], List.empty[Command]), ( l:(List[Command], List[Command]), d:(Int, Int, Boolean, Int, String) ) => {
+          val command = Command.fromJson( Json.parse( d._5 ) )
+          if d._3 then (command :: l._1, l._2)
+          else (l._1, command :: l._2)
+        } )
 
         (ClassicGameImpl(
           gameFieldVal = Json.parse( gameData._2 ).as[GameField],
@@ -88,7 +104,7 @@ object SlickImpl extends FileIO( "slick" ):
           bonusCardsVal = Json.parse( gameData._11 ).asMapC( _.as[BonusCard], _.asOptionC( _.asTuple[PlayerID, Int] ) ),
           winnerVal = Json.parse( gameData._12 ).asOption[PlayerID],
           roundVal = gameData._13
-        ), List.empty, List.empty)
+        ), undoList, redoList)
       } catch {
         case e:Throwable => throw e
       } finally {

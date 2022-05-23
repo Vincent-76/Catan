@@ -36,7 +36,8 @@ lazy val root = project
     libraryDependencies += ( "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-stream" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += "com.github.slick.slick" % "slick_3" % "nafg~dottyquery-SNAPSHOT",
-    libraryDependencies +="mysql" % "mysql-connector-java" % "8.0.24",
+    libraryDependencies +="mysql" % "mysql-connector-java" % "8.0.29",
+    libraryDependencies += ( "org.mongodb.scala" %% "mongo-scala-driver" % "4.6.0" ).cross( CrossVersion.for3Use2_13 ),
     //libraryDependencies += ( "ch.qos.logback" % "logback-classic" % "1.2.11" ).cross( CrossVersion.for3Use2_13 ),
     /*libraryDependencies ++= Seq(
       ( "com.typesafe.slick" %% "slick" % "3.3.3" ).cross( CrossVersion.for3Use2_13 ),

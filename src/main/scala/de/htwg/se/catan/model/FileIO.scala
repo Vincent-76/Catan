@@ -5,13 +5,22 @@ import de.htwg.se.catan.model.impl.fileio.JsonFileIO
 import de.htwg.se.catan.util.^=
 
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.util.{ Calendar, UUID }
 import scala.reflect.io.File
 
 object FileIO extends ObjectComponent[FileIO]:
+  private def isUUID( s:String ):Boolean = try {
+    UUID.fromString( s )
+    true
+  } catch {
+    case _:IllegalArgumentException => false 
+  }
+  
   def load( id:String ):(Game, List[Command], List[Command]) =
     val extension = if( id.forall( Character.isDigit ) )
       "slick"
+    else if( isUUID( id ) )
+      "mongodb"
     else id.substring( id.lastIndexOf( "." ) + 1 )
     impls.find( _.extension ^= extension ) match
       case Some( impl ) => impl.load( id )

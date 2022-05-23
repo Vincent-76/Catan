@@ -16,6 +16,7 @@ import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.info.*
 import de.htwg.se.catan.model.state.*
 import de.htwg.se.catan.model.error.*
+import de.htwg.se.catan.model.impl.mongodb.MongoDBImpl
 import de.htwg.se.catan.model.impl.slick.SlickImpl
 import net.codingwell.scalaguice.ScalaModule
 
@@ -134,6 +135,7 @@ object CatanModule:
     XMLFileIO.init()
     JsonFileIO.init()
     SlickImpl.init()
+    MongoDBImpl.init()
 
 class CatanModule( val test:Boolean = false ) extends AbstractModule:
 
