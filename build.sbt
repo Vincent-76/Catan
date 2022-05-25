@@ -56,6 +56,12 @@ lazy val root = project
     scalaVersion := scala3Version,
     // To cross compile with Scala 3 and Scala 2
     crossScalaVersions := Seq( scala3Version, scala2Version ),
+
+    assembly / mainClass := Some( "de.htwg.se.catan.Catan" ),
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    }
   )/*.dependsOn( `slick` )*/.aggregate( model, util, tui )
 
 /*lazy val `slick` = project.in( file( "de.htwg.se.catan.model.impl.slick" ) ).settings(
@@ -101,7 +107,3 @@ lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "s
 libraryDependencies ++= javaFXModules.map( m=>
   "org.openjfx" % s"javafx-$m" % "16" classifier osName
 )
-
-
-
-

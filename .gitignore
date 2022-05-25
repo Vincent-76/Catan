@@ -21,4 +21,6 @@ project/.sbtserver
 .sbtserver/
 src/main/scala/META-INF
 
+*/target/*
+
 savegames/
