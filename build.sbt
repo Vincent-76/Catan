@@ -57,8 +57,10 @@ lazy val root = project
     // To cross compile with Scala 3 and Scala 2
     crossScalaVersions := Seq( scala3Version, scala2Version ),
 
-    assembly / mainClass := Some( "de.htwg.se.catan.Catan" ),
+    assembly / mainClass := Some( "de.htwg.se.catan.aview.gui.GUIApp" ),
+    assembly / assemblyJarName := "CatanGUI.jar",
     assembly / assemblyMergeStrategy := {
+      case "reference.conf" => MergeStrategy.concat
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard
       case x => MergeStrategy.first
     }

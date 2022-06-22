@@ -131,7 +131,7 @@ case class ClassicPlayerImpl( idVal:PlayerID,
     else structures
     copy( structures = newStructures.updated( structure, newStructures.getOrElse( structure, 0 ) + 1 ) )
 
-  def randomHandResource( ):Option[Resource] = Random.element( resources.flatMap( d => ( 0 until d._2 ).map( _ => d._1 ) ).toSeq )
+  def randomHandResource( r:Random ):Option[Resource] = r.element( resources.flatMap( d => ( 0 until d._2 ).map( _ => d._1 ) ).toSeq )
 
   def useDevCard( devCard:DevelopmentCard ):Try[ClassicPlayerImpl] =
     val index = devCardsVal.indexOf( devCard )

@@ -8,7 +8,7 @@ import de.htwg.se.catan.model.error.{ InsufficientResources, InsufficientStructu
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import scala.util.{ Failure, Success }
+import scala.util.{ Failure, Success, Random }
 
 class ClassicPlayerImplSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
@@ -87,8 +87,8 @@ class ClassicPlayerImplSpec extends AnyWordSpec with Matchers {
         p.structures( CityPlacement ) shouldBe CityPlacement.available + 1
       }
       "randomHandResource" in {
-        player.randomHandResource() shouldBe None
-        val r = player.addResourceCards( ResourceCards.of( wood = 1, wheat = 2, ore = 1 ) ).randomHandResource()
+        player.randomHandResource( Random() ) shouldBe None
+        val r = player.addResourceCards( ResourceCards.of( wood = 1, wheat = 2, ore = 1 ) ).randomHandResource( Random() )
         r shouldNot be( None )
         r.get should ( be( Wood ) or be( Wheat ) or be( Ore ) )
       }
