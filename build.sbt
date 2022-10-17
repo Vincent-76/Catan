@@ -1,20 +1,20 @@
 name := "Catan"
 version := "0.1"
 
-scalaVersion := "2.13.5"
+scalaVersion := "2.13.10"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "16.0.0-R24"
 
 libraryDependencies += "com.google.inject" % "guice" % "5.0.1"
 libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.0.1"
-libraryDependencies += "net.codingwell" %% "scala-guice" % "5.0.1"
+libraryDependencies += "net.codingwell" %% "scala-guice" % "5.1.0"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.0"
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.3"
 
-coverageExcludedPackages := "de.htwg.se.catan.aview.*"
+coverageExcludedPackages := "com.aimit.htwg.catan.view.*"
 coverageExcludedFiles := ".*(Catan|CatanModule)"
 
 lazy val osName = System.getProperty("os.name") match {
