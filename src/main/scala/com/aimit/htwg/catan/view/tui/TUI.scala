@@ -9,7 +9,7 @@ import com.aimit.htwg.catan.view.tui.command.{ ExitCommand, HelpCommand, LoadCom
 import com.aimit.htwg.catan.view.tui.tuistate._
 import com.aimit.htwg.catan.util._
 
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 /**
  * @author Vincent76;
@@ -118,56 +118,8 @@ object TUI {
     else Option.empty
   }
 
-}
 
-class TUI( val controller:Controller ) extends Observer {
-
-  var actionInfo:Option[String] = None
-
-  controller.add( this )
-  onUpdate( None )
-
-  def onInput( input:String ):Unit = {
-    val commandInput = CommandInput( input )
-    val globalCommand = findGlobalCommand( commandInput )
-    if ( globalCommand.isDefined ) {
-      if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
-        globalCommand.get.action( commandInput, controller )
-      else
-        onError( InvalidFormat( commandInput.input ) )
-    } else {
-      val tuiState = findTUIState( controller.game.state )
-      val inputPattern = tuiState.inputPattern
-      if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) )
-        tuiState.action( commandInput )
-      else
-        onError( InvalidFormat( commandInput.input ) )
-    }
-  }
-
-  override def onUpdate( info:Option[Info] ):Unit = {
-    val tuiState = findTUIState( controller.game.state )
-    TUI.clear()
-    val gameDisplay = tuiState.createGameDisplay
-    if ( gameDisplay.isDefined )
-      TUI.out( gameDisplay.get )
-    //TUI.outln()
-    actionInfo = Some( tuiState.getActionInfo )
-    if( info.isDefined ) {
-      TUI.outln()
-      onInfo( info.get )
-    }
-    TUI.outln()
-    TUI.action( actionInfo.get )
-  }
-
-  def findGlobalCommand( commandInput:CommandInput ):Option[CommandAction] = {
-    if ( commandInput.command.isDefined )
-      return TUI.commands.find( _.command == commandInput.command.get )
-    Option.empty
-  }
-
-  def findTUIState( state:State ):TUIState = state match {
+  def findTUIState( controller:Controller ):TUIState = controller.game.state match {
     case s:InitState => InitTUIState( controller )
     case s:InitPlayerState => InitPlayerTUIState( controller )
     case s:InitBeginnerState => InitBeginnerTUIState( s.beginner, s.diceValues, controller )
@@ -186,6 +138,59 @@ class TUI( val controller:Controller ) extends Observer {
     case s:DevRoadBuildingState => DevRoadBuildingTUIState( controller )
     case s:MonopolyState => MonopolyTUIState( controller )
     case _ => ErrorTUIState( controller )
+  }
+
+  def findGlobalCommand( commandInput:CommandInput ):Option[CommandAction] = {
+    if ( commandInput.command.isDefined )
+      return commands.find( _.command == commandInput.command.get )
+    Option.empty
+  }
+
+  def processInput( controller:Controller, input:String ):Try[Unit] = {
+    val commandInput = CommandInput( input )
+    val globalCommand = findGlobalCommand( commandInput )
+    if ( globalCommand.isDefined ) {
+      if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
+        Success( globalCommand.get.action( commandInput, controller ) )
+      else
+        Failure( InvalidFormat( commandInput.input ) )
+    } else {
+      val tuiState = TUI.findTUIState( controller )
+      val inputPattern = tuiState.inputPattern
+      if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) )
+        Success( tuiState.action( commandInput ) )
+      else
+        Failure( InvalidFormat( commandInput.input ) )
+    }
+  }
+}
+
+class TUI( val controller:Controller ) extends Observer {
+
+  var actionInfo:Option[String] = None
+
+  controller.add( this )
+  onUpdate( None )
+
+  def onInput( input:String ):Unit = TUI.processInput( controller, input ) match {
+    case Success( _ ) =>
+    case Failure( t ) => onError( t )
+  }
+
+  override def onUpdate( info:Option[Info] ):Unit = {
+    val tuiState = TUI.findTUIState( controller )
+    TUI.clear()
+    val gameDisplay = tuiState.createGameDisplay
+    if ( gameDisplay.isDefined )
+      TUI.out( gameDisplay.get )
+    //TUI.outln()
+    actionInfo = Some( tuiState.getActionInfo )
+    if( info.isDefined ) {
+      TUI.outln()
+      onInfo( info.get )
+    }
+    TUI.outln()
+    TUI.action( actionInfo.get )
   }
 
   override def onInfo( info:Info ):Unit = {
