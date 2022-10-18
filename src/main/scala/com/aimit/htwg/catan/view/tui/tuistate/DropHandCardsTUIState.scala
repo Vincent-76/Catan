@@ -3,8 +3,10 @@ package com.aimit.htwg.catan.view.tui.tuistate
 import com.aimit.htwg.catan.view.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.model.Card._
-import com.aimit.htwg.catan.model.{ PlayerID, Resource }
+import com.aimit.htwg.catan.model.{ Info, PlayerID, Resource }
 import com.aimit.htwg.catan.util._
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -28,6 +30,6 @@ case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends 
 
   override def inputPattern:Option[String] = Some( "((^|,)" + TUI.resourcePattern + ")+" )
 
-  override def action( commandInput:CommandInput ):Unit =
-    controller.dropResourceCardsToRobber( TUI.parseResources( commandInput.input ) )
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
+    (controller.dropResourceCardsToRobber( TUI.parseResources( commandInput.input ) ), Nil)
 }

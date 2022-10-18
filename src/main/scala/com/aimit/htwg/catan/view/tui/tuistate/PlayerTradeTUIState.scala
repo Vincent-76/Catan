@@ -3,8 +3,10 @@ package com.aimit.htwg.catan.view.tui.tuistate
 import com.aimit.htwg.catan.view.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.model.Card.ResourceCards
-import com.aimit.htwg.catan.model.PlayerID
+import com.aimit.htwg.catan.model.{ Info, PlayerID }
 import com.aimit.htwg.catan.util._
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -24,6 +26,6 @@ case class PlayerTradeTUIState( pID:PlayerID, give:ResourceCards, get:ResourceCa
 
   override def inputPattern:Option[String] = Some( "(" + TUI.regexIgnoreCase( "y" ) + "|" + TUI.regexIgnoreCase( "n" ) + ")" )
 
-  override def action( commandInput:CommandInput ):Unit =
-    controller.playerTradeDecision( commandInput.input ^= "y" )
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
+    (controller.playerTradeDecision( commandInput.input ^= "y" ), Nil)
 }

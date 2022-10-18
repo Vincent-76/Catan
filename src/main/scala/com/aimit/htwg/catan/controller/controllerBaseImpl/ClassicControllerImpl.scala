@@ -34,8 +34,7 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
     redoStack = newRedoStack*/
     checkWinner( game ) match {
       case None =>
-        update( info )
-        Success( info )
+        Success( update( info ) )
       case Some( pID ) =>
         gameVal = game.setWinner( pID )
         exit( Some( GameEndInfo( pID ) ) )
@@ -45,10 +44,10 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
 
   def action( command:Option[Command] ):Try[Option[Info]] = {
     if( command.isEmpty ) {
-      onError( WrongState )
+      Failure( error( WrongState ) )
     } else undoManager.doStep( command.get, game ) match {
       case Success( (game, info) ) => actionDone( game, info )
-      case Failure( t ) => onError( t )
+      case Failure( t ) => Failure( error( t ) )
     }
     /*else command.get.doStep( this.game ) match {
       case Success( (game, info) ) => actionDone( game, command.get, Nil, info )
@@ -59,7 +58,7 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
 
   def undoAction():Try[Option[Info]] = undoManager.undoStep( game ) match {
     case Success( newGame ) => actionDone( newGame, None )
-    case Failure( t ) => onError( t )
+    case Failure( t ) => Failure( error( t ) )
   }
     /*undoStack match {
     case Nil => error( NothingToUndo )
@@ -72,7 +71,7 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
 
   def redoAction():Try[Option[Info]] = undoManager.redoStep( game ) match {
     case Success( (newGame, info) ) => actionDone( newGame, info )
-    case Failure( t ) => onError( t )
+    case Failure( t ) => Failure( error( t ) )
   }
     /*redoStack match {
     case Nil => error( NothingToRedo )
@@ -81,29 +80,23 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
       actionDone( game, head, stack, info )
   }*/
 
-  def saveGame():String = {
+  def saveGame():Try[Option[Info]] = {
     val path = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
-    update( info = Some( GameSavedInfo( path ) ) )
-    path
+    Success( update( Some( GameSavedInfo( path ) ) ) )
   }
 
-  def loadGame( path:String ):Unit = {
+  def loadGame( path:String ):Try[Option[Info]] = {
     val (newGame, undoStack, redoStack) = FileIO.load( path )
     gameVal = newGame
     undoManager.clear()
     undoManager.undoStack = undoStack
     undoManager.redoStack = redoStack
-    update( info = Some( GameLoadedInfo( path ) ) )
+    Success( update( Some( GameLoadedInfo( path ) ) ) )
   }
 
-  def onError( t:Throwable ):Failure[Option[Info]] = {
-    error( t )
-    Failure( t )
-  }
-
-  def exit( info:Option[Info] = None ):Unit = {
+  def exit( info:Option[Info] = None ):Try[Option[Info]] = {
     running = false
-    update( info )
+    Success( update( info ) )
   }
 
 }

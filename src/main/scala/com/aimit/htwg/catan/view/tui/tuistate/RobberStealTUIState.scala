@@ -3,8 +3,10 @@ package com.aimit.htwg.catan.view.tui.tuistate
 import com.aimit.htwg.catan.view.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.model.Card._
-import com.aimit.htwg.catan.model.InvalidPlayerID
+import com.aimit.htwg.catan.model.{ Info, InvalidPlayerID }
 import com.aimit.htwg.catan.model.state.RobberStealState
+
+import scala.util.{ Failure, Try }
 
 /**
  * @author Vincent76;
@@ -26,8 +28,8 @@ case class RobberStealTUIState( state:RobberStealState, controller:Controller ) 
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
-  override def action( commandInput:CommandInput ):Unit = controller.game.getPlayerID( commandInput.input.toInt ) match {
-    case Some( pID ) => controller.robberStealFromPlayer( pID )
-    case None => controller.error( InvalidPlayerID( commandInput.input.toInt ) )
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = controller.game.getPlayerID( commandInput.input.toInt ) match {
+    case Some( pID ) => (controller.robberStealFromPlayer( pID ), Nil)
+    case None => (Failure( controller.error( InvalidPlayerID( commandInput.input.toInt ) ) ), Nil)
   }
 }

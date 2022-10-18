@@ -11,7 +11,7 @@ trait Observer {
 
   def onInfo( info:Info ):Unit
 
-  def onError( t:Throwable )
+  def onError( t:Throwable ):Unit
 }
 
 
@@ -22,9 +22,15 @@ trait Observable {
 
   def remove( o:Observer ):Unit = subscribers = subscribers.removed( o ).toList
 
-  def update( info:Option[Info] = None ):Unit = subscribers.foreach( _.onUpdate( info ) )
+  def update( info:Option[Info] = None ):Option[Info] = {
+    subscribers.foreach( _.onUpdate( info ) )
+    info
+  }
 
   //def info( info:Info ):Unit = subscribers.foreach( _.onInfo( info ) )
 
-  def error( t:Throwable ):Unit = subscribers.foreach( _.onError( t ) )
+  def error( t:Throwable ):Throwable = {
+    subscribers.foreach( _.onError( t ) )
+    t
+  }
 }

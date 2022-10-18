@@ -4,7 +4,7 @@ import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model.state._
 import com.aimit.htwg.catan.model.{ PlacementPointNotEmpty, Player, _ }
-import com.aimit.htwg.catan.view.tui.TUI.InvalidFormat
+import com.aimit.htwg.catan.view.tui.TUI.{ InvalidFormat, outln }
 import com.aimit.htwg.catan.view.tui.command.{ ExitCommand, HelpCommand, LoadCommand, RedoCommand, SaveCommand, UndoCommand }
 import com.aimit.htwg.catan.view.tui.tuistate._
 import com.aimit.htwg.catan.util._
@@ -146,22 +146,95 @@ object TUI {
     Option.empty
   }
 
-  def processInput( controller:Controller, input:String ):Try[Unit] = {
+  def processInput( controller:Controller, input:String ):(Try[Option[Info]], List[String]) = {
     val commandInput = CommandInput( input )
     val globalCommand = findGlobalCommand( commandInput )
     if ( globalCommand.isDefined ) {
       if ( commandInput.input.matches( globalCommand.get.inputPattern ) )
-        Success( globalCommand.get.action( commandInput, controller ) )
+        globalCommand.get.action( commandInput, controller )
       else
-        Failure( InvalidFormat( commandInput.input ) )
+        (Failure( controller.error( InvalidFormat( commandInput.input ) ) ), Nil)
     } else {
       val tuiState = TUI.findTUIState( controller )
       val inputPattern = tuiState.inputPattern
       if ( inputPattern.isEmpty || commandInput.input.matches( inputPattern.get ) )
-        Success( tuiState.action( commandInput ) )
+        tuiState.action( commandInput )
       else
-        Failure( InvalidFormat( commandInput.input ) )
+        (Failure( controller.error( InvalidFormat( commandInput.input ) ) ), Nil)
     }
+  }
+  def getInfo( controller:Controller, info:Info ):Iterable[String] = info match {
+    case info:DiceInfo => List( info.dices._1 + " + " + info.dices._2 + " = " + ( info.dices._1 + info.dices._2 ) )
+    case GatherInfo( dices, playerResources ) =>
+      List( dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) ) ++
+      playerResources.map[String]( d => TUI.displayName( controller.player( d._1 ) ) + " " + d._2.toString( "+" ) )
+    case GotResourcesInfo( pID, cards ) =>
+      List( TUI.displayName( controller.player( pID ) ) + "  " + cards.toString( "+" ) )
+    case LostResourcesInfo( pID, cards ) =>
+      List( TUI.displayName( controller.player( pID ) ) + "  " + cards.toString( "-" ) )
+    case ResourceChangeInfo( playerAdd, playerSub ) =>
+      val nameLength = ( playerAdd.keys ++ playerSub.keys ).map( controller.player( _ ).idName.length ).max
+      playerSub.map( d => TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + d._2.toString( "-" ) ) ++
+      playerAdd.map( d => TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + d._2.toString( "+" ) )
+    case BankTradedInfo( _, give, get ) =>
+      List( "You traded " + give.toString( "" ) + " for " + get.toString( "" ) + "." )
+    case DrawnDevCardInfo( _, devCard ) =>
+      List( "Drawn: " + devCard.title + "\n" + devCard.desc )
+    case InsufficientStructuresInfo( _, structure ) =>
+      List( "You don't have enough structures of " + structure.title + " to build more." )
+    case NoPlacementPointsInfo( _, structure ) =>
+      List( "There aren't any more possible placement points for structure " + structure.title + " to build more." )
+    case GameEndInfo( winner ) =>
+      val p = controller.player( winner )
+      List( TUI.displayName( p ) + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" )
+    case GameSavedInfo( path ) => List( "Game was saved to: " + path )
+    case GameLoadedInfo( path ) => List( "Game was loaded from: " + path )
+    case _ => List()
+  }
+
+  def getError( controller:Controller, t:Throwable ):String = t match {
+    case e:InvalidFormat => "Invalid format: [" + errorHighlight( e.input ) + "]!"
+    case WrongState => "Unable in this state!"
+    case InsufficientResources => "Insufficient resources for this action!"
+    case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
+    case InsufficientStructures( structure ) =>
+      "Insufficient structures of " + errorHighlight( structure.title ) + " for this action!"
+    case NonExistentPlacementPoint( id ) => "Placement point " + errorHighlight( id ) + " does not exists!"
+    case PlacementPointNotEmpty( id ) => "Placement point " + errorHighlight( id ) + " is not empty!"
+    case NoAdjacentStructure => "Player has no adjacent structure!"
+    case TooCloseToBuilding( id ) => "Placement point " + errorHighlight( id ) + " is too close to another building!"
+    case NoConnectedStructures( id ) => "No connected structures on placement point " + errorHighlight( id ) + "!"
+    case SettlementRequired( id ) =>
+      "You need a settlement on placement point " + errorHighlight( id ) + " to build a city!"
+    case InvalidPlacementPoint( id ) => "Invalid placement point " + errorHighlight( id ) + "!"
+    case NotEnoughPlayers => "Minimum " + errorHighlight( controller.game.minPlayers ) + " players required!"
+    case InvalidPlayerColor( color ) => "Invalid player color: [" + errorHighlight( color ) + "]!"
+    case RobberOnlyOnLand => "Robber can only be placed on land!"
+    case NoPlacementPoints( structure ) =>
+      "No available placement points for structure " + errorHighlight( structure.title ) + "!"
+    case InvalidResourceAmount( amount ) => "Invalid resource amount: " + errorHighlight( amount ) + "!"
+    case InvalidTradeResources( give, get ) =>
+      "Invalid trade resources: " + errorHighlight( give.title ) + " <-> " + errorHighlight( get.title ) + "!"
+    case InvalidDevCard( devCard ) => "Invalid dev card: [" + errorHighlight( devCard ) + "]!"
+    case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + errorHighlight( devCard.title ) + "!"
+    case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
+    case DevCardDrawnInTurn( devCard ) =>
+      "You've drawn this development card (" + errorHighlight( devCard.title ) + ") in this turn, you can use it in your next turn."
+    case InsufficientBankResources => "Bank has insufficient resources!"
+    case InconsistentData => "Internal problem, please try again."
+    case DevStackIsEmpty => "Development card stack is empty!"
+    case PlayerNameAlreadyExists( name ) => "Player with name: [" + errorHighlight( name ) + "] already exists!"
+    case PlayerNameEmpty => "Player name can't be empty!"
+    case PlayerNameTooLong( name ) =>
+      "Player name [" + errorHighlight( name ) + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
+    case PlayerColorIsAlreadyInUse( playerColor ) =>
+      "Player color " + colorOf( playerColor ) + playerColor.title + reset + " is already in use!"
+    case InvalidPlayerID( id ) => "Invalid player id: [" + errorHighlight( id ) + "]!"
+    case InvalidPlayer( playerID ) => "Invalid player with id: " + errorHighlight( playerID ) + "!"
+    case NothingToUndo => "Nothing to undo!"
+    case NothingToRedo => "Nothing to redo!"
+    case e:ControllerError => e.toString
+    case t:Throwable => t + ": " + t.getMessage
   }
 }
 
@@ -172,10 +245,8 @@ class TUI( val controller:Controller ) extends Observer {
   controller.add( this )
   onUpdate( None )
 
-  def onInput( input:String ):Unit = TUI.processInput( controller, input ) match {
-    case Success( _ ) =>
-    case Failure( t ) => onError( t )
-  }
+  def onInput( input:String ):Unit =
+    TUI.processInput( controller, input )._2.foreach( TUI.outln )
 
   override def onUpdate( info:Option[Info] ):Unit = {
     val tuiState = TUI.findTUIState( controller )
@@ -193,84 +264,10 @@ class TUI( val controller:Controller ) extends Observer {
     TUI.action( actionInfo.get )
   }
 
-  override def onInfo( info:Info ):Unit = {
-    info match {
-      case info:DiceInfo => TUI.outln( info.dices._1 + " + " + info.dices._2 + " = " + ( info.dices._1 + info.dices._2 ) )
-      case GatherInfo( dices, playerResources ) =>
-        TUI.outln( dices._1 + " + " + dices._2 + " = " + ( dices._1 + dices._2 ) )
-        playerResources.foreach( d => {
-          TUI.outln( TUI.displayName( controller.player( d._1 ) ) + " " + d._2.toString( "+" ) )
-        } )
-      case GotResourcesInfo( pID, cards ) =>
-        TUI.outln( TUI.displayName( controller.player( pID ) ) + "  " + cards.toString( "+" ) )
-      case LostResourcesInfo( pID, cards ) =>
-        TUI.outln( TUI.displayName( controller.player( pID ) ) + "  " + cards.toString( "-" ) )
-      case ResourceChangeInfo( playerAdd, playerSub ) =>
-        val nameLength = ( playerAdd.keys ++ playerSub.keys ).map( controller.player( _ ).idName.length ).max
-        playerSub.foreach( d => TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + d._2.toString( "-" ) ) )
-        playerAdd.foreach( d => TUI.outln( TUI.displayName( controller.player( d._1 ), nameLength ) + "  " + d._2.toString( "+" ) ) )
-      case BankTradedInfo( _, give, get ) =>
-        TUI.outln( "You traded " + give.toString( "" ) + " for " + get.toString( "" ) + "." )
-      case DrawnDevCardInfo( _, devCard ) =>
-        TUI.outln( "Drawn: " + devCard.title + "\n" + devCard.desc )
-      case InsufficientStructuresInfo( _, structure ) =>
-        TUI.outln( "You don't have enough structures of " + structure.title + " to build more." )
-      case NoPlacementPointsInfo( _, structure ) =>
-        TUI.outln( "There aren't any more possible placement points for structure " + structure.title + " to build more." )
-      case GameEndInfo( winner ) =>
-        val p = controller.player( winner )
-        TUI.out( TUI.displayName( p ) + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" )
-      case GameSavedInfo( path ) => TUI.outln( "Game was saved to: " + path )
-      case GameLoadedInfo( path ) => TUI.outln( "Game was loaded from: " + path )
-      case _ =>
-    }
-  }
+  override def onInfo( info:Info ):Unit = TUI.getInfo( controller, info ).foreach( TUI.outln )
 
   override def onError( t:Throwable ):Unit = {
-    TUI.error( t match {
-      case e:InvalidFormat => "Invalid format: [" + TUI.errorHighlight( e.input ) + "]!"
-      case WrongState => "Unable in this state!"
-      case InsufficientResources => "Insufficient resources for this action!"
-      case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
-      case InsufficientStructures( structure ) =>
-        "Insufficient structures of " + TUI.errorHighlight( structure.title ) + " for this action!"
-      case NonExistentPlacementPoint( id ) => "Placement point " + TUI.errorHighlight( id ) + " does not exists!"
-      case PlacementPointNotEmpty( id ) => "Placement point " + TUI.errorHighlight( id ) + " is not empty!"
-      case NoAdjacentStructure => "Player has no adjacent structure!"
-      case TooCloseToBuilding( id ) => "Placement point " + TUI.errorHighlight( id ) + " is too close to another building!"
-      case NoConnectedStructures( id ) => "No connected structures on placement point " + TUI.errorHighlight( id ) + "!"
-      case SettlementRequired( id ) =>
-        "You need a settlement on placement point " + TUI.errorHighlight( id ) + " to build a city!"
-      case InvalidPlacementPoint( id ) => "Invalid placement point " + TUI.errorHighlight( id ) + "!"
-      case NotEnoughPlayers => "Minimum " + TUI.errorHighlight( controller.game.minPlayers ) + " players required!"
-      case InvalidPlayerColor( color ) => "Invalid player color: [" + TUI.errorHighlight( color ) + "]!"
-      case RobberOnlyOnLand => "Robber can only be placed on land!"
-      case NoPlacementPoints( structure ) =>
-        "No available placement points for structure " + TUI.errorHighlight( structure.title ) + "!"
-      case InvalidResourceAmount( amount ) => "Invalid resource amount: " + TUI.errorHighlight( amount ) + "!"
-      case InvalidTradeResources( give, get ) =>
-        "Invalid trade resources: " + TUI.errorHighlight( give.title ) + " <-> " + TUI.errorHighlight( get.title ) + "!"
-      case InvalidDevCard( devCard ) => "Invalid dev card: [" + TUI.errorHighlight( devCard ) + "]!"
-      case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + TUI.errorHighlight( devCard.title ) + "!"
-      case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
-      case DevCardDrawnInTurn( devCard ) =>
-        "You've drawn this development card (" + TUI.errorHighlight( devCard.title ) + ") in this turn, you can use it in your next turn."
-      case InsufficientBankResources => "Bank has insufficient resources!"
-      case InconsistentData => "Internal problem, please try again."
-      case DevStackIsEmpty => "Development card stack is empty!"
-      case PlayerNameAlreadyExists( name ) => "Player with name: [" + TUI.errorHighlight( name ) + "] already exists!"
-      case PlayerNameEmpty => "Player name can't be empty!"
-      case PlayerNameTooLong( name ) =>
-        "Player name [" + TUI.errorHighlight( name ) + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
-      case PlayerColorIsAlreadyInUse( playerColor ) =>
-        "Player color " + TUI.colorOf( playerColor ) + playerColor.title + TUI.reset + " is already in use!"
-      case InvalidPlayerID( id ) => "Invalid player id: [" + TUI.errorHighlight( id ) + "]!"
-      case InvalidPlayer( playerID ) => "Invalid player with id: " + TUI.errorHighlight( playerID ) + "!"
-      case NothingToUndo => "Nothing to undo!"
-      case NothingToRedo => "Nothing to redo!"
-      case e:ControllerError => e
-      case t:Throwable => t + ": " + t.getMessage
-    } )
+    TUI.error( TUI.getError( controller, t ) )
     if ( actionInfo.isDefined ) TUI.action( actionInfo.get )
   }
 }

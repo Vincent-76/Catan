@@ -1,8 +1,10 @@
 package com.aimit.htwg.catan.view.tui.command
 
 import com.aimit.htwg.catan.controller.Controller
-import com.aimit.htwg.catan.model.Resource
+import com.aimit.htwg.catan.model.{ Info, Resource }
 import com.aimit.htwg.catan.view.tui.{ CommandAction, CommandInput, TUI }
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -10,9 +12,9 @@ import com.aimit.htwg.catan.view.tui.{ CommandAction, CommandInput, TUI }
 case object BankTradeCommand
   extends CommandAction( "btrade", List( "giveResource", "getResource" ), "Trade resources with the bank." ) {
 
-  override def action( commandInput:CommandInput, controller:Controller ):Unit = {
+  override def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String]) = {
     val parts = commandInput.input.split( "\\s+", 2 )( 1 ).split( "\\s*-\\s*" )
-    controller.bankTrade( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) )
+    (controller.bankTrade( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) ), Nil)
   }
 
   override protected def getInputPattern:String = {

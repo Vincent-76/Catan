@@ -1,6 +1,9 @@
 package com.aimit.htwg.catan.view.tui
 
 import com.aimit.htwg.catan.controller.Controller
+import com.aimit.htwg.catan.model.Info
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -9,7 +12,7 @@ abstract class CommandAction( val command:String, val parameter:List[String] = L
 
   val inputPattern:String = getInputPattern
 
-  def action( commandInput:CommandInput, controller:Controller ):Unit
+  def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String])
 
   def getSyntax:String = "[" + command + parameter.map( p => " <" + p + ">" ).mkString + "]"
 

@@ -1,9 +1,12 @@
 package com.aimit.htwg.catan.view.tui.tuistate
 
 import com.aimit.htwg.catan.controller.Controller
+import com.aimit.htwg.catan.model.Info
 import com.aimit.htwg.catan.view.tui.command._
 import com.aimit.htwg.catan.view.tui._
 import com.aimit.htwg.catan.util._
+
+import scala.util.{ Success, Try }
 
 /**
  * @author Vincent76;
@@ -33,9 +36,9 @@ case class ActionTUIState( controller:Controller ) extends TUIState {
     Some( "(" + TUI.regexIgnoreCase( "end" ) + "|" + availableCommands.map( _.inputPattern ).mkString( "|" ) + ")" )
   }
 
-  override def action( commandInput:CommandInput ):Unit = availableCommands.find( c => c.command ^= commandInput.command.get ) match {
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = availableCommands.find( c => c.command ^= commandInput.command.get ) match {
     case Some( c ) => c.action( commandInput, controller )
-    case _ if commandInput.input ^= "end" => controller.endTurn()
-    case _ =>
+    case _ if commandInput.input ^= "end" => (controller.endTurn(), Nil)
+    case _ => (Success( None ), Nil)
   }
 }

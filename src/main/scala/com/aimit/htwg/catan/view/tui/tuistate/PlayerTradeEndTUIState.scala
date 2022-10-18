@@ -3,7 +3,9 @@ package com.aimit.htwg.catan.view.tui.tuistate
 import com.aimit.htwg.catan.view.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.model.Card.ResourceCards
-import com.aimit.htwg.catan.model.{ InvalidPlayerID, PlayerID }
+import com.aimit.htwg.catan.model.{ Info, InvalidPlayerID, PlayerID }
+
+import scala.util.{ Failure, Try }
 
 /**
  * @author Vincent76;
@@ -34,11 +36,11 @@ case class PlayerTradeEndTUIState( give:ResourceCards, get:ResourceCards, decisi
     Some( "[1-9][0-9]?" )
   else Option.empty
 
-  override def action( commandInput:CommandInput ):Unit = if( decisions.exists( _._2 ) ) {
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = if( decisions.exists( _._2 ) ) {
     controller.game.getPlayerID( commandInput.input.toInt ) match {
-      case Some( pID ) => controller.playerTrade( pID )
-      case None => controller.error( InvalidPlayerID( commandInput.input.toInt ) )
+      case Some( pID ) => (controller.playerTrade( pID ), Nil)
+      case None => (Failure( controller.error( InvalidPlayerID( commandInput.input.toInt ) ) ), Nil)
     }
-  } else controller.abortPlayerTrade()
+  } else (controller.abortPlayerTrade(), Nil)
 
 }

@@ -2,7 +2,9 @@ package com.aimit.htwg.catan.view.tui.tuistate
 
 import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.view.tui.{ CommandInput, TUI, TUIState }
-import com.aimit.htwg.catan.model.PlayerID
+import com.aimit.htwg.catan.model.{ Info, PlayerID }
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -27,10 +29,10 @@ case class InitBeginnerTUIState( beginner:Option[PlayerID], diceValues:Map[Playe
     }
   }
 
-  override def action( commandInput:CommandInput ):Unit = {
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = {
     if( beginner.isDefined )
-      controller.setBeginner()
+      (controller.setBeginner(), Nil)
     else
-      controller.diceOutBeginner()
+      (controller.diceOutBeginner(), Nil)
   }
 }

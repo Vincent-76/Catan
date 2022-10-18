@@ -2,7 +2,10 @@ package com.aimit.htwg.catan.view.tui.tuistate
 
 import com.aimit.htwg.catan.view.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import com.aimit.htwg.catan.controller.Controller
+import com.aimit.htwg.catan.model.Info
 import com.aimit.htwg.catan.model.impl.placement.SettlementPlacement
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -20,6 +23,6 @@ case class BuildInitSettlementTUIState( controller:Controller ) extends TUIState
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
-  override def action( commandInput:CommandInput ):Unit =
-    controller.buildInitSettlement( commandInput.command.get.toInt )
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
+    (controller.buildInitSettlement( commandInput.command.get.toInt ), Nil)
 }

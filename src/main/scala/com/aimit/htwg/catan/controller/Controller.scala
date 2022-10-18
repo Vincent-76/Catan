@@ -25,11 +25,11 @@ trait Controller extends Observable {
   def undoAction():Try[Option[Info]]
   def redoAction():Try[Option[Info]]
 
-  def saveGame():String
+  def saveGame():Try[Option[Info]]
 
-  def loadGame( path:String ):Unit
+  def loadGame( path:String ):Try[Option[Info]]
 
-  def exit( info:Option[Info] = None ):Unit
+  def exit( info:Option[Info] = None ):Try[Option[Info]]
 
   def initGame():Try[Option[Info]] = action( game.state.initGame() )
   def addPlayer( playerColor:PlayerColor, name:String ):Try[Option[Info]] = action( game.state.addPlayer( playerColor, name ) )

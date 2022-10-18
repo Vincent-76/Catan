@@ -1,6 +1,8 @@
 package com.aimit.htwg.catan.view.tui
 
-import com.aimit.htwg.catan.model.{ Game, PlayerID }
+import com.aimit.htwg.catan.model.{ Game, Info, PlayerID }
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -23,5 +25,5 @@ trait TUIState {
 
   def inputPattern:Option[String] = None
 
-  def action( commandInput: CommandInput ):Unit
+  def action( commandInput: CommandInput ):(Try[Option[Info]], List[String])
 }

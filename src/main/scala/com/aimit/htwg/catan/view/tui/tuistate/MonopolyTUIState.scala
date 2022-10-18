@@ -2,7 +2,9 @@ package com.aimit.htwg.catan.view.tui.tuistate
 
 import com.aimit.htwg.catan.view.tui.{ CommandInput, GameFieldDisplay, TUI, TUIState }
 import com.aimit.htwg.catan.controller.Controller
-import com.aimit.htwg.catan.model.Resource
+import com.aimit.htwg.catan.model.{ Info, Resource }
+
+import scala.util.Try
 
 /**
  * @author Vincent76;
@@ -21,6 +23,6 @@ case class MonopolyTUIState( controller:Controller ) extends TUIState {
   override def inputPattern:Option[String] =
     Some( "(" + Resource.impls.map( r => TUI.regexIgnoreCase( r.title ) ).mkString( "|" ) + ")" )
 
-  override def action( commandInput:CommandInput ):Unit =
-    controller.monopolyAction( Resource.of( commandInput.input ).get )
+  override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
+    (controller.monopolyAction( Resource.of( commandInput.input ).get ), Nil)
 }

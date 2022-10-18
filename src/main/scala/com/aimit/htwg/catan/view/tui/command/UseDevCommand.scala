@@ -1,9 +1,11 @@
 package com.aimit.htwg.catan.view.tui.command
 
 import com.aimit.htwg.catan.controller.Controller
-import com.aimit.htwg.catan.model.{ Card, DevelopmentCard, InvalidDevCard }
+import com.aimit.htwg.catan.model.{ Card, DevelopmentCard, Info, InvalidDevCard }
 import com.aimit.htwg.catan.view.tui.TUI.InvalidFormat
 import com.aimit.htwg.catan.view.tui.{ CommandAction, CommandInput, TUI }
+
+import scala.util.{ Failure, Try }
 
 /**
  * @author Vincent76;
@@ -11,14 +13,14 @@ import com.aimit.htwg.catan.view.tui.{ CommandAction, CommandInput, TUI }
 case object UseDevCommand
   extends CommandAction( "usedevcard", List( "devcard" ), "Use one of your development cards." ) {
 
-  override def action( commandInput:CommandInput, controller:Controller ):Unit = commandInput.args.headOption match {
+  override def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String]) = commandInput.args.headOption match {
     case Some( devCardString ) =>
       val devCard = DevelopmentCard.usableOf( devCardString )
       if ( devCard.isEmpty )
-        controller.error( InvalidDevCard( devCardString ) )
+        (Failure( controller.error( InvalidDevCard( devCardString ) ) ), Nil)
       else
-        controller.useDevCard( devCard.get )
-    case None => controller.error( InvalidFormat( commandInput.input ) )
+        (controller.useDevCard( devCard.get ), Nil)
+    case None => (Failure( controller.error( InvalidFormat( commandInput.input ) ) ), Nil)
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) + " (" +

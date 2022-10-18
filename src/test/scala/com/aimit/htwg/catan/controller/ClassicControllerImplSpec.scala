@@ -55,7 +55,12 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
       }
       "save and load game" in {
         val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )
-        val path = controller.saveGame()
+        val savedResult = controller.saveGame()
+        savedResult.isSuccess shouldBe true
+        val savedInfo = savedResult.get
+        savedInfo.isDefined shouldBe true
+        savedInfo.get shouldBe a [GameSavedInfo]
+        val path = savedInfo.get.asInstanceOf[GameSavedInfo].path
         controller.loadGame( path )
         val file = new File( path )
         if( file.exists )
