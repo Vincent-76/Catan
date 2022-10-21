@@ -16,10 +16,10 @@ case class BuildInitSettlementTUIState( controller:Controller ) extends TUIState
     GameFieldDisplay.get( controller.game, Some( SettlementPlacement.getBuildablePoints( controller.game, controller.onTurn, any = true ) ) ).buildGameField
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( TUI.displayName( controller.game.player ) + " place your settlement." )
-    "Select position [<id>] for your settlement"
-  }
+  override def createStateDisplay:Iterable[String] =
+    List( TUI.displayName( controller.game.player ) + " place your settlement." )
+
+  override def getActionInfo:String = "Select position [<id>] for your settlement"
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 

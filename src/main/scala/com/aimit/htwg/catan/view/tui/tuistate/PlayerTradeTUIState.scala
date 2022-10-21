@@ -17,12 +17,13 @@ case class PlayerTradeTUIState( pID:PlayerID, give:ResourceCards, get:ResourceCa
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( pID ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( TUI.displayName( controller.game.player( pID ) ) + ", do you want to trade?" )
-    TUI.outln( "Get:\t" + give.toString )
-    TUI.outln( "Give:\t" + get.toString )
-    "Type [Y] for yes or [N] for no"
-  }
+  override def createStateDisplay:Iterable[String] = List(
+    TUI.displayName( controller.game.player( pID ) ) + ", do you want to trade?",
+    "Get:\t" + give.toString,
+    "Give:\t" + get.toString
+  )
+
+  override def getActionInfo:String = "Type [Y] for yes or [N] for no"
 
   override def inputPattern:Option[String] = Some( "(" + TUI.regexIgnoreCase( "y" ) + "|" + TUI.regexIgnoreCase( "n" ) + ")" )
 

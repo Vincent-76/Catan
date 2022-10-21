@@ -15,10 +15,11 @@ case class YearOfPlentyTUIState( controller:Controller ) extends TUIState {
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( "You can specify 2 resources to get from the bank." )
-    "Type [" + TUI.resourcePatternInfo + ", ...] to specify resources"
-  }
+  override def createStateDisplay:Iterable[String] = List(
+    "You can specify 2 resources to get from the bank."
+  )
+
+  override def getActionInfo:String = "Type [" + TUI.resourcePatternInfo + ", ...] to specify resources"
 
   override def inputPattern:Option[String] = Some( "((^|,)" + TUI.resourcePattern + ")+" )
 

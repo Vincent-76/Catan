@@ -17,14 +17,15 @@ case class RobberStealTUIState( state:RobberStealState, controller:Controller ) 
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( "Players to steal from:" )
-    state.adjacentPlayers.foreach( pID => {
+  override def createStateDisplay:Iterable[String] = {
+    List( "Players to steal from:" ) ++
+    state.adjacentPlayers.map( pID => {
       val p = controller.game.player( pID )
-      TUI.outln( TUI.displayName( p ) + " with " + p.resources.amount + "Cards" )
+      TUI.displayName( p ) + " with " + p.resources.amount + "Cards"
     } )
-    "Type [<PlayerID>] to select a player to steal from"
   }
+
+  override def getActionInfo:String = "Type [<PlayerID>] to select a player to steal from"
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 

@@ -16,11 +16,10 @@ case class DiceTUIState( controller:Controller ) extends TUIState {
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( "Available commands:" )
-    TUI.outln( UseDevCommand.desc + "   " + UseDevCommand.getSyntax )
-    "Type command, or Enter to roll the dices"
-  }
+  override def createStateDisplay:Iterable[String] =
+    List( "Available commands:", UseDevCommand.desc + "   " + UseDevCommand.getSyntax )
+
+  override def getActionInfo:String = "Type command, or Enter to roll the dices"
 
   override def inputPattern:Option[String] =
     Some( "(^$|" + UseDevCommand.inputPattern + ")" )

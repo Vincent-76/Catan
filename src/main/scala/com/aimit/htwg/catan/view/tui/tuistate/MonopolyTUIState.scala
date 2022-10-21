@@ -15,10 +15,11 @@ case class MonopolyTUIState( controller:Controller ) extends TUIState {
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( "You can specify a resource to get all the corresponding cards from the other players" )
-    "Type [<" + Resource.impls.map( _.title ).mkString( "|" ) + ">] to specify a resource"
-  }
+  override def createStateDisplay:Iterable[String] = List(
+    "You can specify a resource to get all the corresponding cards from the other players"
+  )
+
+  override def getActionInfo:String = "Type [<" + Resource.impls.map( _.title ).mkString( "|" ) + ">] to specify a resource"
 
   override def inputPattern:Option[String] =
     Some( "(" + Resource.impls.map( r => TUI.regexIgnoreCase( r.title ) ).mkString( "|" ) + ")" )

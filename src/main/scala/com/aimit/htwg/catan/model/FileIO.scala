@@ -29,5 +29,5 @@ abstract class FileIO( val extension:String ) extends ComponentImpl {
 
   def load( path:String ):(Game, List[Command], List[Command])
 
-  def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String
+  def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String ):String
 }

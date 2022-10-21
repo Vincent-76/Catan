@@ -20,7 +20,7 @@ case class XMLParseError( expected:String, got:String ) extends RuntimeException
 
 object XMLFileIO extends FileIO( "xml" ) {
 
-  override def load( path:String ):(Game, List[Command], List[Command]) = {
+  override def load( path:String ):(Game, List[Command], List[Command] ) = {
     val xml = scala.xml.XML.loadFile( path )
     val game = Game.fromXML( xml.childOf( "game" ) )
     val undoStack = xml.childOf( "undoStack" ).asList( n => Command.fromXML( n ) )
@@ -28,8 +28,8 @@ object XMLFileIO extends FileIO( "xml" ) {
     (game, undoStack, redoStack)
   }
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String = {
-    val file = File( getFileName )
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String = getFileName ):String = {
+    val file = File( fileName )
     val save = <Save>
       <game>{ game.toXML }</game>
       <undoStack>{ undoStack.toXML( _.toXML ) }</undoStack>

@@ -10,10 +10,10 @@ import scala.util.Try
  * @author Vincent76;
  */
 case class ErrorTUIState( controller:Controller ) extends TUIState {
-  override def getActionInfo:String = {
-    TUI.outln( "Error!" )
-    "Press Enter to undo"
-  }
+
+  override def createStateDisplay:Iterable[String] = List( "Error!" )
+
+  override def getActionInfo:String = "Press Enter to undo"
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
     (controller.undoAction(), Nil)

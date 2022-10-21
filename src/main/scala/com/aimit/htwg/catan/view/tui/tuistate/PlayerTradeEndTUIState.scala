@@ -16,20 +16,26 @@ case class PlayerTradeEndTUIState( give:ResourceCards, get:ResourceCards, decisi
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( "Give: " + give.toString )
-    TUI.outln( "Get: " + get.toString )
+  override def createStateDisplay:Iterable[String] = {
+    val list = List(
+      "Give: " + give.toString,
+      "Get: " + get.toString
+    )
     if( decisions.exists( _._2 ) ) {
       val nameLength = decisions.map( d => controller.game.player( d._1 ).idName.length ).max
-      decisions.foreach( data => {
-        TUI.outln( TUI.displayName( controller.game.player( data._1 ), nameLength ) +
-          "   " + (if( data._2 ) "Yes" else "No") )
-      } )
-      "Type [<PlayerID>] to accept the trade, or [X] to abort"
-    } else {
-      TUI.outln( "No trade partner found!" )
-      "Press Enter to abort"
+      list ++ decisions.toList.map( data => TUI.displayName( controller.game.player( data._1 ), nameLength ) +
+        "   " + (if( data._2 ) "Yes" else "No")
+      )
     }
+    else
+      list ++ List( "No trade partner found!" )
+  }
+
+  override def getActionInfo:String = {
+    if( decisions.exists( _._2 ) )
+      "Type [<PlayerID>] to accept the trade, or [X] to abort"
+    else
+      "Press Enter to abort"
   }
 
   override def inputPattern:Option[String] = if( decisions.exists( _._2 ) )

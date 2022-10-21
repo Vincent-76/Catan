@@ -15,10 +15,10 @@ case class BuildInitRoadTUIState( vID:Int, controller:Controller ) extends TUISt
     GameFieldDisplay.get( controller.game, Some( controller.game.getBuildableRoadSpotsForSettlement( vID ) ) ).buildGameField
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( TUI.displayName( controller.game.player ) + " place your road." )
-    "Select position [<id>] for your road"
-  }
+  override def createStateDisplay:Iterable[String] =
+    List( TUI.displayName( controller.game.player ) + " place your road." )
+
+  override def getActionInfo:String = "Select position [<id>] for your road"
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 

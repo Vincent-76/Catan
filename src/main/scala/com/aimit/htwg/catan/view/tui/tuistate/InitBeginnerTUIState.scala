@@ -11,22 +11,27 @@ import scala.util.Try
  */
 case class InitBeginnerTUIState( beginner:Option[PlayerID], diceValues:Map[PlayerID, Int], controller:Controller ) extends TUIState {
 
-  override def getActionInfo:String = {
-    if( diceValues.isEmpty ) {
-      TUI.outln( "Time to dice who begins!" )
-      "Press Enter to roll the dices"
-    } else {
+  override def createStateDisplay:Iterable[String] = {
+    if( diceValues.isEmpty )
+      List( "Time to dice who begins!" )
+    else {
       val nameLength = controller.game.players.map( _._2.idName.length ).max
-      diceValues.foreach( d => if( d._2 > 0 ) TUI.outln( TUI.displayName( controller.game.players( d._1 ), nameLength ) + "   " + d._2 ) )
+      val list = diceValues.filter( d => d._2 > 0 ).map( d => TUI.displayName( controller.game.players( d._1 ), nameLength ) + "   " + d._2 )
       TUI.outln()
-      if( beginner.isDefined ) {
-        TUI.outln( "\n->\t" + TUI.displayName( controller.player( beginner.get ) ) + " begins.\n" )
-        "Press Enter to proceed"
-      } else {
-        TUI.outln( "Tie!" )
-        "Press Enter to roll again"
-      }
+      if( beginner.isDefined )
+        list ++ List( "" ) ++ List( "\n->\t" + TUI.displayName( controller.player( beginner.get ) ) + " begins.\n" )
+      else
+        list ++ List( "" ) ++ List( "Tie!" )
     }
+  }
+
+  override def getActionInfo:String = {
+    if( diceValues.isEmpty )
+      "Press Enter to roll the dices"
+    else if( beginner.isDefined )
+      "Press Enter to proceed"
+    else
+      "Press Enter to roll again"
   }
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = {

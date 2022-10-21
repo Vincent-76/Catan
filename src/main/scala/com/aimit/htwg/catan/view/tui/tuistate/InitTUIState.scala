@@ -11,11 +11,12 @@ import scala.util.Try
  */
 case class InitTUIState( controller:Controller ) extends TUIState {
 
-  override def getActionInfo:String = {
-    TUI.outln( "Welcome to Settlers of Catan." )
-    TUI.outln( "Type [help] for a list of all available commands." )
-    "Press Enter to add players"
-  }
+  override def createStateDisplay:Iterable[String] = List(
+    "Welcome to Settlers of Catan.",
+    "Type [help] for a list of all available commands."
+  )
+
+  override def getActionInfo:String = "Press Enter to add players"
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
     (controller.initGame(), Nil)

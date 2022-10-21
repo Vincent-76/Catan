@@ -255,12 +255,13 @@ class TUI( val controller:Controller ) extends Observer {
     if ( gameDisplay.isDefined )
       TUI.out( gameDisplay.get )
     //TUI.outln()
-    actionInfo = Some( tuiState.getActionInfo )
+    tuiState.createStateDisplay.foreach( TUI.outln )
     if( info.isDefined ) {
       TUI.outln()
       onInfo( info.get )
     }
     TUI.outln()
+    actionInfo = Some( tuiState.getActionInfo )
     TUI.action( actionInfo.get )
   }
 

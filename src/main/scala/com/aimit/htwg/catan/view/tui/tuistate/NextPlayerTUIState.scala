@@ -15,10 +15,11 @@ case class NextPlayerTUIState( controller:Controller ) extends TUIState {
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( TUI.displayName( controller.game.player ) + "'s turn." )
-    "Press Enter to proceed"
-  }
+  override def createStateDisplay:Iterable[String] = List(
+    TUI.displayName( controller.game.player ) + "'s turn."
+  )
+
+  override def getActionInfo:String = "Press Enter to proceed"
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
     (controller.startTurn(), Nil)

@@ -25,12 +25,13 @@ case class ActionTUIState( controller:Controller ) extends TUIState {
     GameFieldDisplay.get( controller.game ).buildGameField + buildPlayerDisplay( controller.game, Some( controller.game.onTurn ) )
   )
 
-  override def getActionInfo:String = {
-    TUI.outln( "Available commands:" )
+  override def createStateDisplay:Iterable[String] = {
     val descLength = availableCommands.map( _.desc.length ).max
-    availableCommands.foreach( c => TUI.outln( c.desc.toLength( descLength ) + "   " + c.getSyntax ) )
-    "Type command, or [end] to end your turn"
+    List( "Available commands:" ) ++
+    availableCommands.map( c => c.desc.toLength( descLength ) + "   " + c.getSyntax )
   }
+
+  override def getActionInfo:String = "Type command, or [end] to end your turn"
 
   override def inputPattern:Option[String] = {
     Some( "(" + TUI.regexIgnoreCase( "end" ) + "|" + availableCommands.map( _.inputPattern ).mkString( "|" ) + ")" )

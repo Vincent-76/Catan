@@ -16,10 +16,11 @@ trait TUIState {
     if( onTurn.isDefined )
       playersDisplay + PlayerDisplay.get( game.players( onTurn.get ) ).buildTurnPlayerDisplay( game )
     else playersDisplay
-
   }
 
   def createGameDisplay:Option[String] = None
+
+  def createStateDisplay:Iterable[String] = Nil
 
   def getActionInfo:String
 
