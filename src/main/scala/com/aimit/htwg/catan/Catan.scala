@@ -25,7 +25,7 @@ object Catan {
   val tui:TUI = new TUI( controller )
 
   def main( args:Array[String] ):Unit = {
-    val gui:Option[GUIApp] = if( args.contains( "gui" ) )
+    val gui:Option[GUIApp] = if( !args.contains( "tui" ) )
       Some( new GUIApp( controller ) )
     else None
     var input:String = ""

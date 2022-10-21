@@ -21,13 +21,15 @@ object FileIO extends ObjectComponent[FileIO] {
 abstract class FileIO( val extension:String ) extends ComponentImpl {
   override def init():Unit = FileIO.addImpl( this )
 
-  def getFileName:String = {
+  def getDefaultFileName:String = {
     File( CatanModule.savegamePath ).createDirectory().path + File.separator +
     "Catan_" + new SimpleDateFormat( "YYYY-MM-dd_HH.mm.ss" )
-      .format( Calendar.getInstance().getTime ) + "_savegame." + extension
+      .format( Calendar.getInstance().getTime ) + "_savegame"
   }
+
+  def getFinalFileName( fileName:String ) = s"$fileName.$extension"
 
   def load( path:String ):(Game, List[Command], List[Command])
 
-  def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String ):String
+  def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String = getDefaultFileName ):String
 }

@@ -39,6 +39,7 @@ trait Game extends XMLSerializable with JsonSerializable {
 
   def gameField:GameField
   def state:State
+  def resourceCards:ResourceCards
   def players:Map[PlayerID, Player]
   def turn:Turn
   def bonusCards:Map[BonusCard, Option[(PlayerID, Int)]]

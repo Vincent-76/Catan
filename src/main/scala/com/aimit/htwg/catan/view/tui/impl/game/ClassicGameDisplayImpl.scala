@@ -16,7 +16,7 @@ object ClassicGameDisplayImpl extends GameDisplay[ClassicGameImpl] {
     (colorOf( Sheep ) + " ", "Pasture/Sheep"),
     (colorOf( Wheat ) + " ", "Field/Wheat"),
     (colorOf( Ore ) + " ", "Mountains/Ore"),
-    (emptyVertex, "Empty Vertex"),
+    //(emptyVertex, "Empty Vertex"),
     (settlement, "Settlement"),
     (city, "City"),
     (robber, "Robber"),

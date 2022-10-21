@@ -57,7 +57,7 @@ case class ClassicGameFieldDisplayImpl(
 
   def buildGameField:String = {
     val emptyField:Field = Array.fill[Array[String]]( 31 )( Array.fill[String]( 57 )( " " ) )
-    val field = gameField.hexagons.redByKey( emptyField, buildRow ).toVector
+    val field = gameField.field.redByKey( emptyField, buildRow ).toVector
     val legend = GameDisplay.get( game ).buildGameLegend( game )
     field.view.zipWithIndex.map( d => {
       TUI.reset + d._1.mkString( TUI.reset ) + (if( d._2 - 2 >= 0 && d._2 - 2 < legend.size )
@@ -67,7 +67,7 @@ case class ClassicGameFieldDisplayImpl(
   }
 
   private def buildRow( field:Field, i:Int ):Field = {
-    val row = gameField.hexagons( i )
+    val row = gameField.field( i )
     val fRow = row.filter( _.isDefined )
     val nulls = row.size - fRow.size
     fRow.redByKey( field, ( f:Field, j:Int ) => {
@@ -151,17 +151,17 @@ case class ClassicGameFieldDisplayImpl(
 
     def addEdge( h1:Hex, hex2:Option[Hex], i:Int, j:Int, dir:EdgeDir ):Field = {
       if( hex2.isEmpty )
-        return f.update( i, j, dir.symbol )
+        return f.update( i, j, " " )//dir.symbol )
       val edge = gameField.findEdge( h1, hex2.get )
       if( edge.isEmpty )
-        return f.update( i, j, dir.symbol )
+        return f.update( i, j, " " )//dir.symbol )
       if( h1.isWater && hex2.get.isWater )
         return f.update( i, j, colorOf( Water ) + " " )
       val f1 = if( edge.get.road.isEmpty )
         if( isShowingID( buildableIDs, edge.get ) )
           f.showID( edge.get.id, i, j )
         else
-          f.update( i, j, dir.symbol )
+          f.update( i, j, " " )//dir.symbol )
       else
         f.update( i, j, TUI.colorOf( game.players( edge.get.road.get.owner ).color ) + dir.symbol )
       if( edge.get.port.isEmpty )
@@ -194,7 +194,7 @@ case class ClassicGameFieldDisplayImpl(
         if( i == 0 || i == f.length - 1 )
           return f.update( i, j, " " )
         else
-          return f.update( i, j, "|" )
+          return f.update( i, j, " " )
       val vertex = game.gameField.findVertex( h1, hex2.get, hex3.get )
       if( vertex.isEmpty )
         return f.update( i, j, " " )
@@ -202,7 +202,7 @@ case class ClassicGameFieldDisplayImpl(
         if( isShowingID( buildableIDs, vertex.get ) )
           return f.showID( vertex.get.id, i, j )
         else
-          return f.update( i, j, ClassicGameFieldDisplayImpl.emptyVertex )
+          return f.update( i, j, " " )//ClassicGameFieldDisplayImpl.emptyVertex )
       val player = game.players( vertex.get.building.get.owner )
       if( isShowingID( buildableIDs, vertex.get ) )
         return f.showID( vertex.get.id, i, j, TUI.colorOf( player.color ) )

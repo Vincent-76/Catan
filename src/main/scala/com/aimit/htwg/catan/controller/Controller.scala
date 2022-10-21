@@ -25,7 +25,7 @@ trait Controller extends Observable {
   def undoAction():Try[Option[Info]]
   def redoAction():Try[Option[Info]]
 
-  def saveGame():Try[Option[Info]]
+  def saveGame( fileName:Option[String] = None ):Try[Option[Info]]
 
   def loadGame( path:String ):Try[Option[Info]]
 

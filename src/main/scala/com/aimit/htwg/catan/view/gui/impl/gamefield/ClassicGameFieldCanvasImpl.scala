@@ -30,7 +30,7 @@ object ClassicGameFieldCanvasImpl {
   )
   val numberImages:Map[DiceValue, Image] = DiceValue.impls.filter( _.frequency > 0 ).map( n => (n, new Image( "/numbers/" + n.value + ".png" )) ).toMap
   val portImages:Map[Option[Resource], List[Image]] = (Resource.impls.map( Some( _ ) ).toList :+ None).map( r =>
-    (r, ClassicGameFieldImpl.adjacentOffset.indices.map( i =>
+    (r, GameField.adjacentOffset.indices.map( i =>
       new Image( "/ports/" + (if( r.isDefined ) r.get.title.toLowerCase else "unspecific") + "/" + i + ".png" )
     ).toList)
   ).toMap
@@ -47,8 +47,8 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl] {
 
   protected def doUpdate( gameField:ClassicGameFieldImpl, hWidth:Double, hSize:Double ):Coords = {
     graphicsContext2D.clearRect( 0, 0, width.value, height.value )
-    val coords = gameField.hexagons.redByKey( Map.empty:Coords, ( coords:Coords, i:Int ) => {
-      val row = gameField.hexagons( i )
+    val coords = gameField.field.redByKey( Map.empty:Coords, ( coords:Coords, i:Int ) => {
+      val row = gameField.field( i )
       val fRow = row.filter( _.isDefined )
       val nulls = row.size - fRow.size
       fRow.redByKey( coords, ( coords:Coords, j:Int ) => {
@@ -143,7 +143,7 @@ class ClassicGameFieldCanvasImpl extends GameFieldCanvas[ClassicGameFieldImpl] {
 
         //graphicsContext2D.drawImage( new Image( "/port_clay.png" ), hexCorner( hSize, center, 4 )._1, ( center._2 - hSize ), hWidth, ( hSize * 2 ) )
 
-        val rotNr = ClassicGameFieldImpl.adjacentOffset.indices.find( i => gameField.adjacentEdge( h, i ) match {
+        val rotNr = GameField.adjacentOffset.indices.find( i => gameField.adjacentEdge( h, i ) match {
           case Some( e ) if e.port.isDefined && e.port.get == w.port.get => true
           case _ => false
         } ).getOrElse( 0 )

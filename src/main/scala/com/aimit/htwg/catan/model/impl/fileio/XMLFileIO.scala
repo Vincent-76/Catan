@@ -28,8 +28,8 @@ object XMLFileIO extends FileIO( "xml" ) {
     (game, undoStack, redoStack)
   }
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String = getFileName ):String = {
-    val file = File( fileName )
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String = getDefaultFileName ):String = {
+    val file = File( getFinalFileName( fileName ) )
     val save = <Save>
       <game>{ game.toXML }</game>
       <undoStack>{ undoStack.toXML( _.toXML ) }</undoStack>
