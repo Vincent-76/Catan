@@ -57,7 +57,7 @@ case class ClassicGameFieldDisplayImpl(
 
   def buildGameField:String = {
     val emptyField:Field = Array.fill[Array[String]]( 31 )( Array.fill[String]( 57 )( " " ) )
-    val field = gameField.hexagons.redByKey( emptyField, buildRow ).toVector
+    val field = gameField.field.redByKey( emptyField, buildRow ).toVector
     val legend = GameDisplay.get( game ).buildGameLegend( game )
     field.view.zipWithIndex.map( d => {
       TUI.reset + d._1.mkString( TUI.reset ) + (if( d._2 - 2 >= 0 && d._2 - 2 < legend.size )
@@ -67,7 +67,7 @@ case class ClassicGameFieldDisplayImpl(
   }
 
   private def buildRow( field:Field, i:Int ):Field = {
-    val row = gameField.hexagons( i )
+    val row = gameField.field( i )
     val fRow = row.filter( _.isDefined )
     val nulls = row.size - fRow.size
     fRow.redByKey( field, ( f:Field, j:Int ) => {

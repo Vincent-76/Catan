@@ -80,8 +80,11 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
       actionDone( game, head, stack, info )
   }*/
 
-  def saveGame():Try[Option[Info]] = {
-    val path = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
+  def saveGame( fileName:Option[String] = None ):Try[Option[Info]] = {
+    val path = if( fileName.isDefined )
+      fileIO.save( game, undoManager.undoStack, undoManager.redoStack, fileName.get )
+    else
+      fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
     Success( update( Some( GameSavedInfo( path ) ) ) )
   }
 

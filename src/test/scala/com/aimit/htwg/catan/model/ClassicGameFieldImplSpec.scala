@@ -15,14 +15,14 @@ class ClassicGameFieldImplSpec extends AnyWordSpec with Matchers {
     "new" should {
       val gameField = ClassicGameFieldImpl( 1 )
       "create" in {
-        ( 2 to 10 ).foreach( seed => ClassicGameFieldImpl( seed ).hexagons.red( 0, (i:Int, r:Vector[Option[Hex]] ) => {
+        ( 2 to 10 ).foreach( seed => ClassicGameFieldImpl( seed ).field.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
         } ) should be( 37 ) )
       }
       "have a size" in {
         gameField.fieldWidth shouldBe 7
         gameField.fieldHeight shouldBe 7
-        gameField.hexagons.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
+        gameField.field.red( 0, ( i:Int, r:Vector[Option[Hex]] ) => {
           r.red( i, ( j:Int, h:Option[Hex] ) => j + ( if ( h.isDefined ) 1 else 0 ) )
         } ) should be( 37 )
       }
@@ -144,7 +144,7 @@ class ClassicGameFieldImplSpec extends AnyWordSpec with Matchers {
         nVertex.get.building.get.owner shouldBe pID
       }
       "have hex adjacent edges" in {
-        val adjacentF = gameField.adjacentEdge( h, ClassicGameFieldImpl.adjacentOffset.size )
+        val adjacentF = gameField.adjacentEdge( h, GameField.adjacentOffset.size )
         adjacentF shouldBe None
         val adjacentN = gameField.adjacentEdge( h, 2 )
         adjacentN shouldBe None

@@ -1,5 +1,6 @@
 package com.aimit.htwg.catan.model
 
+import com.aimit.htwg.catan.model.GameField.Field
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLNode, XMLNodeSeq, XMLOption }
 import com.aimit.htwg.catan.model.impl.fileio.{ JsonSerializable, XMLDeserializer, XMLSerializable }
@@ -13,12 +14,28 @@ abstract class GameFieldImpl( name:String ) extends DeserializerComponentImpl[Ga
 }
 
 object GameField extends ClassComponent[GameField, GameFieldImpl] {
+
+  type Field[E] = Vector[Row[E]]
+
+  type Row[E] = Vector[Option[E]]
+
+  type Edges = Map[(Hex, Hex), Edge]
+
+  type Vertices = Map[(Hex, Hex, Hex), Vertex]
+
+  /***
+   * starting on the south western hex counterclockwise
+   */
+  val adjacentOffset = Vector( (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0), (0, -1) )
+
   implicit val turnWrites:Writes[GameField] = ( o:GameField ) => o.toJson
 
   implicit val turnReads:Reads[GameField] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
 }
 
 trait GameField extends XMLSerializable with JsonSerializable {
+
+  def field:Field[Hex]
 
   def fieldWidth:Int
   def fieldHeight:Int
@@ -29,11 +46,11 @@ trait GameField extends XMLSerializable with JsonSerializable {
 
   def hexList:List[Hex]
   def findHex( hID:Int ):Option[Hex]
-  def findHex( r:Int, c:Int ):Option[Hex]
+  def findHex( row:Int, col:Int ):Option[Hex]
   def adjacentHexes( h:Hex ):List[Hex]
-  def adjacentHex( h:Hex, ai:Int ):Option[Hex]
+  def adjacentHex( h:Hex, offsetIndex:Int ):Option[Hex]
   def adjacentEdges( h:Hex ):List[Edge]
-  def adjacentEdge( h:Hex, ai:Int ):Option[Edge]
+  def adjacentEdge( h:Hex, offsetIndex:Int ):Option[Edge]
   def adjacentVertices( h:Hex ):List[Vertex]
   def adjacentPlayers( h:Hex ):List[PlayerID]
 
@@ -66,8 +83,8 @@ object Hex extends XMLDeserializer[Hex] {
 
   def fromXML( node:Node ):Hex = Hex(
     id = ( node \ "@id" ).content.toInt,
-    r = ( node \ "@r" ).content.toInt,
-    c = ( node \ "@c" ).content.toInt,
+    row = ( node \ "@row" ).content.toInt,
+    col = ( node \ "@col" ).content.toInt,
     area = Area.fromXML( node.childOf( "area" ) )
   )
 
@@ -75,10 +92,10 @@ object Hex extends XMLDeserializer[Hex] {
   implicit val hexReads:Reads[Hex] = Json.reads[Hex]
 }
 
-case class Hex /*private[GameField]*/( id:Int, r:Int, c:Int, area:Area ) extends PlacementPoint with XMLSerializable {
+case class Hex /*private[GameField]*/( id:Int, row:Int, col:Int, area:Area ) extends PlacementPoint with XMLSerializable {
   //private def copy( ):Unit = {}
 
-  def toXML:Node = <Hex id={ id.toString } r={ r.toString } c={ c.toString }>
+  def toXML:Node = <Hex id={ id.toString } row={ row.toString } col={ col.toString }>
     <area>{ area.toXML }</area>
   </Hex>
 

@@ -1,9 +1,9 @@
 package com.aimit.htwg.catan.model.impl.gamefield
 
+import com.aimit.htwg.catan.model.GameField.{ Edges, Field, Row, Vertices, adjacentOffset }
 import com.aimit.htwg.catan.model._
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.{ JsonLookupResult, JsonMap, JsonSeq, JsonTuple2, JsonTuple3, JsonValue }
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2, XMLTuple3 }
-import com.aimit.htwg.catan.model.impl.gamefield.ClassicGameFieldImpl.{ Edges, Hexagons, Vertices }
 import com.aimit.htwg.catan.util._
 import play.api.libs.json.{ JsValue, Json }
 
@@ -13,54 +13,55 @@ import scala.xml.Node
 /**
  * @author Vincent76;
  */
-case class ClassicGameFieldImpl( hexagons:Hexagons,
+case class ClassicGameFieldImpl( _field:Field[Hex],
                                  edges:Edges,
                                  vertices:Vertices,
                                  robber:Hex
                                ) extends GameField {
 
   def toXML:Node = <ClassicGameFieldImpl robber={ robber.id.toString }>
-    <hexagons>{ hexagons.toXML( _.toXML( _.toXML( _.toXML ) ) ) }</hexagons>
+    <field>{ field.toXML( _.toXML( _.toXML( _.toXML ) ) ) }</field>
     <edges>{ edges.toXML( _.toXML( _.id.toString, _.id.toString ), _.toXML ) }</edges>
     <vertices>{ vertices.toXML( _.toXML( _.id.toString, _.id.toString, _.id.toString ), _.toXML ) }</vertices>
   </ClassicGameFieldImpl>.copy( label = ClassicGameFieldImpl.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( ClassicGameFieldImpl.name ),
-    "hexagons" -> hexagons.toJsonC( _.toJsonC( o => Json.toJson( o ) ) ),
+    "field" -> field.toJsonC( _.toJsonC( o => Json.toJson( o ) ) ),
     "edges" -> edges.toJsonC( _.toJsonC( h1 => Json.toJson( h1.id ), h2 => Json.toJson( h2.id ) ), e => Json.toJson( e ) ),
     "vertices" -> vertices.toJsonC( _.toJsonC( h1 => Json.toJson( h1.id ), h2 => Json.toJson( h2.id ), h3 => Json.toJson( h3.id ) ), v => Json.toJson( v ) ),
     "robber" -> Json.toJson( robber.id )
   )
 
+  def field:Field[Hex] = _field
 
-  def fieldWidth:Int = hexagons.map( r => r.size ).max
-  def fieldHeight:Int = hexagons.size
+  def fieldWidth:Int = field.map( r => r.size ).max
+  def fieldHeight:Int = field.size
   def robberHex:Hex = robber
   def setRobberHex( hex:Hex ):GameField = copy( robber = hex )
 
 
-  def hexList:List[Hex] = hexagons.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
+  def hexList:List[Hex] = field.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
 
   def findHex( hID:Int ):Option[Hex] = {
-    hexagons.foreach( _.foreach( h => if( h.isDefined && h.get.id == hID ) return h ) )
+    field.foreach( _.foreach( h => if( h.isDefined && h.get.id == hID ) return h ) )
     Option.empty
   }
 
-  def findHex( r:Int, c:Int ):Option[Hex] = ClassicGameFieldImpl.findHex( r, c, hexagons )
+  def findHex( row:Int, col:Int ):Option[Hex] = ClassicGameFieldImpl.findHex( row, col, field )
 
-  def adjacentHexes( h:Hex ):List[Hex] = ClassicGameFieldImpl.adjacentHexes( h, hexagons )
+  def adjacentHexes( h:Hex ):List[Hex] = ClassicGameFieldImpl.adjacentHexes( h, field )
 
-  def adjacentHex( h:Hex, ai:Int ):Option[Hex] = {
-    if( ai < ClassicGameFieldImpl.adjacentOffset.size ) {
-      val o = ClassicGameFieldImpl.adjacentOffset( ai )
-      findHex( h.r + o._1, h.c + o._2 )
+  def adjacentHex( h:Hex, offsetIndex:Int ):Option[Hex] = {
+    if( offsetIndex < adjacentOffset.size ) {
+      val o = adjacentOffset( offsetIndex )
+      findHex( h.row + o._1, h.col + o._2 )
     } else None
   }
 
   def adjacentEdges( h:Hex ):List[Edge] = {
-    ClassicGameFieldImpl.adjacentOffset.redByKey( List.empty, ( edges:List[Edge], i:Int ) => {
-      val hex1 = findHex( h.r + ClassicGameFieldImpl.adjacentOffset( i )._1, h.c + ClassicGameFieldImpl.adjacentOffset( i )._2 )
+    adjacentOffset.redByKey( List.empty, ( edges:List[Edge], i:Int ) => {
+      val hex1 = findHex( h.row + adjacentOffset( i )._1, h.col + adjacentOffset( i )._2 )
       val edge = if( hex1.isDefined ) findEdge( h, hex1.get ) else Option.empty
       if( edge.isDefined )
         edges :+ edge.get
@@ -69,19 +70,19 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
     } )
   }
 
-  def adjacentEdge( h:Hex, ai:Int ):Option[Edge] = {
-    if( ai < ClassicGameFieldImpl.adjacentOffset.size ) {
-      val o = ClassicGameFieldImpl.adjacentOffset( ai )
-      val hex1 = findHex( h.r + o._1, h.c + o._2 )
+  def adjacentEdge( h:Hex, offsetIndex:Int ):Option[Edge] = {
+    if( offsetIndex < adjacentOffset.size ) {
+      val o = adjacentOffset( offsetIndex )
+      val hex1 = findHex( h.row + o._1, h.col + o._2 )
       if( hex1.isDefined ) findEdge( h, hex1.get ) else None
     } else None
   }
 
   def adjacentVertices( h:Hex ):List[Vertex] = {
-    ClassicGameFieldImpl.adjacentOffset.redByKey( List.empty, ( vertices:List[Vertex], i:Int ) => {
-      val o1 = ClassicGameFieldImpl.adjacentOffset( i )
+    adjacentOffset.redByKey( List.empty, ( vertices:List[Vertex], i:Int ) => {
+      val o1 = adjacentOffset( i )
       val o2 = ClassicGameFieldImpl.nextAdjacentOffset( i )
-      val vertex = getVertex( h, (h.r + o1._1, h.c + o1._2), (h.r + o2._1, h.c + o2._2) )
+      val vertex = getVertex( h, (h.row + o1._1, h.col + o1._2), (h.row + o2._1, h.col + o2._2) )
       if( vertex.isDefined )
         vertices :+ vertex.get
       else
@@ -158,10 +159,10 @@ case class ClassicGameFieldImpl( hexagons:Hexagons,
 object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
 
   def fromXML( node:Node ):ClassicGameFieldImpl = {
-    val hexagons = node.childOf( "hexagons" ).asVector( _.asVector( _.asOption( n => Hex.fromXML( n ) ) ) )
-    val hexList = hexagons.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
+    val field = node.childOf( "field" ).asVector( _.asVector( _.asOption( n => Hex.fromXML( n ) ) ) )
+    val hexList = field.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
     ClassicGameFieldImpl(
-      hexagons = hexagons,
+      field,
       edges = node.childOf( "edges" ).asMapC( ( keyNode, valNode ) => {
         val edge = Edge.fromXML( valNode, hexList )
         ((edge.h1, edge.h2), edge)
@@ -175,10 +176,10 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
   }
 
   def fromJson( json:JsValue ):ClassicGameFieldImpl = {
-    val hexagons = ( json \ "hexagons" ).asVectorC( _.asVectorC( _.asOption[Hex] ) )
-    val hexList = hexagons.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
+    val field = ( json \ "field" ).asVectorC( _.asVectorC( _.asOption[Hex] ) )
+    val hexList = field.flatMap( _.filter( _.isDefined ).map( _.get ) ).toList
     ClassicGameFieldImpl(
-      hexagons = hexagons,
+      field,
       edges = ( json \ "edges" ).asMapC( _.asTupleC(
         v1 => hexList.find( _.id == v1.as[Int] ).get,
         v2 => hexList.find( _.id == v2.as[Int] ).get
@@ -195,23 +196,11 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
 
   def apply( seed:Int ):ClassicGameFieldImpl = {
     val random = new Random( seed )
-    val hexagons = createHexagons( random )
-    val edges = createEdges( hexagons, random )
-    val robber = hexagons.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area.isInstanceOf[DesertArea] ).get.get
-    ClassicGameFieldImpl( hexagons, edges, createVertices( hexagons, edges ), robber )
+    val field = createField( random )
+    val edges = createEdges( field, random )
+    val robber = field.deepFind( ( e:Option[Hex] ) => e.isDefined && e.get.area.isInstanceOf[DesertArea] ).get.get
+    ClassicGameFieldImpl( field, edges, createVertices( field, edges ), robber )
   }
-
-  type Row[E] = Vector[Option[E]]
-
-  type Field[E] = Vector[Row[E]]
-
-  type Hexagons = Field[Hex]
-
-  type Edges = Map[(Hex, Hex), Edge]
-
-  type Vertices = Map[(Hex, Hex, Hex), Vertex]
-
-  val adjacentOffset = Vector( (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0), (0, -1) )
 
 
   def findHex[E]( r:Int, c:Int, data:Field[E] ):Option[E] = {
@@ -220,8 +209,8 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
     None
   }
 
-  def adjacentHexes( h:Hex, hexagons:Hexagons ):List[Hex] = {
-    adjacentOffset.map( c => findHex( h.r + c._1, h.c + c._2, hexagons ) ).filter( _.isDefined ).map( _.get ).toList
+  def adjacentHexes( h:Hex, field:Field[Hex] ):List[Hex] = {
+    adjacentOffset.map( c => findHex( h.row + c._1, h.col + c._2, field ) ).filter( _.isDefined ).map( _.get ).toList
   }
 
   def findEdge( h1:Hex, h2:Hex, data:Edges ):Option[Edge] = data.get( if( h1.id < h2.id ) (h1, h2) else (h2, h1) ) match {
@@ -237,9 +226,9 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
   }
 
 
-  def createHexagons( random:Random = Random ):Hexagons = {
+  def createField( random:Random = Random ):Field[Hex] = {
     val (hexData:Vector[Vector[Option[(Int, Int, Int)]]], _) = createRow( Vector.empty, 6, 1 )
-    type Result = (Hexagons, (List[WaterArea], List[WaterArea], List[Option[Resource]], List[DiceValue]))
+    type Result = (Field[Hex], (List[WaterArea], List[WaterArea], List[Option[Resource]], List[DiceValue]))
     val areas = getAvailableAreas( random )
     hexData.redByKey( (Vector.empty, areas), ( result:Result, i:Int ) => {
       hexData( i ).redByKey( result, ( res:Result, j:Int ) => {
@@ -329,24 +318,24 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
   }
 
 
-  def createEdges( hexagons:Hexagons, random:Random ):Edges = {
-    hexagons.red( Map.empty:Edges, ( map:Edges, r:Row[Hex] ) => r.red( map, ( m:Edges, hex:Option[Hex] ) => {
+  def createEdges( field:Field[Hex], random:Random ):Edges = {
+    field.red( Map.empty:Edges, ( map:Edges, r:Row[Hex] ) => r.red( map, ( m:Edges, hex:Option[Hex] ) => {
       if( hex.isDefined ) {
         val h = hex.get
-        val m1 = addEdge( m, h, (h.r + 1, h.c - 1), hexagons, random )
-        val m2 = addEdge( m1, h, (h.r + 1, h.c), hexagons, random )
-        addEdge( m2, h, (h.r, h.c + 1), hexagons, random )
+        val m1 = addEdge( m, h, (h.row + 1, h.col - 1), field, random )
+        val m2 = addEdge( m1, h, (h.row + 1, h.col), field, random )
+        addEdge( m2, h, (h.row, h.col + 1), field, random )
       } else m
     } ) )
   }
 
-  def addEdge( m:Edges, h:Hex, c:(Int, Int), hexagons:Hexagons, random:Random ):Edges = {
-    val nHex = findHex( c._1, c._2, hexagons )
+  def addEdge( m:Edges, h:Hex, c:(Int, Int), field:Field[Hex], random:Random ):Edges = {
+    val nHex = findHex( c._1, c._2, field )
     if( nHex.isDefined )
       return m + ((h, nHex.get) -> (if( isPortHex( h ) && nHex.get.area.isInstanceOf[LandArea] )
-        createPortEdge( m, h, h, nHex.get, hexagons, random )
+        createPortEdge( m, h, h, nHex.get, field, random )
       else if( isPortHex( nHex.get ) && h.area.isInstanceOf[LandArea] )
-        createPortEdge( m, nHex.get, h, nHex.get, hexagons, random )
+        createPortEdge( m, nHex.get, h, nHex.get, field, random )
       else
         new Edge( m.size, h, nHex.get )
         ))
@@ -358,8 +347,8 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
     case _ => false
   }
 
-  private def createPortEdge( m:Edges, portHex:Hex, h1:Hex, h2:Hex, hexagons:Hexagons, random:Random ):Edge = {
-    val adjacentLandHex = adjacentHexes( portHex, hexagons ).filter( h => {
+  private def createPortEdge( m:Edges, portHex:Hex, h1:Hex, h2:Hex, field:Field[Hex], random:Random ):Edge = {
+    val adjacentLandHex = adjacentHexes( portHex, field ).filter( h => {
       h.area.isInstanceOf[LandArea]
     } )
     val landHex = if( h1 == portHex ) h2 else h1
@@ -385,20 +374,20 @@ object ClassicGameFieldImpl extends GameFieldImpl( "ClassicGameFieldImpl" ) {
   }
 
 
-  def createVertices( hexagons:Hexagons, edges:Edges ):Vertices = {
-    hexagons.red( Map[(Hex, Hex, Hex), Vertex](), ( map:Vertices, r:Row[Hex] ) => r.red( map, ( m:Vertices, hex:Option[Hex] ) => {
+  def createVertices( field:Field[Hex], edges:Edges ):Vertices = {
+    field.red( Map[(Hex, Hex, Hex), Vertex](), ( map:Vertices, r:Row[Hex] ) => r.red( map, ( m:Vertices, hex:Option[Hex] ) => {
       if( hex.isDefined ) {
         val h = hex.get
-        val m1 = addVertex( m, h, (h.r + 1, h.c - 1), (h.r + 1, h.c), hexagons, edges )
-        addVertex( m1, h, (h.r, h.c + 1), (h.r + 1, h.c), hexagons, edges )
+        val m1 = addVertex( m, h, (h.row + 1, h.col - 1), (h.row + 1, h.col), field, edges )
+        addVertex( m1, h, (h.row, h.col + 1), (h.row + 1, h.col), field, edges )
       } else
         m
     } ) )
   }
 
-  def addVertex( m:Vertices, h:Hex, c1:(Int, Int), c2:(Int, Int), hexagons:Hexagons, edges:Edges ):Vertices = {
-    val hex1 = findHex( c1._1, c1._2, hexagons )
-    val hex2 = findHex( c2._1, c2._2, hexagons )
+  def addVertex( m:Vertices, h:Hex, c1:(Int, Int), c2:(Int, Int), field:Field[Hex], edges:Edges ):Vertices = {
+    val hex1 = findHex( c1._1, c1._2, field )
+    val hex2 = findHex( c2._1, c2._2, field )
     if( hex1.isDefined && hex2.isDefined )
       return m + ((h, hex1.get, hex2.get) -> new Vertex( m.size, h, hex1.get, hex2.get, getPortEdge( h, hex1.get, hex2.get, edges ) ))
     m

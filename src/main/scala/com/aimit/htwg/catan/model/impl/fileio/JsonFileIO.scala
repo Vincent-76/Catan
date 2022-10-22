@@ -30,8 +30,8 @@ object JsonFileIO extends FileIO( "json" ) {
     (game, undoStack, redoStack)
   }
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String ):String = {
-    val file = new File( fileName )
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command], fileName:String = getDefaultFileName ):String = {
+    val file = new File( getFinalFileName( fileName ) )
     val pw = new PrintWriter( file )
     val save = Json.obj(
       "game" -> Json.toJson( game ),
