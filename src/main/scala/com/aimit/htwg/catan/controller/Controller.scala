@@ -75,7 +75,7 @@ class Controller( var game:Game,
   }
 
   def loadGame( path:String ):Try[Option[Info]] = {
-    val (newGame, undoStack, redoStack) = FileIO.load( path )
+    val (newGame, undoStack, redoStack) = FileIO.load( path )._2
     game = newGame
     undoManager.clear()
     undoManager.undoStack = undoStack

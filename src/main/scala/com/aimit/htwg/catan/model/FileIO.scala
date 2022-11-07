@@ -10,10 +10,10 @@ import java.util.Calendar
 import scala.reflect.io.File
 
 object FileIO extends ObjectComponent[FileIO] {
-  def load( path:String ):(Game, List[Command], List[Command]) = {
+  def load( path:String ):(FileIO, (Game, List[Command], List[Command])) = {
     val extension = path.substring( path.lastIndexOf( "." ) + 1 )
     impls.find( _.extension ^= extension ) match {
-      case Some( impl ) => impl.load( path )
+      case Some( impl ) => (impl, impl.load( path ))
       case _ => throw new NotImplementedError( "Loader for extension: '" + extension + "'!" )
     }
   }

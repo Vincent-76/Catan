@@ -26,7 +26,7 @@ class FileIOSpec extends AnyWordSpec with Matchers {
         val undoStack = List( InitGameCommand() )
         val redoStack = List( InitGameCommand() )
         val path = JsonFileIO.save( game, undoStack, redoStack )
-        val (game2, undoStack2, redoStack2) = FileIO.load( path )
+        val (game2, undoStack2, redoStack2) = FileIO.load( path )._2
         val file = new File( path )
         if( file.exists )
           file.delete()
