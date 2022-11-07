@@ -27,11 +27,11 @@ case class InitPlayerTUIState( controller:Controller ) extends TUIState {
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = {
     if( commandInput.input.matches( TUI.regexIgnoreCase( "next" ) ) )
-      (controller.setInitBeginnerState(), Nil)
+      (controller.action( _.setInitBeginnerState() ), Nil)
     else PlayerColor.of( commandInput.args.head ) match {
       case None => (Failure( controller.error( InvalidPlayerColor( commandInput.args.head ) ) ), Nil)
       case Some( playerColor ) =>
-        (controller.addPlayer( playerColor, commandInput.command.get ), Nil)
+        (controller.action( _.addPlayer( playerColor, commandInput.command.get ) ), Nil)
     }
   }
 }

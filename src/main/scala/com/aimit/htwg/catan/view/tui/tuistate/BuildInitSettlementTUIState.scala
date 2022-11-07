@@ -24,5 +24,5 @@ case class BuildInitSettlementTUIState( controller:Controller ) extends TUIState
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
-    (controller.buildInitSettlement( commandInput.command.get.toInt ), Nil)
+    (controller.action( _.buildInitSettlement( commandInput.command.get.toInt ) ), Nil)
 }

@@ -1,6 +1,7 @@
 package com.aimit.htwg.catan.model
 
 import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.controller.Controller
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO
 import com.aimit.htwg.catan.util.RichString
 

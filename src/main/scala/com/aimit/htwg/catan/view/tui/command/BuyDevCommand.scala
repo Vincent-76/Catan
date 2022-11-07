@@ -13,6 +13,6 @@ case object BuyDevCommand extends
   CommandAction( "buydevcard", List.empty, "Buy a development card." ) {
 
   override def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String]) =
-    (controller.buyDevCard(), Nil)
+    (controller.action( _.buyDevCard() ), Nil)
 
 }

@@ -1,59 +1,90 @@
 package com.aimit.htwg.catan.controller
 
 import com.aimit.htwg.catan.model.Card.ResourceCards
+import com.aimit.htwg.catan.model.FileIO.impls
 import com.aimit.htwg.catan.model._
-import com.aimit.htwg.catan.util.Observable
+import com.aimit.htwg.catan.model.impl.fileio.{ JsonSerializable, XMLSerializable }
+import com.aimit.htwg.catan.util.{ Observable, UndoManager }
+import play.api.libs.json.{ JsSuccess, JsValue, Reads, Writes }
 
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 /**
  * @author Vincent76;
  */
 
-trait Controller extends Observable {
-
-  def game:Game
+class Controller( var game:Game,
+                  val fileIO:FileIO,
+                  val undoManager:UndoManager = new UndoManager(),
+                  var running:Boolean = true
+                ) extends Observable {
 
   def onTurn:PlayerID = game.onTurn
   def player:Player = game.player( onTurn )
   def player( pID:PlayerID ):Player = game.player( pID )
 
-  def hasUndo:Boolean
-  def hasRedo:Boolean
+  def hasUndo:Boolean = undoManager.hasUndo
+  def hasRedo:Boolean = undoManager.hasRedo
 
-  def action( command:Option[Command] ):Try[Option[Info]]
-  def undoAction():Try[Option[Info]]
-  def redoAction():Try[Option[Info]]
+  private def checkWinner( newGame:Game ):Option[PlayerID] =
+    newGame.players.values.find( p => newGame.getPlayerVictoryPoints( p.id ) >= newGame.requiredVictoryPoints ) match {
+      case Some( p ) => Some( p.id )
+      case None => Option.empty
+    }
 
-  def saveGame( fileName:Option[String] = None ):Try[Option[Info]]
+  private def actionDone( newGame:Game, info:Option[Info] ):Try[Option[Info]] = {
+    game = newGame
+    checkWinner( game ) match {
+      case None =>
+        Success( update( info ) )
+      case Some( pID ) =>
+        game = game.setWinner( pID )
+        exit( Some( GameEndInfo( pID ) ) )
+        Success( info )
+    }
+  }
 
-  def loadGame( path:String ):Try[Option[Info]]
+  def action( stateCommand:State => Option[Command] ):Try[Option[Info]] =
+    action( stateCommand( game.state ) )
 
-  def exit( info:Option[Info] = None ):Try[Option[Info]]
+  def action( command:Option[Command] ):Try[Option[Info]] = {
+    if( command.isEmpty ) {
+      Failure( error( WrongState ) )
+    } else undoManager.doStep( command.get, game ) match {
+      case Success( (game, info) ) => actionDone( game, info )
+      case Failure( t ) => Failure( error( t ) )
+    }
+  }
 
-  def initGame():Try[Option[Info]] = action( game.state.initGame() )
-  def addPlayer( playerColor:PlayerColor, name:String ):Try[Option[Info]] = action( game.state.addPlayer( playerColor, name ) )
-  def setInitBeginnerState():Try[Option[Info]] = action( game.state.setInitBeginnerState() )
-  def diceOutBeginner():Try[Option[Info]] = action( game.state.diceOutBeginner() )
-  def setBeginner():Try[Option[Info]] = action( game.state.setBeginner() )
-  def buildInitSettlement( vID:Int ):Try[Option[Info]] = action( game.state. buildInitSettlement( vID ))
-  def buildInitRoad( eID:Int ):Try[Option[Info]] = action( game.state.buildInitRoad( eID ) )
-  def startTurn():Try[Option[Info]] = action( game.state.startTurn() )
-  def rollTheDices():Try[Option[Info]] = action( game.state.rollTheDices() )
-  def useDevCard( devCard:DevelopmentCard ):Try[Option[Info]] = action( game.state.useDevCard( devCard ) )
-  def dropResourceCardsToRobber( cards:ResourceCards ):Try[Option[Info]] = action( game.state.dropResourceCardsToRobber( cards ) )
-  def placeRobber( hID:Int ):Try[Option[Info]] = action( game.state.placeRobber( hID ) )
-  def robberStealFromPlayer( stealPlayerID:PlayerID ):Try[Option[Info]] = action( game.state.robberStealFromPlayer( stealPlayerID ) )
-  def setBuildState( structure:StructurePlacement ):Try[Option[Info]] = action( game.state.setBuildState( structure ) )
-  def build( id:Int ):Try[Option[Info]] = action( game.state.build( id ) )
-  def bankTrade( give:ResourceCards, get:ResourceCards ):Try[Option[Info]] = action( game.state.bankTrade( give, get ) )
-  def setPlayerTradeState( give:ResourceCards, get:ResourceCards ):Try[Option[Info]] = action( game.state.setPlayerTradeState( give, get ) )
-  def playerTradeDecision( decision:Boolean ):Try[Option[Info]] = action( game.state.playerTradeDecision( decision ) )
-  def abortPlayerTrade():Try[Option[Info]] = action( game.state.abortPlayerTrade() )
-  def playerTrade( tradePlayerID:PlayerID ):Try[Option[Info]] = action( game.state.playerTrade( tradePlayerID) )
-  def buyDevCard():Try[Option[Info]] = action( game.state.buyDevCard() )
-  def yearOfPlentyAction( resources:ResourceCards ):Try[Option[Info]] = action( game.state.yearOfPlentyAction( resources ) )
-  def devBuildRoad( eID:Int ):Try[Option[Info]] = action( game.state.devBuildRoad( eID ) )
-  def monopolyAction( r:Resource ):Try[Option[Info]] = action( game.state.monopolyAction( r ) )
-  def endTurn():Try[Option[Info]] = action( game.state.endTurn() )
+  def undoAction():Try[Option[Info]] = undoManager.undoStep( game ) match {
+    case Success( newGame ) => actionDone( newGame, None )
+    case Failure( t ) => Failure( error( t ) )
+  }
+
+  def redoAction():Try[Option[Info]] = undoManager.redoStep( game ) match {
+    case Success( (newGame, info) ) => actionDone( newGame, info )
+    case Failure( t ) => Failure( error( t ) )
+  }
+
+  def saveGame( fileName:Option[String] = None ):Try[Option[Info]] = {
+    val path = if( fileName.isDefined )
+      fileIO.save( game, undoManager.undoStack, undoManager.redoStack, fileName.get )
+    else
+      fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
+    Success( update( Some( GameSavedInfo( path ) ) ) )
+  }
+
+  def loadGame( path:String ):Try[Option[Info]] = {
+    val (newGame, undoStack, redoStack) = FileIO.load( path )
+    game = newGame
+    undoManager.clear()
+    undoManager.undoStack = undoStack
+    undoManager.redoStack = redoStack
+    Success( update( Some( GameLoadedInfo( path ) ) ) )
+  }
+
+  def exit( info:Option[Info] = None ):Try[Option[Info]] = {
+    running = false
+    Success( update( info ) )
+  }
 }

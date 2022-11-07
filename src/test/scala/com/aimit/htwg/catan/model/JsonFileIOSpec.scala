@@ -1,7 +1,7 @@
 package com.aimit.htwg.catan.model
 
 import com.google.inject.{ Guice, Injector }
-import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.{ CatanModule, ClassicCatanModule }
 import com.aimit.htwg.catan.model.commands.InitGameCommand
 import com.aimit.htwg.catan.model.impl.fileio.{ JsonFileIO, JsonParseError, JsonSerializable }
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO._
@@ -14,7 +14,7 @@ import java.io.File
 
 class JsonFileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
   "JsonParseError" when {
     val parseError = JsonParseError( expected = "expected", got = "got" )
     "new" should {

@@ -1,7 +1,7 @@
 package com.aimit.htwg.catan.model
 
 import com.google.inject.{ Guice, Injector }
-import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.{ CatanModule, ClassicCatanModule }
 import com.aimit.htwg.catan.model.Card.ResourceCards
 import com.aimit.htwg.catan.model.commands._
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.XMLMap
@@ -17,7 +17,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class XMLSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
   "(de)serialized" when {
     "Model" should {
       "Port" in {

@@ -16,7 +16,7 @@ case object BuildCommand
 
   override def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String]) = {
     val placement = controller.game.availablePlacements.withType[model.StructurePlacement].find( _.title.toLowerCase == commandInput.args( 0 ).toLowerCase )
-    (controller.setBuildState( placement.get ), Nil)
+    (controller.action( _.setBuildState( placement.get ) ), Nil)
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) +

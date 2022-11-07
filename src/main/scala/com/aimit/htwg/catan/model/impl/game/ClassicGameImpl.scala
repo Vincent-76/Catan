@@ -164,6 +164,8 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
   def resourceCards:ResourceCards = resourceStack
 
+  def devCards:Int = developmentCards.length
+
   def players:Map[PlayerID, Player] = playersVal
 
   def turn:Turn = turnVal

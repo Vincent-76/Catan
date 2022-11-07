@@ -30,7 +30,7 @@ case class YearOfPlentyGUIState( controller:Controller ) extends GUIState {
     center = selector
     bottom = new Button( "OK" ) {
       alignmentInParent = Pos.Center
-      onAction = _ => controller.yearOfPlentyAction( selector.values )
+      onAction = _ => controller.action( _.yearOfPlentyAction( selector.values ) )
     }
   } )
 

@@ -21,5 +21,5 @@ case class DevRoadBuildingTUIState( controller:Controller ) extends TUIState {
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
-    (controller.devBuildRoad( commandInput.input.toInt ), Nil)
+    (controller.action( _.devBuildRoad( commandInput.input.toInt ) ), Nil)
 }

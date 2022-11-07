@@ -1,7 +1,7 @@
 package com.aimit.htwg.catan.model
 
 import com.google.inject.{ Guice, Injector }
-import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.{ CatanModule, ClassicCatanModule }
 import com.aimit.htwg.catan.model.commands.InitGameCommand
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO._
 import com.aimit.htwg.catan.model.impl.fileio.{ XMLFileIO, XMLParseError }
@@ -18,7 +18,7 @@ class XMLFileIOSpec extends AnyWordSpec with Matchers {
   }
 
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
   "XMLParseError" when {
     val parseError = XMLParseError( expected = "expected", got = "got" )
     "new" should {

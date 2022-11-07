@@ -12,7 +12,7 @@ case class BuildGUIState( state:BuildState, controller:Controller ) extends GUIS
 
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( state.structure.getBuildablePoints( controller.game, controller.onTurn ) ) {
-      override def action( id:Int ):Unit = controller.build( id )
+      override def action( id:Int ):Unit = controller.action( _.build( id ) )
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )

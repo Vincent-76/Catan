@@ -44,10 +44,10 @@ case class PlayerTradeGUIState( state:PlayerTradeState, controller:Controller ) 
       alignmentInParent = Pos.Center
       children = List(
         new Button( "Yes" ) {
-          onAction = _ => gui.controller.playerTradeDecision( true )
+          onAction = _ => gui.controller.action( _.playerTradeDecision( true ) )
         },
         new Button( "No" ) {
-          onAction = _ => gui.controller.playerTradeDecision( false )
+          onAction = _ => gui.controller.action( _.playerTradeDecision( false ) )
         }
       )
     }

@@ -28,5 +28,5 @@ case class PlayerTradeTUIState( pID:PlayerID, give:ResourceCards, get:ResourceCa
   override def inputPattern:Option[String] = Some( "(" + TUI.regexIgnoreCase( "y" ) + "|" + TUI.regexIgnoreCase( "n" ) + ")" )
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
-    (controller.playerTradeDecision( commandInput.input ^= "y" ), Nil)
+    (controller.action( _.playerTradeDecision( commandInput.input ^= "y" ) ), Nil)
 }

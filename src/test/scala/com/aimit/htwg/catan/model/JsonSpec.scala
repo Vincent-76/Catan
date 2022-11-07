@@ -1,7 +1,7 @@
 package com.aimit.htwg.catan.model
 
 import com.google.inject.{ Guice, Injector }
-import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.{ CatanModule, ClassicCatanModule }
 import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model.commands._
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO._
@@ -17,7 +17,7 @@ import play.api.libs.json.{ Json, Reads, Writes }
 
 class JsonSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
   "(de)serialized" when {
     "Model" should {
       "Port" in {

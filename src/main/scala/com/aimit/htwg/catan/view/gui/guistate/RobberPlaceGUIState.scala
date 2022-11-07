@@ -11,7 +11,7 @@ import com.aimit.htwg.catan.model.impl.placement.RobberPlacement
 case class RobberPlaceGUIState( controller:Controller ) extends GUIState {
   override def getDisplayState:DisplayState =
     new FieldInputDisplayState( RobberPlacement.getBuildablePoints( controller.game, controller.onTurn ) ) {
-      override def action( id:Int ):Unit = controller.placeRobber( id )
+      override def action( id:Int ):Unit = controller.action( _.placeRobber( id ) )
     }
 
   override def playerDisplayed:Option[(Player, Boolean)] = Some( controller.player, true )

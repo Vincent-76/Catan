@@ -20,5 +20,5 @@ case class BuildTUIState( structure:StructurePlacement, controller:Controller ) 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
-    (controller.build( commandInput.input.toInt ), Nil)
+    (controller.action( _.build( commandInput.input.toInt ) ), Nil)
 }

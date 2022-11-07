@@ -1,7 +1,7 @@
 package com.aimit.htwg.catan.model
 
 import com.google.inject.{ Guice, Injector }
-import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.{ CatanModule, ClassicCatanModule }
 import com.aimit.htwg.catan.model.commands.InitGameCommand
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO
 import com.aimit.htwg.catan.model.impl.game.ClassicGameImpl
@@ -13,7 +13,7 @@ import java.io.File
 
 class FileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
   "FileIO" when {
     "created" should {
       "load" in {

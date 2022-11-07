@@ -31,5 +31,5 @@ case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends 
   override def inputPattern:Option[String] = Some( "((^|,)" + TUI.resourcePattern + ")+" )
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
-    (controller.dropResourceCardsToRobber( TUI.parseResources( commandInput.input ) ), Nil)
+    (controller.action( _.dropResourceCardsToRobber( TUI.parseResources( commandInput.input ) ) ), Nil)
 }

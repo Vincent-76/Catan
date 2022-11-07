@@ -1,7 +1,7 @@
 package com.aimit.htwg.catan.util
 
 import com.google.inject.{ Guice, Injector }
-import com.aimit.htwg.catan.CatanModule
+import com.aimit.htwg.catan.{ CatanModule, ClassicCatanModule }
 import com.aimit.htwg.catan.model.commands.{ AddPlayerCommand, InitGameCommand }
 import com.aimit.htwg.catan.model.state.InitPlayerState
 import com.aimit.htwg.catan.model.{ Game, Green, NothingToRedo, NothingToUndo, PlayerNameEmpty }
@@ -12,7 +12,7 @@ import scala.util.{ Failure, Success }
 
 class UndoManagerSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( new CatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
   val game:Game = injector.getInstance( classOf[Game] )
   "UndoManager" when {
     val undoManager = new UndoManager()

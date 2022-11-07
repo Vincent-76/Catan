@@ -30,7 +30,7 @@ case class RobberStealTUIState( state:RobberStealState, controller:Controller ) 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = controller.game.getPlayerID( commandInput.input.toInt ) match {
-    case Some( pID ) => (controller.robberStealFromPlayer( pID ), Nil)
+    case Some( pID ) => (controller.action( _.robberStealFromPlayer( pID ) ), Nil)
     case None => (Failure( controller.error( InvalidPlayerID( commandInput.input.toInt ) ) ), Nil)
   }
 }

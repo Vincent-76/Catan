@@ -4,7 +4,7 @@ import com.aimit.htwg.catan.model.{ Command, FileIO, Game }
 
 import java.io
 import scala.reflect.io.File
-import scala.xml.{ Elem, Node, NodeSeq, PrettyPrinter, Utility }
+import scala.xml.{ Elem, Node, NodeSeq }
 
 trait XMLSerializable {
   def toXML:Node

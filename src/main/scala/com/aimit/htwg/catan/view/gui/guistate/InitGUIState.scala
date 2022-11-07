@@ -22,7 +22,7 @@ case class InitGUIState( controller:Controller ) extends GUIState {
           styleClass.add( "initHeader" )
         },
         new Button( "Add Players" ) {
-          onAction = _ => controller.initGame()
+          onAction = _ => controller.action( _.initGame() )
           styleClass.add( "button" )
         }
       )

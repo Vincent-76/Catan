@@ -33,14 +33,14 @@ case class PlayerTradeEndGUIState( state:PlayerTradeEndState, controller:Control
           },
           new Button( "Trade" ) {
             styleClass.add( "button" )
-            onAction = _ => controller.playerTrade( d._1 )
+            onAction = _ => controller.action( _.playerTrade( d._1 ) )
           }
         )
       } )
     }
     bottom = new Button( "Abort" ) {
       alignmentInParent = Pos.Center
-      onAction = _ => controller.abortPlayerTrade()
+      onAction = _ => controller.action( _.abortPlayerTrade() )
     }
   } )
 

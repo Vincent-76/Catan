@@ -39,7 +39,7 @@ case class ActionTUIState( controller:Controller ) extends TUIState {
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = availableCommands.find( c => c.command ^= commandInput.command.get ) match {
     case Some( c ) => c.action( commandInput, controller )
-    case _ if commandInput.input ^= "end" => (controller.endTurn(), Nil)
+    case _ if commandInput.input ^= "end" => (controller.action( _.endTurn() ), Nil)
     case _ => (Success( None ), Nil)
   }
 }

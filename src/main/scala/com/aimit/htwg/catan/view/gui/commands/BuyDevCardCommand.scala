@@ -18,7 +18,7 @@ case object BuyDevCardCommand extends SimpleGUICommand( "Buy Development Card" )
         spacing = 10
         children = new Button( "Buy" ) {
           alignmentInParent = Pos.CenterRight
-          onAction = _ => gui.controller.buyDevCard()
+          onAction = _ => gui.controller.action( _.buyDevCard() )
         }
       }
     }.show()

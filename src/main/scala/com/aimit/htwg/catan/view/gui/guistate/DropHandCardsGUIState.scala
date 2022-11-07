@@ -36,7 +36,7 @@ case class DropHandCardsGUIState( state:DropHandCardsState, controller:Controlle
       center = selector
       bottom = new Button( "Drop" ) {
         alignmentInParent = Pos.Center
-        onAction = _ => controller.dropResourceCardsToRobber( selector.values )
+        onAction = _ => controller.action( _.dropResourceCardsToRobber( selector.values ) )
       }
     }
   } )

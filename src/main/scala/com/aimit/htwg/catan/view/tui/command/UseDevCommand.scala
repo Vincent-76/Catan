@@ -19,7 +19,7 @@ case object UseDevCommand
       if ( devCard.isEmpty )
         (Failure( controller.error( InvalidDevCard( devCardString ) ) ), Nil)
       else
-        (controller.useDevCard( devCard.get ), Nil)
+        (controller.action( _.useDevCard( devCard.get ) ), Nil)
     case None => (Failure( controller.error( InvalidFormat( commandInput.input ) ) ), Nil)
   }
 

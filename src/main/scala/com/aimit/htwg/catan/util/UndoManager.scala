@@ -6,10 +6,11 @@ import com.aimit.htwg.catan.model.{ Command, Game, NothingToRedo, NothingToUndo 
 import scala.util.{ Failure, Success, Try }
 
 class UndoManager( var undoStack:List[Command] = Nil,
-                        var redoStack:List[Command] = Nil
-                      ) {
+                   var redoStack:List[Command] = Nil
+                 ) {
 
   def hasUndo:Boolean = undoStack.nonEmpty
+
   def hasRedo:Boolean = redoStack.nonEmpty
 
   private def stepDone( command:Command,
@@ -39,13 +40,13 @@ class UndoManager( var undoStack:List[Command] = Nil,
 
   def redoStep( game:Game ):Try[CommandSuccess] = redoStack match {
     case Nil => Failure( NothingToRedo )
-    case head :: stack => head.doStep( game )  match {
+    case head :: stack => head.doStep( game ) match {
       case Success( result ) => stepDone( head, stack, result )
       case f => f.rethrow
     }
   }
 
-  def clear():Unit = {
+  def clear( ):Unit = {
     undoStack = Nil
     redoStack = Nil
   }

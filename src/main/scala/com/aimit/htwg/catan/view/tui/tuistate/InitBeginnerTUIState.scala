@@ -36,8 +36,8 @@ case class InitBeginnerTUIState( beginner:Option[PlayerID], diceValues:Map[Playe
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) = {
     if( beginner.isDefined )
-      (controller.setBeginner(), Nil)
+      (controller.action( _.setBeginner() ), Nil)
     else
-      (controller.diceOutBeginner(), Nil)
+      (controller.action( _.diceOutBeginner() ), Nil)
   }
 }

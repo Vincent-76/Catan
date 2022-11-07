@@ -19,6 +19,6 @@ case class InitTUIState( controller:Controller ) extends TUIState {
   override def getActionInfo:String = "Press Enter to add players"
 
   override def action( commandInput:CommandInput ):(Try[Option[Info]], List[String]) =
-    (controller.initGame(), Nil)
+    (controller.action( _.initGame() ), Nil)
 
 }

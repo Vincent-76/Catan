@@ -4,7 +4,6 @@ import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.FactoryModuleBuilder
 import com.google.inject.name.Names
 import com.aimit.htwg.catan.controller.Controller
-import com.aimit.htwg.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import com.aimit.htwg.catan.model._
 import com.aimit.htwg.catan.model.commands._
 import com.aimit.htwg.catan.model.impl.fileio.{ JsonFileIO, XMLFileIO }
@@ -20,6 +19,13 @@ import scala.util.Random
 
 object CatanModule {
   val savegamePath:String = "savegames"
+
+  val availablePlacements:List[Placement] = List(
+    RobberPlacement,
+    RoadPlacement,
+    SettlementPlacement,
+    CityPlacement,
+  )
 
   def playerFactoryFromString( playerFactoryClass:String ):Option[PlayerFactory] = playerFactoryClass match {
     case "ClassicPlayerImpl" => Some( ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ) )
@@ -84,29 +90,22 @@ object CatanModule {
   }
 }
 
-class CatanModule( val test:Boolean = false ) extends AbstractModule with ScalaModule {
+abstract class CatanModule( availablePlacements:List[Placement] ) extends AbstractModule with ScalaModule {
 
-  val availablePlacements:List[Placement] = List(
-    RobberPlacement,
-    RoadPlacement,
-    SettlementPlacement,
-    CityPlacement,
-  )
+  def bindFileIO():Unit
+  def bindGame():Unit
+  def bindTurn():Unit
+  def bindGameField():Unit
+  def bindPlayer():Unit
+  def bindOther():Unit
 
   override def configure( ):Unit = {
-    bind[Controller].to[ClassicControllerImpl]
-    bind[FileIO].toInstance( JsonFileIO )
-    bind[Game].to[ClassicGameImpl]
-    bind[Turn].to[ClassicTurnImpl]
-    val seed = if( test ) 1 else Random.nextInt( Int.MaxValue / 1000 )
-    bind[Int].annotatedWith( Names.named( "seed" ) ).toInstance( seed )
-    bind[GameField].toInstance( ClassicGameFieldImpl( seed ) )
-    val playerClass = classOf[ClassicPlayerImpl]
-    bind[String].annotatedWith( Names.named( "playerFactoryClass" ) ).toInstance( playerClass.getSimpleName )
-    install( new FactoryModuleBuilder()
-        .implement( classOf[Player], playerClass )
-        .build( classOf[PlayerFactory] )
-    )
+    bindFileIO()
+    bindGame()
+    bindTurn()
+    bindGameField()
+    bindPlayer()
+    bindOther()
     bind[List[Placement]].annotatedWith( Names.named( "availablePlacements" ) ).toInstance( availablePlacements )
   }
 }

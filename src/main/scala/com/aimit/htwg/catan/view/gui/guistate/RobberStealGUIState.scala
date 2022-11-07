@@ -20,7 +20,7 @@ case class RobberStealGUIState( state:RobberStealState, controller:Controller ) 
       spacing = 8
       alignment = Pos.Center
       children = state.adjacentPlayers.map( pID => new Button( controller.player( pID ).name ) {
-        onAction = _ => controller.robberStealFromPlayer( pID )
+        onAction = _ => controller.action( _.robberStealFromPlayer( pID ) )
       } )
     }
   } )

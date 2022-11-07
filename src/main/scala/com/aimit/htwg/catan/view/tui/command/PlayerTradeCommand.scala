@@ -14,7 +14,7 @@ case object PlayerTradeCommand
 
   override def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String]) = {
     val parts = commandInput.input.split( "\\s+", 2 )( 1 ).split( "\\s*-\\s*" )
-    (controller.setPlayerTradeState( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) ), Nil)
+    (controller.action( _.setPlayerTradeState( TUI.parseResources( parts( 0 ) ), TUI.parseResources( parts( 1 ) ) ) ), Nil)
   }
 
   override protected def getInputPattern:String = {

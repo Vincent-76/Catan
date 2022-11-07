@@ -46,7 +46,7 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
           } )
         else Nil) :+ new Button( "Roll the dices" ) {
           styleClass.add( "button" )
-          onAction = _ => controller.diceOutBeginner()
+          onAction = _ => controller.action( _.diceOutBeginner() )
         }
       })
     }
@@ -58,7 +58,7 @@ case class InitBeginnerGUIState( state:InitBeginnerState, controller:Controller 
       },
       new Button( "Continue" ) {
         styleClass.add( "button" )
-        onAction = _ => controller.setBeginner()
+        onAction = _ => controller.action( _.setBeginner() )
       }
     )
   }

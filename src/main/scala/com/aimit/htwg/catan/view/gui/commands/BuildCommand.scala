@@ -19,7 +19,7 @@ case object BuildCommand extends SimpleGUICommand( "Build" ) {
       spacing = 10
       alignment = Pos.Center
       children = gui.controller.game.availablePlacements.withType[StructurePlacement].map( s => new Button( s.title ) {
-        onAction = _ => gui.controller.setBuildState( s )
+        onAction = _ => gui.controller.action( _.setBuildState( s ) )
       } )
     }
   }.show()
