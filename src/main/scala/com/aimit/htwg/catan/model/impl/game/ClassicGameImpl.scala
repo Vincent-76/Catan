@@ -7,7 +7,7 @@ import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model._
 import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO._
 import com.aimit.htwg.catan.model.impl.fileio.JsonSerializable
-import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLTuple2 }
+import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption, XMLSequence, XMLSet, XMLTuple2 }
 import com.aimit.htwg.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import com.aimit.htwg.catan.model.state.InitState
 import com.aimit.htwg.catan.util._
@@ -23,7 +23,7 @@ import scala.xml.Node
 object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
 
   val stackResourceAmount:Int = 19
-  val availablePlacements:List[Placement] = List(
+  val availablePlacements:Set[Placement] = Set(
     RobberPlacement,
     RoadPlacement,
     SettlementPlacement,
@@ -36,7 +36,7 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
     seedVal = (node \ "@seed").content.toInt,
     playerFactory = CatanModule.playerFactoryFromString( (node \ "@playerFactoryClass").content ).get,
     playerFactoryClass = (node \ "@playerFactoryClass").content,
-    availablePlacementsVal = node.childOf( "availablePlacements" ).asList( n => Placement.of( n.content ).get ),
+    availablePlacementsVal = node.childOf( "availablePlacements" ).asSet( n => Placement.of( n.content ).get ),
     stateVal = State.fromXML( node.childOf( "state" ) ),
     resourceStack = ResourceCards.fromXML( node.childOf( "resourceStack" ) ),
     developmentCards = node.childOf( "developmentCards" ).asList( n => DevelopmentCard.of( n.content ).get ),
@@ -63,7 +63,7 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
     seedVal = ( json \ "seed" ).as[Int],
     playerFactory = CatanModule.playerFactoryFromString( ( json \ "playerFactoryClass" ).as[String] ).get,
     playerFactoryClass = ( json \ "playerFactoryClass" ).as[String],
-    availablePlacementsVal = ( json \ "availablePlacements" ).asList[Placement],
+    availablePlacementsVal = ( json \ "availablePlacements" ).asSet[Placement],
     stateVal = ( json \ "state" ).as[State],
     resourceStack = ( json \ "resourceStack" ).as[ResourceCards],
     developmentCards = ( json \ "developmentCards"  ).asList[DevelopmentCard],
@@ -79,7 +79,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
                             seedVal:Int,
                             playerFactory:PlayerFactory,
                             playerFactoryClass:String,
-                            availablePlacementsVal:List[Placement],
+                            availablePlacementsVal:Set[Placement],
                             stateVal:State = InitState(),
                             resourceStack:ResourceCards = Card.getResourceCards( ClassicGameImpl.stackResourceAmount ),
                             developmentCards:List[DevelopmentCard] = List.empty,
@@ -156,7 +156,7 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
   def maxPlayerNameLength:Int = 10
 
-  def availablePlacements:List[Placement] = availablePlacementsVal
+  def availablePlacements:Set[Placement] = availablePlacementsVal
 
   def gameField:GameField = gameFieldVal
 

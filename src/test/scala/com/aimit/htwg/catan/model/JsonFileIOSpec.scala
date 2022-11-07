@@ -14,7 +14,7 @@ import java.io.File
 
 class JsonFileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule.create( test = true ) )
   "JsonParseError" when {
     val parseError = JsonParseError( expected = "expected", got = "got" )
     "new" should {

@@ -6,7 +6,18 @@ import play.api.libs.json.JsValue
 
 import scala.xml.Node
 
-sealed abstract class Component[I] {
+
+abstract class ComponentImpl {
+  def init():Unit
+}
+
+abstract class NamedComponentImpl( val name:String ) extends ComponentImpl
+
+abstract class DeserializerComponentImpl[+T]( name:String ) extends NamedComponentImpl( name ) with XMLDeserializer[T] with JsonDeserializer[T]
+
+
+
+abstract class Component[I] {
   private var implementations:Set[I] = Set.empty
 
   def addImpl[T <: I]( impl:T ):Unit =
@@ -15,26 +26,22 @@ sealed abstract class Component[I] {
   def impls:Set[I] = implementations
 }
 
-
 abstract class ObjectComponent[I] extends Component[I]
 
+abstract class NamedComponent[I <: NamedComponentImpl] extends Component[I] {
+  def hasImpl( name:String ):Boolean = impls.exists( _.name ^= name )
 
-abstract class ComponentImpl {
-  def init()
+  def findImpl( name:String ):Option[I] = impls.find( _.name ^= name ) match {
+    case Some( v ) => Some( v )
+    case _ => None
+  }
 }
 
-abstract class DeserializerComponentImpl[+T]( var name:String ) extends ComponentImpl with XMLDeserializer[T] with JsonDeserializer[T]
-
-abstract class ClassComponent[T, I <: DeserializerComponentImpl[T]] extends Component[I] with XMLDeserializer[T] with JsonDeserializer[T] {
-
-  def findImpl( name:String ):Either[I, String] = impls.find( _.name ^= name ) match {
-    case Some( v ) => Left( v )
-    case _ => Right( name )
-  }
+abstract class ClassComponent[T, I <: DeserializerComponentImpl[T]] extends NamedComponent[I] with XMLDeserializer[T] with JsonDeserializer[T] {
 
   def fromXML( node:Node ):T = findImpl( node.label ) match {
-    case Left( impl ) => impl.fromXML( node )
-    case Right( value ) => throw XMLParseError( expected = getClass.getSimpleName, got = value )
+    case Some( impl ) => impl.fromXML( node )
+    case None => throw XMLParseError( expected = getClass.getSimpleName, got = node.label )
   }
 
   def fromJson( json:JsValue ):T = {
@@ -42,8 +49,8 @@ abstract class ClassComponent[T, I <: DeserializerComponentImpl[T]] extends Comp
     if( name.isError )
       throw JsonParseError( expected = getClass.getSimpleName, got = name.toString )
     findImpl( name.get ) match {
-      case Left( impl ) => impl.fromJson( json )
-      case Right( value ) => throw JsonParseError( expected = getClass.getSimpleName, got = value )
+      case Some( impl ) => impl.fromJson( json )
+      case None => throw JsonParseError( expected = getClass.getSimpleName, got = name.get )
     }
   }
 }

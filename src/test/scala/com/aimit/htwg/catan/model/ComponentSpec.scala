@@ -23,10 +23,10 @@ class ComponentSpec extends AnyWordSpec with Matchers {
   "ClassComponent" when {
     "created" should {
       "find implementation" in {
-        TestClassComponent.findImpl( "TestImpl" ) shouldBe Left( TestDeserializerComponentImpl )
+        TestClassComponent.findImpl( "TestImpl" ) shouldBe Some( TestDeserializerComponentImpl )
       }
       "not find implementation" in {
-        TestClassComponent.findImpl( "TestImpl2" ) shouldBe Right( "TestImpl2" )
+        TestClassComponent.findImpl( "TestImpl2" ) shouldBe None
       }
       "fromXML" in {
         TestClassComponent.fromXML( <TestImpl /> ) shouldBe "Test"

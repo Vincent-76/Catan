@@ -17,10 +17,10 @@ import net.codingwell.scalaguice.ScalaModule
 
 import scala.util.Random
 
-object CatanModule {
+object CatanModule extends NamedComponent[CatanModuleImpl] {
   val savegamePath:String = "savegames"
 
-  val availablePlacements:List[Placement] = List(
+  val availablePlacements:Set[Placement] = Set(
     RobberPlacement,
     RoadPlacement,
     SettlementPlacement,
@@ -33,6 +33,8 @@ object CatanModule {
   }
 
   def init():Unit = {
+    ClassicCatanModule.init()
+
     ClassicGameImpl.init()
     ClassicGameFieldImpl.init()
     ClassicPlayerImpl.init()
@@ -90,22 +92,28 @@ object CatanModule {
   }
 }
 
-abstract class CatanModule( availablePlacements:List[Placement] ) extends AbstractModule with ScalaModule {
+abstract class CatanModuleImpl( name:String ) extends NamedComponentImpl( name ) {
+  override def init():Unit = CatanModule.addImpl( this )
 
-  def bindFileIO():Unit
-  def bindGame():Unit
-  def bindTurn():Unit
-  def bindGameField():Unit
-  def bindPlayer():Unit
-  def bindOther():Unit
+  protected def _create( test:Boolean, fileIO:FileIO, availablePlacements:Set[Placement] ):CatanModule
+
+  def create( test:Boolean = false,
+              fileIO:FileIO = JsonFileIO,
+              availablePlacements:Set[Placement] = CatanModule.availablePlacements
+            ):CatanModule =
+    _create( test, fileIO, availablePlacements )
+}
+
+abstract class CatanModule( test:Boolean,
+                            fileIO:FileIO,
+                            availablePlacements:Set[Placement]
+                          ) extends AbstractModule with ScalaModule {
 
   override def configure( ):Unit = {
-    bindFileIO()
-    bindGame()
-    bindTurn()
-    bindGameField()
-    bindPlayer()
-    bindOther()
-    bind[List[Placement]].annotatedWith( Names.named( "availablePlacements" ) ).toInstance( availablePlacements )
+    bind[FileIO].toInstance( fileIO )
+    bindAll( if( test ) 1 else Random.nextInt( Int.MaxValue / 1000 ) )
+    bind[Set[Placement]].annotatedWith( Names.named( "availablePlacements" ) ).toInstance( availablePlacements )
   }
+
+  def bindAll( seed:Int ):Unit
 }

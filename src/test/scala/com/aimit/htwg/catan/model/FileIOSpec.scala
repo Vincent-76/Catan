@@ -13,7 +13,7 @@ import java.io.File
 
 class FileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule.create( test = true ) )
   "FileIO" when {
     "created" should {
       "load" in {

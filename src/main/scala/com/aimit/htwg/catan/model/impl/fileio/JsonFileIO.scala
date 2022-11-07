@@ -18,7 +18,7 @@ case class JsonParseError( expected:String, got:String ) extends RuntimeExceptio
   override def toString:String = "JsonParseError: Expected -> '" + expected + "', Got -> '" + got + "'"
 }
 
-object JsonFileIO extends FileIO( "json" ) {
+object JsonFileIO extends FileIO( "JSON", "json" ) {
 
   override def load( path:String ):(Game, List[Command], List[Command]) = {
     val source = Source.fromFile( path )
@@ -51,6 +51,14 @@ object JsonFileIO extends FileIO( "json" ) {
 
     def toJsonC( builder:E => JsValue ):JsArray =
       JsArray( seq.map( builder ) )
+  }
+
+  implicit class JsonSet[E]( set:Set[E] ) {
+    def toJson( implicit jfs:Writes[E] ):JsArray =
+      JsArray( set.map( e => Json.toJson( e ) ).toSeq ) //toJson( e => Json.toJson( e ) )
+
+    def toJsonC( builder:E => JsValue ):JsArray =
+      JsArray( set.map( builder ).toSeq )
   }
 
   implicit class JsonMap[K, V]( map:Map[K, V] ) {
@@ -103,6 +111,12 @@ object JsonFileIO extends FileIO( "json" ) {
 
     def asVectorC[E]( builder:JsValue => E ):Vector[E] = asIndexedSeq( builder ).toVector
 
+    def asSet[E]( implicit fjs:Reads[E] ):Set[E] = asSetC( _.as[E] )
+
+    def asSetC[E]( builder:JsValue => E ):Set[E] = asIndexedSeq( builder ).toSet
+
+
+
 
     def asMap[K, V]( implicit fjs:Reads[K], fjs2:Reads[V] ):Map[K, V] = asMapC[K, V]( _.as[K], _.as[V] )
 
@@ -148,6 +162,10 @@ object JsonFileIO extends FileIO( "json" ) {
     def asVector[E]( implicit fjs:Reads[E] ):Vector[E] = jsonRes.get.asVector[E]
 
     def asVectorC[E]( builder:JsValue => E ):Vector[E] = jsonRes.get.asVectorC( builder )
+
+    def asSet[E]( implicit fjs:Reads[E] ):Set[E] = jsonRes.get.asSet[E]
+
+    def asSetC[E]( builder:JsValue => E ):Set[E] = jsonRes.get.asSetC( builder )
 
     def asMap[K, V]( implicit fjs:Reads[K], fjs2:Reads[V] ):Map[K, V] = jsonRes.get.asMap[K, V]
 

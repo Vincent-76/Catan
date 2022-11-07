@@ -7,7 +7,7 @@ import com.aimit.htwg.catan.model.{ Game, Placement }
 import scalafx.scene.canvas.GraphicsContext
 
 object PlacementOverlay {
-  def get( availablePlacements:List[Placement] ):List[PlacementOverlay] = availablePlacements.map {
+  def get( availablePlacements:Set[Placement] ):Set[PlacementOverlay] = availablePlacements.map {
     case RobberPlacement => RobberPlacementOverlayImpl
     case RoadPlacement => RoadPlacementOverlayImpl
     case SettlementPlacement => SettlementPlacementOverlayImpl

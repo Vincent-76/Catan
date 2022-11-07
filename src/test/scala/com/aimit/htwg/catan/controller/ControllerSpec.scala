@@ -35,7 +35,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
 
   "Controller" when {
-    val controller = new Controller( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" ), XMLFileIO )
+    val controller = Controller( new ClassicGameImpl( ClassicGameFieldImpl( 1 ), ClassicTurnImpl(), 1, ( pID:PlayerID, color:PlayerColor, name:String ) => ClassicPlayerImpl( pID, color, name ), "ClassicPlayerImpl" ), XMLFileIO )
     "new" should {
       "have game" in {
         val observer = new TestObserver()

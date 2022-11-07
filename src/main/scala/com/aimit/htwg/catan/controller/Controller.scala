@@ -13,6 +13,11 @@ import scala.util.{ Failure, Success, Try }
  * @author Vincent76;
  */
 
+object Controller {
+  def apply( game:Game, fileIO:FileIO, undoStack:List[Command] = Nil, redoStack:List[Command] = Nil ):Controller =
+    new Controller( game, fileIO, new UndoManager( undoStack, redoStack ) )
+}
+
 class Controller( var game:Game,
                   val fileIO:FileIO,
                   val undoManager:UndoManager = new UndoManager(),

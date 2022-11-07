@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import scala.reflect.io.File
 
-object FileIO extends ObjectComponent[FileIO] {
+object FileIO extends NamedComponent[FileIO] {
   def load( path:String ):(FileIO, (Game, List[Command], List[Command])) = {
     val extension = path.substring( path.lastIndexOf( "." ) + 1 )
     impls.find( _.extension ^= extension ) match {
@@ -19,7 +19,7 @@ object FileIO extends ObjectComponent[FileIO] {
   }
 }
 
-abstract class FileIO( val extension:String ) extends ComponentImpl {
+abstract class FileIO( name:String, val extension:String ) extends NamedComponentImpl( name ) {
   override def init():Unit = FileIO.addImpl( this )
 
   def getDefaultFileName:String = {

@@ -35,7 +35,7 @@ trait Game extends XMLSerializable with JsonSerializable {
   def unspecifiedPortFactor:Int
   def specifiedPortFactor:Int
   def maxPlayerNameLength:Int
-  def availablePlacements:List[Placement]
+  def availablePlacements:Set[Placement]
 
   def gameField:GameField
   def state:State

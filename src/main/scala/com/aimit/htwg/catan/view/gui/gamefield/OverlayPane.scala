@@ -9,7 +9,7 @@ import scalafx.scene.text.TextAlignment
  * @author Vincent76;
  */
 
-class OverlayPane( placements:List[PlacementOverlay] ) extends Canvas {
+class OverlayPane( placements:Set[PlacementOverlay] ) extends Canvas {
 
   graphicsContext2D.textAlign = TextAlignment.Center
   graphicsContext2D.textBaseline = VPos.Center

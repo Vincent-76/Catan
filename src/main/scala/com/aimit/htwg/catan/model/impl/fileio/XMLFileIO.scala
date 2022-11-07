@@ -18,7 +18,7 @@ case class XMLParseError( expected:String, got:String ) extends RuntimeException
   override def toString:String = "XMLParseError: Expected -> '" + expected + "', Got -> '" + got + "'"
 }
 
-object XMLFileIO extends FileIO( "xml" ) {
+object XMLFileIO extends FileIO( "XML", "xml" ) {
 
   override def load( path:String ):(Game, List[Command], List[Command] ) = {
     val xml = scala.xml.XML.loadFile( path )
@@ -57,6 +57,14 @@ object XMLFileIO extends FileIO( "xml" ) {
         <entry>{wrap( valBuilder( e ) )}</entry>
       )}
     </List>
+  }
+
+  implicit class XMLSet[E]( val set:Set[E] ) {
+    def toXML( valBuilder:E => io.Serializable ):Node = <Set>
+      {set.map( e =>
+        <entry>{wrap( valBuilder( e ) )}</entry>
+      )}
+    </Set>
   }
 
   implicit class XMLMap[K, V]( val map:Map[K, V] ) {
@@ -114,6 +122,11 @@ object XMLFileIO extends FileIO( "xml" ) {
     }
 
     def asList[E]( builder:Node => E ):List[E] = asSeq( builder ).toList
+
+    def asSet[E]( builder:Node => E ):Set[E] = node.label match {
+      case "Set" => (node \ "entry").map( n => builder( n.firstChild().get ) ).toSet
+      case e => throw XMLParseError( expected = "Set", got = e )
+    }
 
     def asVector[E]( builder:Node => E ):Vector[E] = asSeq( builder ).toVector
 

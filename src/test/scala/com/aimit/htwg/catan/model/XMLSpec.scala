@@ -17,7 +17,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class XMLSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( ClassicCatanModule( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule.create( test = true ) )
   "(de)serialized" when {
     "Model" should {
       "Port" in {
@@ -43,7 +43,7 @@ class XMLSpec extends AnyWordSpec with Matchers {
           injector.getInstance( classOf[Turn] ), 1,
           injector.getInstance( classOf[PlayerFactory] ),
           "ClassicPlayerImpl",
-          availablePlacementsVal = List( RoadPlacement, SettlementPlacement, CityPlacement ),
+          availablePlacementsVal = Set( RoadPlacement, SettlementPlacement, CityPlacement ),
         ).addPlayer( Green, "Test" )
           .setBonusCard( LongestRoadCard, Some( PlayerID( 0 ), 6 ) )
           .setWinner( PlayerID( 0 ) )
