@@ -29,7 +29,7 @@ object MonopolyCommand extends CommandImpl( "MonopolyCommand" ) {
 
 case class MonopolyCommand( resource:Resource, state:MonopolyState ) extends Command {
 
-  def toXML:Node = <MonopolyCommand resource={ resource.title }>
+  def toXML:Node = <MonopolyCommand resource={ resource.name }>
     <state>{ state.toXML }</state>
   </MonopolyCommand>.copy( label = MonopolyCommand.name )
 

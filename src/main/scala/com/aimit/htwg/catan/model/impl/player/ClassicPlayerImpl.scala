@@ -54,12 +54,12 @@ case class ClassicPlayerImpl( idVal:PlayerID,
   )
 
 
-  def toXML:Node = <ClassicPlayerImpl color={ colorVal.title } name={ nameVal } victoryPoints={ victoryPointsVal.toString }>
+  def toXML:Node = <ClassicPlayerImpl color={ colorVal.name } name={ nameVal } victoryPoints={ victoryPointsVal.toString }>
     <id>{ idVal.toXML }</id>
-    <resources>{ resourcesVal.toXML( _.title, _.toString ) }</resources>
-    <devCards>{ devCardsVal.toXML( _.title ) }</devCards>
-    <usedDevCards>{ usedDevCards.toXML( _.title ) }</usedDevCards>
-    <structures>{ structures.toXML( _.title, _.toString ) }</structures>
+    <resources>{ resourcesVal.toXML( _.name, _.toString ) }</resources>
+    <devCards>{ devCardsVal.toXML( _.name ) }</devCards>
+    <usedDevCards>{ usedDevCards.toXML( _.name ) }</usedDevCards>
+    <structures>{ structures.toXML( _.name, _.toString ) }</structures>
   </ClassicPlayerImpl>.copy( label = ClassicPlayerImpl.name )
 
   def toJson:JsValue = Json.obj(

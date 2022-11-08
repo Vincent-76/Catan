@@ -21,7 +21,7 @@ import scalafx.scene.paint.Color
 object GUIApp {
   val stoneBackground:Background = getBackground( "/stone_background.png" )
   val woodBackground:Background = getBackground( "/wood_background.png" )
-  val resourceIcons:Map[Resource, Image] = Resource.impls.map( r => (r, new Image( "/resources/" + r.title.toLowerCase + ".png" )) ).toMap
+  val resourceIcons:Map[Resource, Image] = Resource.impls.map( r => (r, new Image( "/resources/" + r.name.toLowerCase + ".png" )) ).toMap
   val devCardIcon:Image = new Image( "/resources/dev.png" )
 
 
@@ -141,12 +141,12 @@ class GUIApp( val controller:Controller ) extends Observer {
     case BankTradedInfo( pID, give, get ) =>
       gui.showInfo( controller.player( pID ).name.toLength( controller.game.maxPlayerNameLength ) + "  " + give.toString( "" ) + "  <->  " + get.toString( "" ) )
     case DrawnDevCardInfo( _, devCard ) =>
-      gui.showInfoDialog( "Drawn: " + devCard.title, Some( devCard.desc ) )
+      gui.showInfoDialog( "Drawn: " + devCard.name, Some( devCard.desc ) )
     case InsufficientStructuresInfo( pID, structure ) =>
-      gui.showInfo( controller.player( pID ).name + ": Insufficient structures of " + structure.title + " to build more." )
+      gui.showInfo( controller.player( pID ).name + ": Insufficient structures of " + structure.name + " to build more." )
     case NoPlacementPointsInfo( pID, structure ) =>
       gui.showInfo( controller.player( pID ).name +
-        ": There aren't any more possible placement points for structure " + structure.title + " to build more." )
+        ": There aren't any more possible placement points for structure " + structure.name + " to build more." )
     case GameEndInfo( winner ) =>
       val p = controller.player( winner )
       gui.showInfoDialog(
@@ -166,7 +166,7 @@ class GUIApp( val controller:Controller ) extends Observer {
       case InsufficientResources => "Insufficient resources for this action!"
       case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
       case InsufficientStructures( structure ) =>
-        "Insufficient structures of " + structure.title + " for this action!"
+        "Insufficient structures of " + structure.name + " for this action!"
       case NonExistentPlacementPoint( id ) => "This placement point does not exists!"
       case PlacementPointNotEmpty( id ) => "This placement point is not empty!"
       case NoAdjacentStructure => "Player has no adjacent structure!"
@@ -179,15 +179,15 @@ class GUIApp( val controller:Controller ) extends Observer {
       case InvalidPlayerColor( color ) => "Invalid player color: [" + color + "]!"
       case RobberOnlyOnLand => "Robber can only be placed on land!"
       case NoPlacementPoints( structure ) =>
-        "No available placement points for structure " + structure.title + "!"
+        "No available placement points for structure " + structure.name + "!"
       case InvalidResourceAmount( amount ) => "Invalid resource amount: " + amount + "!"
       case InvalidTradeResources( give, get ) =>
-        "Invalid trade resources: " + give.title + " <-> " + get.title + "!"
+        "Invalid trade resources: " + give.name + " <-> " + get.name + "!"
       case InvalidDevCard( devCard ) => "Invalid dev card: [" + devCard + "]!"
-      case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + devCard.title + "!"
+      case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + devCard.name + "!"
       case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
       case DevCardDrawnInTurn( devCard ) =>
-        "You've drawn this development card (" + devCard.title + ") in this turn, you can use it in your next turn."
+        "You've drawn this development card (" + devCard.name + ") in this turn, you can use it in your next turn."
       case InsufficientBankResources => "Bank has insufficient resources!"
       case InconsistentData => "Internal problem, please try again."
       case DevStackIsEmpty => "Development card stack is empty!"
@@ -196,7 +196,7 @@ class GUIApp( val controller:Controller ) extends Observer {
       case PlayerNameTooLong( name ) =>
         "Player name [" + name + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
       case PlayerColorIsAlreadyInUse( playerColor ) =>
-        "Player color: [" + playerColor.title + "] is already in use!"
+        "Player color: [" + playerColor.name + "] is already in use!"
       case InvalidPlayerID( id ) => "Invalid player id: [" + id + "]!"
       case InvalidPlayer( playerID ) => "Invalid player with id: " + playerID + "!"
       case NothingToUndo => "Nothing to undo!"

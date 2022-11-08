@@ -12,13 +12,13 @@ import scala.util.Try
  * @author Vincent76;
  */
 case object BuildCommand
-  extends CommandAction( "build", List( StructurePlacement.impls.map( _.title ).mkString( "|" ) ), "Build a new structure." ) {
+  extends CommandAction( "build", List( StructurePlacement.impls.map( _.name ).mkString( "|" ) ), "Build a new structure." ) {
 
   override def action( commandInput:CommandInput, controller:Controller ):(Try[Option[Info]], List[String]) = {
-    val placement = controller.game.availablePlacements.withType[model.StructurePlacement].find( _.title.toLowerCase == commandInput.args( 0 ).toLowerCase )
+    val placement = controller.game.availablePlacements.withType[model.StructurePlacement].find( _.name.toLowerCase == commandInput.args( 0 ).toLowerCase )
     (controller.action( _.setBuildState( placement.get ) ), Nil)
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) +
-    "\\s+(" + StructurePlacement.impls.map( p => TUI.regexIgnoreCase( p.title ) ).mkString( "|" ) + ")"
+    "\\s+(" + StructurePlacement.impls.map( p => TUI.regexIgnoreCase( p.name ) ).mkString( "|" ) + ")"
 }

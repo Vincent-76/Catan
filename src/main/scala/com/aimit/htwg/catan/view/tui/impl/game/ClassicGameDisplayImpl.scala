@@ -26,7 +26,7 @@ object ClassicGameDisplayImpl extends GameDisplay[ClassicGameImpl] {
 
   protected def doBuildGameLegend( game:ClassicGameImpl ):Vector[(String, String)] = {
     val legend = game.resourceStack.red( this.legend :+ ("", ""), ( l:Vector[(String, String)], r:Resource, amount:Int ) => {
-      l :+ (r.title + " Stack", amount.toString)
+      l :+ (r.name + " Stack", amount.toString)
     } ) :+ ("Dev Stack", game.developmentCards.size.toString)
     val titleLength = legend.map( _._1.length ).max
     legend.map( d => (d._1.toLength( titleLength ), d._2) )

@@ -29,8 +29,8 @@ object BankTradeCommand extends CommandImpl( "BankTradeCommand" ) {
 case class BankTradeCommand( give:ResourceCards, get:ResourceCards ) extends Command {
 
   def toXML:Node = <BankTradeCommand>
-    <give>{ give.toXML( _.title, _.toString ) }</give>
-    <get>{ get.toXML( _.title, _.toString ) }</get>
+    <give>{ give.toXML( _.name, _.toString ) }</give>
+    <get>{ get.toXML( _.name, _.toString ) }</get>
   </BankTradeCommand>.copy( label = BankTradeCommand.name )
 
   def toJson:JsValue = Json.obj(

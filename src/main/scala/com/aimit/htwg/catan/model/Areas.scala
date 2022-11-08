@@ -22,7 +22,7 @@ object Port extends XMLDeserializer[Port] {
 
 case class Port( specific:Option[Resource] = None ) extends XMLSerializable {
   def toXML:Node = <Port>
-    <specific>{ specific.toXML( v => <value>{ v.title }</value> ) }</specific>
+    <specific>{ specific.toXML( v => <value>{ v.name }</value> ) }</specific>
   </Port>
 }
 
@@ -112,7 +112,7 @@ object ResourceArea extends LandAreaImpl[ResourceArea]( "ResourceArea" ) {
 }
 
 case class ResourceArea( resource:Resource, number:DiceValue ) extends LandArea( resource ) {
-  def toXML:Node = <ResourceArea resource={ resource.title } number={ number.value.toString } />.copy( label = ResourceArea.name )
+  def toXML:Node = <ResourceArea resource={ resource.name } number={ number.value.toString } />.copy( label = ResourceArea.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> ResourceArea.name,

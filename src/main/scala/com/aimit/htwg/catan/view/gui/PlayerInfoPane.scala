@@ -30,7 +30,7 @@ class PlayerInfoPane( game:Game, p:Player ) extends AnchorPane {
       style = "-fx-border-color: " + GUIApp.colorOf( p.color ).toHex + "; -fx-border-width: 0 0 1 1; -fx-background-color: #5a5a5a"
       minWidth = 20
       minHeight = 20
-      children = new Text( d._1.title.replaceAll( "[a-z\\s]", "" ) ) {
+      children = new Text( d._1.name.replaceAll( "[a-z\\s]", "" ) ) {
         fill = Color.White
       }
     } ).toList

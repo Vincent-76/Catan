@@ -31,8 +31,8 @@ object SetPlayerTradeStateCommand extends CommandImpl( "SetPlayerTradeStateComma
 case class SetPlayerTradeStateCommand( give:ResourceCards, get:ResourceCards, state:State ) extends Command {
 
   def toXML:Node = <SetPlayerTradeStateCommand>
-    <give>{ give.toXML( _.title, _.toString ) }</give>
-    <get>{ get.toXML( _.title, _.toString ) }</get>
+    <give>{ give.toXML( _.name, _.toString ) }</give>
+    <get>{ get.toXML( _.name, _.toString ) }</get>
     <state>{ state.toXML }</state>
   </SetPlayerTradeStateCommand>.copy( label = SetPlayerTradeStateCommand.name )
 

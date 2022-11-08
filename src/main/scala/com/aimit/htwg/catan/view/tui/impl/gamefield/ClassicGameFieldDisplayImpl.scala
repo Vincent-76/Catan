@@ -99,10 +99,10 @@ case class ClassicGameFieldDisplayImpl(
       case d:DesertArea => (if( buildableIDs.isDefined && buildableIDs.get.contains( h ) )
         base.showID( h.id, i + 3, j + 4 )
       else
-        base).showOnFields( d.f.title, i + 4, j + 4, TUI.text )
+        base).showOnFields( d.f.name, i + 4, j + 4, TUI.text )
       case a:WaterArea => if( a.port.isDefined )
         if( a.port.get.specific.isDefined )
-          base.showOnFields( a.port.get.specific.get.title, i + 3, j + 4, TUI.textOnColor + ClassicGameFieldDisplayImpl.colorOf( a.port.get.specific.get ) )
+          base.showOnFields( a.port.get.specific.get.name, i + 3, j + 4, TUI.textOnColor + ClassicGameFieldDisplayImpl.colorOf( a.port.get.specific.get ) )
         else
           base.update( i + 3, j + 4, TUI.text + "?" )
       else base
@@ -110,7 +110,7 @@ case class ClassicGameFieldDisplayImpl(
         (if( buildableIDs.isDefined && buildableIDs.get.contains( h ) )
           base.showID( h.id, i + 2, j + 4 )
         else base).showOnFields( a.number.value.toString, i + 3, j + 4, ClassicGameFieldDisplayImpl.colorOf( h.area.f ) + TUI.textOnColor )
-          .showOnFields( h.area.f.title, i + 4, j + 4, ClassicGameFieldDisplayImpl.colorOf( h.area.f ) + TUI.textOnColor )
+          .showOnFields( h.area.f.name, i + 4, j + 4, ClassicGameFieldDisplayImpl.colorOf( h.area.f ) + TUI.textOnColor )
     }
     val f2 = f1.addEdge( h, game.gameField.adjacentHex( h, 5 ), i + 3, j, West )
       .addEdge( h, game.gameField.adjacentHex( h, 4 ), i + 1, j + 2, NorthWest )

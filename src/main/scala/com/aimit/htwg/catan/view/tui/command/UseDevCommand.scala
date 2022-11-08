@@ -24,6 +24,6 @@ case object UseDevCommand
   }
 
   override protected def getInputPattern:String = TUI.regexIgnoreCase( command ) + " (" +
-    DevelopmentCard.impls.filter( _.usable ).map( d => TUI.regexIgnoreCase( d.title ) ).mkString( "|" ) + ")"
+    DevelopmentCard.impls.filter( _.usable ).map( d => TUI.regexIgnoreCase( d.name ) ).mkString( "|" ) + ")"
 
 }

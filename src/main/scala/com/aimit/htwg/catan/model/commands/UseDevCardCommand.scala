@@ -29,7 +29,7 @@ object UseDevCardCommand extends CommandImpl( "UseDevCardCommand" ) {
 
 case class UseDevCardCommand( devCard:DevelopmentCard, state:State ) extends Command {
 
-  def toXML:Node = <UseDevCardCommand devCard={ devCard.title }>
+  def toXML:Node = <UseDevCardCommand devCard={ devCard.name }>
     <state>{ state.toXML }</state>
   </UseDevCardCommand>.copy( label = UseDevCardCommand.name )
 

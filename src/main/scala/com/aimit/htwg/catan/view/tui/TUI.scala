@@ -25,9 +25,9 @@ object TUI {
 
   val errorColor:String = Console.RED
 
-  val resourcePattern:String = "(\\s*(" + Resource.impls.map( r => regexIgnoreCase( r.title ) ).mkString( "|" ) + ")\\s*[1-9][0-9]*\\s*)"
+  val resourcePattern:String = "(\\s*(" + Resource.impls.map( r => regexIgnoreCase( r.name ) ).mkString( "|" ) + ")\\s*[1-9][0-9]*\\s*)"
 
-  val resourcePatternInfo:String = "<" + Resource.impls.map( _.title ).mkString( "|" ) + "> <amount>"
+  val resourcePatternInfo:String = "<" + Resource.impls.map( _.name ).mkString( "|" ) + "> <amount>"
 
   val commands = List(
     HelpCommand,
@@ -179,11 +179,11 @@ object TUI {
     case BankTradedInfo( _, give, get ) =>
       List( "You traded " + give.toString( "" ) + " for " + get.toString( "" ) + "." )
     case DrawnDevCardInfo( _, devCard ) =>
-      List( "Drawn: " + devCard.title + "\n" + devCard.desc )
+      List( "Drawn: " + devCard.name + "\n" + devCard.desc )
     case InsufficientStructuresInfo( _, structure ) =>
-      List( "You don't have enough structures of " + structure.title + " to build more." )
+      List( "You don't have enough structures of " + structure.name + " to build more." )
     case NoPlacementPointsInfo( _, structure ) =>
-      List( "There aren't any more possible placement points for structure " + structure.title + " to build more." )
+      List( "There aren't any more possible placement points for structure " + structure.name + " to build more." )
     case GameEndInfo( winner ) =>
       val p = controller.player( winner )
       List( TUI.displayName( p ) + " won with " + controller.game.getPlayerVictoryPoints( p.id ) + " victory points!" )
@@ -198,7 +198,7 @@ object TUI {
     case InsufficientResources => "Insufficient resources for this action!"
     case TradePlayerInsufficientResources => "Trade player has insufficient resources for this action!"
     case InsufficientStructures( structure ) =>
-      "Insufficient structures of " + errorHighlight( structure.title ) + " for this action!"
+      "Insufficient structures of " + errorHighlight( structure.name ) + " for this action!"
     case NonExistentPlacementPoint( id ) => "Placement point " + errorHighlight( id ) + " does not exists!"
     case PlacementPointNotEmpty( id ) => "Placement point " + errorHighlight( id ) + " is not empty!"
     case NoAdjacentStructure => "Player has no adjacent structure!"
@@ -211,15 +211,15 @@ object TUI {
     case InvalidPlayerColor( color ) => "Invalid player color: [" + errorHighlight( color ) + "]!"
     case RobberOnlyOnLand => "Robber can only be placed on land!"
     case NoPlacementPoints( structure ) =>
-      "No available placement points for structure " + errorHighlight( structure.title ) + "!"
+      "No available placement points for structure " + errorHighlight( structure.name ) + "!"
     case InvalidResourceAmount( amount ) => "Invalid resource amount: " + errorHighlight( amount ) + "!"
     case InvalidTradeResources( give, get ) =>
-      "Invalid trade resources: " + errorHighlight( give.title ) + " <-> " + errorHighlight( get.title ) + "!"
+      "Invalid trade resources: " + errorHighlight( give.name ) + " <-> " + errorHighlight( get.name ) + "!"
     case InvalidDevCard( devCard ) => "Invalid dev card: [" + errorHighlight( devCard ) + "]!"
-    case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + errorHighlight( devCard.title ) + "!"
+    case InsufficientDevCards( devCard ) => "Insufficient dev cards of " + errorHighlight( devCard.name ) + "!"
     case AlreadyUsedDevCardInTurn => "You already used a development card in this turn!"
     case DevCardDrawnInTurn( devCard ) =>
-      "You've drawn this development card (" + errorHighlight( devCard.title ) + ") in this turn, you can use it in your next turn."
+      "You've drawn this development card (" + errorHighlight( devCard.name ) + ") in this turn, you can use it in your next turn."
     case InsufficientBankResources => "Bank has insufficient resources!"
     case InconsistentData => "Internal problem, please try again."
     case DevStackIsEmpty => "Development card stack is empty!"
@@ -228,7 +228,7 @@ object TUI {
     case PlayerNameTooLong( name ) =>
       "Player name [" + errorHighlight( name ) + "] is too long, maximum " + controller.game.maxPlayerNameLength + " characters!"
     case PlayerColorIsAlreadyInUse( playerColor ) =>
-      "Player color " + colorOf( playerColor ) + playerColor.title + reset + " is already in use!"
+      "Player color " + colorOf( playerColor ) + playerColor.name + reset + " is already in use!"
     case InvalidPlayerID( id ) => "Invalid player id: [" + errorHighlight( id ) + "]!"
     case InvalidPlayer( playerID ) => "Invalid player with id: " + errorHighlight( playerID ) + "!"
     case NothingToUndo => "Nothing to undo!"

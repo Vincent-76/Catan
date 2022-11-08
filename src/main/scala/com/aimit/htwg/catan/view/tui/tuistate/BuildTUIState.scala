@@ -15,7 +15,7 @@ case class BuildTUIState( structure:StructurePlacement, controller:Controller ) 
     GameFieldDisplay.get( controller.game, Some( structure.getBuildablePoints( controller.game, controller.onTurn ) ) ).buildGameField
   )
 
-  override def getActionInfo:String = "Select position [<id>] for your " + structure.title
+  override def getActionInfo:String = "Select position [<id>] for your " + structure.name
 
   override def inputPattern:Option[String] = Some( "[1-9][0-9]?" )
 

@@ -16,7 +16,7 @@ class CardSpec extends AnyWordSpec with Matchers {
         DevelopmentCard.usableOf( "Knigh" ) shouldBe None
       }
       "have a title" in {
-        KnightCard.toString shouldBe KnightCard.title
+        KnightCard.toString shouldBe KnightCard.name
       }
     }
     "ResourceCards" should {

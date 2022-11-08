@@ -28,7 +28,7 @@ object SetBuildStateCommand extends CommandImpl( "SetBuildStateCommand" ) {
 
 case class SetBuildStateCommand( structure:StructurePlacement, state:State ) extends Command {
 
-  def toXML:Node = <SetBuildStateCommand structure={ structure.title }>
+  def toXML:Node = <SetBuildStateCommand structure={ structure.name }>
     <state>{ state.toXML }</state>
   </SetBuildStateCommand>.copy( label = SetBuildStateCommand.name )
 

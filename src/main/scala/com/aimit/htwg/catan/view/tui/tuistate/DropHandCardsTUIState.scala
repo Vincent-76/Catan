@@ -23,7 +23,7 @@ case class DropHandCardsTUIState( pID:PlayerID, controller:Controller ) extends 
         (controller.game.player( pID ).resources.amount / 2) + " cards!",
       "Resources:",
       controller.game.player( pID ).resources.sort.map( d =>
-        "  " + d._1.title.toLength( Resource.impls.map( _.title.length ).max ) + " " + d._2 ).mkString( "\n" )
+        "  " + d._1.name.toLength( Resource.impls.map( _.name.length ).max ) + " " + d._2 ).mkString( "\n" )
     )
 
   override def getActionInfo:String = "Type [<Resource> <amount>, ...] to drop"

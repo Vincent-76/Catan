@@ -31,7 +31,7 @@ case class ClassicTurnImpl( playerIDVal:PlayerID = new PlayerID( -1 ),
 
   def toXML:Node = <ClassicTurnImpl usedDevCard={ usedDevCardVal.toString }>
     <playerID>{ playerIDVal.toXML }</playerID>
-    <drawnDevCards>{ drawnDevCardsVal.toXML( _.title ) }</drawnDevCards>
+    <drawnDevCards>{ drawnDevCardsVal.toXML( _.name ) }</drawnDevCards>
   </ClassicTurnImpl>.copy( label = ClassicTurnImpl.name )
 
   def toJson:JsValue = Json.obj(

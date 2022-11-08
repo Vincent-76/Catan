@@ -36,8 +36,8 @@ case class PlayerTradeState( pID:PlayerID,
 
   def toXML:Node = <PlayerTradeState>
     <pID>{ pID.toXML }</pID>
-    <give>{ give.toXML( _.title, _.toString ) }</give>
-    <get>{ get.toXML( _.title, _.toString ) }</get>
+    <give>{ give.toXML( _.name, _.toString ) }</give>
+    <get>{ get.toXML( _.name, _.toString ) }</get>
     <decisions>{ decisions.toXML( _.toXML, _.toString ) }</decisions>
   </PlayerTradeState>.copy( label = PlayerTradeState.name )
 

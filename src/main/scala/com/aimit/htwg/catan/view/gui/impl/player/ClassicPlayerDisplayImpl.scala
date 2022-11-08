@@ -84,10 +84,10 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
         padding = Insets( 6 )
         orientation = Orientation.Horizontal
         prefColumns = 2
-        children = player.devCards.sortBy( _.title ).map( devCard => new GlowButton( devCard.title ) {
+        children = player.devCards.sortBy( _.name ).map( devCard => new GlowButton( devCard.name ) {
           minWidth = 60
           onMouseClicked = _ => new CustomDialog( gui, "Development Card" ) {
-            headerText = devCard.title
+            headerText = devCard.name
             content = new Text( devCard.desc ) {
               wrappingWidth = 300
             }

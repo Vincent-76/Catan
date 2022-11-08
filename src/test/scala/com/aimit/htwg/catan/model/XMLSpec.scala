@@ -34,7 +34,7 @@ class XMLSpec extends AnyWordSpec with Matchers {
       }
       "ResourceCards" in {
         val r = ResourceCards.of( wood = 1 )
-        val xml = r.toXML( _.title, _.toString )
+        val xml = r.toXML( _.name, _.toString )
         ResourceCards.fromXML( xml ) shouldBe r
       }
       "ClassicGameImpl" in {

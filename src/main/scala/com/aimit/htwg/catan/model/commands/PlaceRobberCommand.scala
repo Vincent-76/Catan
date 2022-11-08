@@ -38,7 +38,7 @@ case class PlaceRobberCommand( hID:Int, state:RobberPlaceState ) extends RobberC
 
   def toXML:Node = <PlaceRobberCommand hID={ hID.toString }>
     <state>{ state.toXML }</state>
-    <robbedResource>{ robbedResource.toXML( _.title ) }</robbedResource>
+    <robbedResource>{ robbedResource.toXML( _.name ) }</robbedResource>
   </PlaceRobberCommand>.copy( label = PlaceRobberCommand.name )
 
   def toJson:JsValue = Json.obj(

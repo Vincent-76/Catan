@@ -113,12 +113,12 @@ case class ClassicGameImpl( gameFieldVal:GameField,
 
   def toXML:Node = <ClassicGameImpl seed={seedVal.toString} round={roundVal.toString} playerFactoryClass={playerFactoryClass}>
     <turn>{turnVal.toXML}</turn>
-    <availablePlacements>{availablePlacementsVal.toXML( _.title )}</availablePlacements>
+    <availablePlacements>{availablePlacementsVal.toXML( _.name )}</availablePlacements>
     <state>{stateVal.toXML}</state>
-    <resourceStack>{resourceStack.toXML( _.title, _.toString )}</resourceStack>
-    <developmentCards>{developmentCards.toXML( _.title )}</developmentCards>
+    <resourceStack>{resourceStack.toXML( _.name, _.toString )}</resourceStack>
+    <developmentCards>{developmentCards.toXML( _.name )}</developmentCards>
     <players>{playersVal.toXML( _.toXML, _.toXML )}</players>
-    <bonusCards>{bonusCardsVal.toXML( _.title, _.toXML( _.toXML( _.toXML, _.toString ) ) )}</bonusCards>
+    <bonusCards>{bonusCardsVal.toXML( _.name, _.toXML( _.toXML( _.toXML, _.toString ) ) )}</bonusCards>
     <winner>{winnerVal.toXML( _.toXML )}</winner>
     <gameField>{gameFieldVal.toXML}</gameField>
   </ClassicGameImpl>.copy( label = ClassicGameImpl.name )

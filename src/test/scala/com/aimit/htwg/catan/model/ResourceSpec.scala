@@ -15,7 +15,7 @@ class ResourceSpec extends AnyWordSpec with Matchers {
     }
     "new" should {
       "have a string representation" in {
-        Wood.toString shouldBe Wood.title
+        Wood.toString shouldBe Wood.name
       }
     }
   }

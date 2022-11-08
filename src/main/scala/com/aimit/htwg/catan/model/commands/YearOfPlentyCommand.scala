@@ -29,7 +29,7 @@ object YearOfPlentyCommand extends CommandImpl( "YearOfPlentyCommand" ) {
 case class YearOfPlentyCommand( resources:ResourceCards, state:YearOfPlentyState ) extends Command {
 
   def toXML:Node = <YearOfPlentyCommand>
-    <resources>{ resources.toXML( _.title, _.toString ) }</resources>
+    <resources>{ resources.toXML( _.name, _.toString ) }</resources>
     <state>{ state.toXML }</state>
   </YearOfPlentyCommand>.copy( label = YearOfPlentyCommand.name )
 

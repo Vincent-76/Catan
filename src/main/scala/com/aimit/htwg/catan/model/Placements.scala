@@ -2,7 +2,6 @@ package com.aimit.htwg.catan.model
 
 import com.aimit.htwg.catan.model.Card.ResourceCards
 import com.aimit.htwg.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
-import com.aimit.htwg.catan.util.RichString
 import play.api.libs.json._
 
 import scala.collection.immutable.List
@@ -12,19 +11,17 @@ import scala.util.{ Failure, Success, Try }
  * @author Vincent76;
  */
 
-object Placement extends ObjectComponent[Placement] {
-  implicit val placementWrites:Writes[Placement] = ( o:Placement ) => Json.toJson( o.title )
+object Placement extends NamedComponent[Placement] {
+  implicit val placementWrites:Writes[Placement] = ( o:Placement ) => Json.toJson( o.name )
   implicit val placementReads:Reads[Placement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   CityPlacement.init()
   RoadPlacement.init()
   RobberPlacement.init()
   SettlementPlacement.init()
-
-  def of( title:String ):Option[Placement] = impls.find( _.title ^= title )
 }
 
-abstract class Placement( val title:String ) extends ComponentImpl {
+abstract class Placement( title:String ) extends NamedComponentImpl( title ) {
   override def init():Unit = Placement.addImpl( this )
 
   def getBuildablePoints( game:Game, pID:PlayerID, any:Boolean = false ):List[PlacementPoint]
@@ -32,11 +29,9 @@ abstract class Placement( val title:String ) extends ComponentImpl {
 
 
 
-object StructurePlacement extends ObjectComponent[StructurePlacement] {
-  implicit val structurePlacementWrites:Writes[StructurePlacement] = ( o:StructurePlacement ) => Json.toJson( o.title )
+object StructurePlacement extends NamedComponent[StructurePlacement] {
+  implicit val structurePlacementWrites:Writes[StructurePlacement] = ( o:StructurePlacement ) => Json.toJson( o.name )
   implicit val structurePlacementReads:Reads[StructurePlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
-
-  def of( s:String ):Option[StructurePlacement] = impls.find( _.title ^= s )
 }
 
 abstract class StructurePlacement( title:String,
@@ -57,11 +52,9 @@ abstract class StructurePlacement( title:String,
 
 
 
-object VertexPlacement extends ObjectComponent[VertexPlacement] {
-  implicit val vertexPlacementWrites:Writes[VertexPlacement] = ( o:VertexPlacement ) => Json.toJson( o.title )
+object VertexPlacement extends NamedComponent[VertexPlacement] {
+  implicit val vertexPlacementWrites:Writes[VertexPlacement] = ( o:VertexPlacement ) => Json.toJson( o.name )
   implicit val vertexPlacementReads:Reads[VertexPlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
-
-  def of( s:String ):Option[VertexPlacement] = impls.find( _.title ^= s )
 
 }
 

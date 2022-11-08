@@ -1,17 +1,15 @@
 package com.aimit.htwg.catan.model
 
-import play.api.libs.json._
-
 /**
  * @author Vincent76;
  */
 
-object DiceValue extends ObjectComponent[DiceValue] {
+object DiceValue extends SerialComponent[Int, DiceValue] {
   val maxFrequency = 5
   val maxSum = 12
 
-  implicit val diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
-  implicit val diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )
+  /*implicit val diceValueWrites:Writes[DiceValue] = ( o:DiceValue ) => Json.toJson( o.value )
+  implicit val diceValueReads:Reads[DiceValue] = ( json:JsValue ) => JsSuccess( of( json.as[Int] ).get )*/
 
   Two.init()
   Three.init()
@@ -24,12 +22,10 @@ object DiceValue extends ObjectComponent[DiceValue] {
   Ten.init()
   Eleven.init()
   Twelve.init()
-
-  def of( n:Int ):Option[DiceValue] = impls.find( _.value == n )
 }
 
-sealed abstract class DiceValue( val value:Int, val frequency:Int ) extends ComponentImpl {
-  override def init() = DiceValue.addImpl( this )
+sealed abstract class DiceValue( val value:Int, val frequency:Int ) extends SerialComponentImpl( value ) {
+  override def init():Unit = DiceValue.addImpl( this )
 
   override def toString:String = {
     if( value < 10 )

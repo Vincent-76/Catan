@@ -14,18 +14,18 @@ case class ClassicPlayerDisplayImpl( player:ClassicPlayerImpl ) extends PlayerDi
       " Resources[" + player.resources.amount.toLength( 2 ) + "]" +
       " Points[" + game.getPlayerDisplayVictoryPoints( player.id ).toLength( 2 ) + "]" +
       " DevCards[" + player.devCards.size.toLength( 2 ) + "]" +
-      " UsedDevCards[" + DevelopmentCard.impls.flatMap( c => (0 until player.usedDevCards( c )).map( _ => c ) ).map( _.title ).mkString( "|" ) + "] " +
+      " UsedDevCards[" + DevelopmentCard.impls.flatMap( c => (0 until player.usedDevCards( c )).map( _ => c ) ).map( _.name ).mkString( "|" ) + "] " +
       game.getPlayerBonusCards( player.id ).mkString( " " )
   }
 
   def buildTurnPlayerDisplay( game:Game ):String = {
-    val resourceNameLength = Resource.impls.map( _.title.length ).max
+    val resourceNameLength = Resource.impls.map( _.name.length ).max
     TUI.displayName( player ) +
       "\nVictory Points: " + game.getPlayerVictoryPoints( player.id ) +
       "\nResources:" + player.resources.amount + "\n" +
-      player.resources.sort.map( d => "  " + d._1.title.toLength( resourceNameLength ) + "  " + d._2 ).mkString( "\n" ) +
-      "\nDevelopment Cards: [" + player.devCards.map( _.title ).mkString( "|" ) + "]" +
-      "\nUsed Dev Cards:    [" + player.usedDevCards.map( _.title ).mkString( "|" ) + "]" +
-      game.getPlayerBonusCards( player.id ).map( c => "\n" + c.title ).mkString
+      player.resources.sort.map( d => "  " + d._1.name.toLength( resourceNameLength ) + "  " + d._2 ).mkString( "\n" ) +
+      "\nDevelopment Cards: [" + player.devCards.map( _.name ).mkString( "|" ) + "]" +
+      "\nUsed Dev Cards:    [" + player.usedDevCards.map( _.name ).mkString( "|" ) + "]" +
+      game.getPlayerBonusCards( player.id ).map( c => "\n" + c.name ).mkString
   }
 }

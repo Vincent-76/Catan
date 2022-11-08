@@ -39,7 +39,7 @@ case class RobberStealCommand( stealPlayerID:PlayerID, state:RobberStealState ) 
   def toXML:Node = <RobberStealCommand>
     <stealPlayerID>{ stealPlayerID.toXML }</stealPlayerID>
     <state>{ state.toXML }</state>
-    <robbedResource>{ robbedResource.toXML( _.title ) }</robbedResource>
+    <robbedResource>{ robbedResource.toXML( _.name ) }</robbedResource>
   </RobberStealCommand>.copy( label = RobberStealCommand.name )
 
   def toJson:JsValue = Json.obj(

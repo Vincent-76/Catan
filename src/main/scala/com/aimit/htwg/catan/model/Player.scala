@@ -29,26 +29,21 @@ case class PlayerID /*private[Game]*/ ( id:Int ) extends XMLSerializable {
   override def toString:String = id.toString;
 }
 
-object PlayerColor extends ObjectComponent[PlayerColor] {
-  implicit val playerColorWrites:Writes[PlayerColor] = ( playerColor:PlayerColor ) => Json.toJson( playerColor.title )
-  implicit val playerColorReads:Reads[PlayerColor] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
-
+object PlayerColor extends NamedComponent[PlayerColor] {
   Green.init()
   Blue.init()
   Yellow.init()
   Red.init()
 
-  def of( cString:String ):Option[PlayerColor] = impls.find( _.title ^= cString )
-
   def availableColors( players:Iterable[PlayerColor] = Vector.empty ):Seq[PlayerColor] = {
-    players.red( impls.toList.sortBy( _.title ), ( c:Seq[PlayerColor], p:PlayerColor ) => {
+    players.red( impls.toList.sortBy( _.name ), ( c:Seq[PlayerColor], p:PlayerColor ) => {
       c.removed( p )
     } )
   }
 
 }
 
-sealed abstract class PlayerColor( val title:String ) extends ComponentImpl {
+sealed abstract class PlayerColor( name:String ) extends NamedComponentImpl( name ) {
   override def init():Unit = PlayerColor.addImpl( this )
 }
 

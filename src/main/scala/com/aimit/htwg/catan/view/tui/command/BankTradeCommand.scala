@@ -23,5 +23,5 @@ case object BankTradeCommand
 
   override def getSyntax:String = "[" + command + " " +
     parameter.map( p => "<" + p + ">" ).mkString( " - " ) +
-    "] with resource: [<" + Resource.impls.map( _.title ).mkString( "|" ) + "> <amount>]"
+    "] with resource: [<" + Resource.impls.map( _.name ).mkString( "|" ) + "> <amount>]"
 }

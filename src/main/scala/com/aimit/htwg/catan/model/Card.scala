@@ -12,7 +12,7 @@ import scala.xml.Node
 /**
  * @author Vincent76;
  */
-object Card extends ObjectComponent[Card] {
+object Card extends NamedComponent[Card] {
 
   type ResourceCards = Map[Resource, Int]
 
@@ -60,7 +60,7 @@ object Card extends ObjectComponent[Card] {
     def sort:Seq[(Resource, Int)] = resources.toList.sortBy( _._1.index )
 
     def toString( prefix:String ):String =
-      resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.title ).mkString( ", " )
+      resources.filter( _._2 > 0 ).map( r => prefix + r._2 + " " + r._1.name ).mkString( ", " )
   }
 
   def getResourceCards( amount:Int ):ResourceCards = {
@@ -68,26 +68,21 @@ object Card extends ObjectComponent[Card] {
   }
 }
 
-abstract class Card extends ComponentImpl {
-  override def init() = Card.addImpl( this )
+abstract class Card( name:String ) extends NamedComponentImpl( name ) {
+  override def init():Unit = Card.addImpl( this )
 }
 
 
 
 
-object DevelopmentCard extends ObjectComponent[DevelopmentCard] {
+object DevelopmentCard extends NamedComponent[DevelopmentCard] {
   val cardCost:ResourceCards = Map( Sheep -> 1, Wheat -> 1, Ore -> 1 )
-
-  implicit val devCardWrites:Writes[DevelopmentCard] = ( developmentCard:DevelopmentCard ) => Json.toJson( developmentCard.title )
-  implicit val devCardsReads:Reads[DevelopmentCard] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
 
   KnightCard.init()
   GreatHallCard.init()
   YearOfPlentyCard.init()
   RoadBuildingCard.init()
   MonopolyCard.init()
-
-  def of( s:String ):Option[DevelopmentCard] = impls.find( _.title ^= s )
 
   def getStack( random:Random = Random ):List[DevelopmentCard] = {
     random.shuffle( impls.red( List.empty, ( l:List[DevelopmentCard], d:DevelopmentCard ) => {
@@ -96,57 +91,50 @@ object DevelopmentCard extends ObjectComponent[DevelopmentCard] {
   }
 
   def usableOf( s:String ):Option[DevelopmentCard] =
-    impls.filter( _.usable ).find( _.title ^= s )
+    impls.filter( _.usable ).find( _.name ^= s )
 }
 
-abstract class DevelopmentCard( val amount:Int, val usable:Boolean, val title:String, val desc:String ) extends Card {
-  override def init() = {
+abstract class DevelopmentCard( name:String, val amount:Int, val usable:Boolean, val desc:String ) extends Card( name ) {
+  override def init():Unit = {
     super.init()
     DevelopmentCard.addImpl( this )
   }
-
-  override def toString:String = title
 }
 
-case object KnightCard extends DevelopmentCard( 14, true, "Knight",
+case object KnightCard extends DevelopmentCard( "Knight",14, true,
   "Move the robber.\nSteal 1 resource from the owner of a settlement or city adjacent to the robber's new hex." )
 
-case object GreatHallCard extends DevelopmentCard( 5, false, "GreatHall",
+case object GreatHallCard extends DevelopmentCard( "GreatHall", 5, false,
   "1 Victory Point!\nReveal this card on your turn if, with it, you reach the number of points required for victory." )
 
-case object YearOfPlentyCard extends DevelopmentCard( 2, true, "YearOfPlenty",
+case object YearOfPlentyCard extends DevelopmentCard( "YearOfPlenty", 2, true,
   "Take any 2 resources from the bank. Add them to your hand. They can be 2 of the same resource or 2 different resources." )
 
-case object RoadBuildingCard extends DevelopmentCard( 2, true, "RoadBuilding",
+case object RoadBuildingCard extends DevelopmentCard( "RoadBuilding", 2, true,
   "Place 2 new roads as if you had just built them." )
 
-case object MonopolyCard extends DevelopmentCard( 2, true, "Monopoly",
+case object MonopolyCard extends DevelopmentCard( "Monopoly", 2, true,
   "When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type." )
 
 
-object BonusCard extends ObjectComponent[BonusCard] {
-  implicit val bonusCardWrites:Writes[BonusCard] = ( bonusCard:BonusCard ) => Json.toJson( bonusCard.title )
-  implicit val bonusCardReads:Reads[BonusCard] = ( json:JsValue ) => JsSuccess( BonusCard.of( json.as[String] ).get )
-
+object BonusCard extends NamedComponent[BonusCard] {
   LargestArmyCard.init()
   LongestRoadCard.init()
-
-  def of( s:String ):Option[BonusCard] = impls.find( _.title ^= s )
 }
 
-abstract class BonusCard( val bonus:Int, val required:Int, val title:String, desc:String ) extends Card {
-  override def init() = {
+abstract class BonusCard( name:String, val bonus:Int, val required:Int, val desc:String ) extends Card( name ) {
+  override def init():Unit = {
     super.init()
     BonusCard.addImpl( this )
   }
 }
 
-case object LargestArmyCard extends BonusCard( 2, 3, "Largest Army",
+case object LargestArmyCard extends BonusCard( "Largest Army", 2, 3,
   "2 Victory Points!\nThe first player to play 3 knight cards gets this card. Another player who plays more knight cards takes this card." ) {
   val minimumKnights:Int = 3
 }
 
-case object LongestRoadCard extends BonusCard( 2, 2, "Longest Road",
+case object LongestRoadCard extends BonusCard(  "Longest Road",2, 2,
   "2 Victory Points!\nThis cards gets to the player with the longest road of at least 5 segments. Another player who builds a longer road takes this card." ) {
   val minimumRoads:Int = 5
 }

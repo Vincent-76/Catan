@@ -30,7 +30,7 @@ object AddPlayerCommand extends CommandImpl( "AddPlayerCommand" ) {
 
 case class AddPlayerCommand( playerColor:PlayerColor, name:String, state:InitPlayerState ) extends Command {
 
-  def toXML:Node = <AddPlayerCommand playerColor={ playerColor.title } name={ name }>
+  def toXML:Node = <AddPlayerCommand playerColor={ playerColor.name } name={ name }>
     <state>{ state.toXML }</state>
   </AddPlayerCommand>.copy( label = AddPlayerCommand.name )
 

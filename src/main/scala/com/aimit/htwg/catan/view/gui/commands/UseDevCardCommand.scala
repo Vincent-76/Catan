@@ -20,11 +20,11 @@ case object UseDevCardCommand extends SimpleGUICommand( "Use Development Card" )
       content = new VBox {
         spacing = 10
         alignment = Pos.Center
-        children = gui.controller.player.devCards.filter( _.usable ).sortBy( _.title ).grouped( 4 ).toList.map( d => {
+        children = gui.controller.player.devCards.filter( _.usable ).sortBy( _.name ).grouped( 4 ).toList.map( d => {
           new HBox {
             spacing = 10
             alignment = Pos.Center
-            children = d.map( d => new Button( d.title ) {
+            children = d.map( d => new Button( d.name ) {
               onAction = _ => gui.controller.action( _.useDevCard( d ) )
             } )
           }

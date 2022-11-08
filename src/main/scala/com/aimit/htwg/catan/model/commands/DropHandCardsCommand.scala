@@ -30,7 +30,7 @@ case class DropHandCardsCommand( state:DropHandCardsState, cards:ResourceCards )
 
   def toXML:Node = <DropHandCardsCommand>
     <state>{ state.toXML }</state>
-    <cards>{ cards.toXML( _.title, _.toString ) }</cards>
+    <cards>{ cards.toXML( _.name, _.toString ) }</cards>
   </DropHandCardsCommand>.copy( label = DropHandCardsCommand.name )
 
   def toJson:JsValue = Json.obj(

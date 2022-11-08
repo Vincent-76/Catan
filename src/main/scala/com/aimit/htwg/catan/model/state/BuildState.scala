@@ -23,7 +23,7 @@ object BuildState extends StateImpl( "BuildState" ) {
 
 case class BuildState( structure:StructurePlacement ) extends State {
 
-  def toXML:Node = <BuildState structure={ structure.title } />.copy( label = BuildState.name )
+  def toXML:Node = <BuildState structure={ structure.name } />.copy( label = BuildState.name )
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( BuildState.name ),

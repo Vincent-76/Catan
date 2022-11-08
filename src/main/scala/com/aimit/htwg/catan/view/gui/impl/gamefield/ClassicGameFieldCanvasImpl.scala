@@ -31,12 +31,12 @@ object ClassicGameFieldCanvasImpl {
   val numberImages:Map[DiceValue, Image] = DiceValue.impls.filter( _.frequency > 0 ).map( n => (n, new Image( "/numbers/" + n.value + ".png" )) ).toMap
   val portImages:Map[Option[Resource], List[Image]] = (Resource.impls.map( Some( _ ) ).toList :+ None).map( r =>
     (r, GameField.adjacentOffset.indices.map( i =>
-      new Image( "/ports/" + (if( r.isDefined ) r.get.title.toLowerCase else "unspecific") + "/" + i + ".png" )
+      new Image( "/ports/" + (if( r.isDefined ) r.get.name.toLowerCase else "unspecific") + "/" + i + ".png" )
     ).toList)
   ).toMap
 
   private def shuffledImageList( r:Resource, variants:Int ):List[Image] = {
-    Random.shuffle( (0 until variants).map( i => new Image( "/" + r.title.toLowerCase + "/" + i + ".png" ) ).toList )
+    Random.shuffle( (0 until variants).map( i => new Image( "/" + r.name.toLowerCase + "/" + i + ".png" ) ).toList )
   }
 }
 

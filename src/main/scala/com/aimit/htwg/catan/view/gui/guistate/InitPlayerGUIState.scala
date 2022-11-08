@@ -26,7 +26,7 @@ case class InitPlayerGUIState( controller:Controller ) extends GUIState {
         promptText = "Name"
         alignment = Pos.Center
       }
-      val comboBox:ComboBox[String] = new ComboBox[String]( PlayerColor.availableColors( controller.game.players.values.map( _.color ) ).map( _.title ) ) {
+      val comboBox:ComboBox[String] = new ComboBox[String]( PlayerColor.availableColors( controller.game.players.values.map( _.color ) ).map( _.name ) ) {
         selectionModel.value.selectFirst()
         styleClass.add( "button" )
       }

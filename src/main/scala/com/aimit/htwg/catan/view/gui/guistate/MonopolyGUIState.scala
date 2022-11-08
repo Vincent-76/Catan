@@ -29,7 +29,7 @@ case class MonopolyGUIState( controller:Controller ) extends GUIState {
         style = "-fx-font-size: 12; -fx-border-color: #353535; -fx-background-color: #FFFFFF; -fx-cursor: hand"
         padding = Insets( 2 )
         minWidth = 60
-        children = new Label( r.title )
+        children = new Label( r.name )
         onMouseEntered = _ => effect = new Glow( 0.7 )
         onMouseExited = _ => effect = null
         onMouseClicked = _ => controller.action( _.monopolyAction( r ) )
