@@ -88,7 +88,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
           ( p:Player, _ ) => p.addVictoryPoint()
         )
         controller.game = controller.game.updatePlayer( p )
-        controller.action( _.buildInitSettlement( 21 ) )
+        controller.action( _.build( 21 ) )
         controller.game.winner shouldBe Some( p.id )
         controller.running shouldBe false
         controller.undoAction()
@@ -102,8 +102,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.action( _.initGame() )
         controller.action( _.diceOutBeginner() )
         controller.action( _.setBeginner() )
-        controller.action( _.buildInitSettlement( 0 ) )
-        controller.action( _.buildInitRoad( 0 ) )
         controller.action( _.startTurn() )
         controller.action( _.rollTheDices() )
         controller.action( _.useDevCard( KnightCard ) )
@@ -119,7 +117,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.action( _.playerTrade( controller.onTurn ) )
         controller.action( _.buyDevCard() )
         controller.action( _.yearOfPlentyAction( ResourceCards.of() ) )
-        controller.action( _.devBuildRoad( 0 ) )
         controller.action( _.monopolyAction( Wood ) )
         controller.action( _.endTurn() )
       }

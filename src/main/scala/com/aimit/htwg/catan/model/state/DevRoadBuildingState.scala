@@ -35,7 +35,7 @@ case class DevRoadBuildingState( nextState:State, roads:Int = 0 ) extends State 
     "roads" -> Json.toJson( roads )
   )
 
-  override def devBuildRoad( eID:Int ):Option[Command] = Some(
+  override def build( eID:Int ):Option[Command] = Some(
     DevBuildRoadCommand( eID, this )
   )
 

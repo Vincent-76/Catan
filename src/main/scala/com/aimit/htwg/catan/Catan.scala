@@ -15,7 +15,7 @@ import scala.io.StdIn
 object Catan {
   val debug = false
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( ClassicCatanModule.create( test = false ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule.instance( test = false ) )
   val controller:Controller = Controller( injector.getInstance( classOf[Game] ), JsonFileIO )
   val tui:TUI = new TUI( controller )
 

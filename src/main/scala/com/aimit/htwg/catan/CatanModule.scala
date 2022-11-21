@@ -32,7 +32,7 @@ object CatanModule extends NamedComponent[CatanModuleImpl] {
     case _ => None
   }
 
-  def init():Unit = {
+  def init( ):Unit = {
     ClassicCatanModule.init()
 
     ClassicGameImpl.init()
@@ -93,14 +93,14 @@ object CatanModule extends NamedComponent[CatanModuleImpl] {
 }
 
 abstract class CatanModuleImpl( name:String ) extends NamedComponentImpl( name ) {
-  override def init():Unit = CatanModule.addImpl( this )
+  override def init( ):Unit = CatanModule.addImpl( this )
 
   protected def _create( test:Boolean, fileIO:FileIO, availablePlacements:Set[Placement] ):CatanModule
 
-  def create( test:Boolean = false,
-              fileIO:FileIO = JsonFileIO,
-              availablePlacements:Set[Placement] = CatanModule.availablePlacements
-            ):CatanModule =
+  def instance( test:Boolean = false,
+                fileIO:FileIO = JsonFileIO,
+                availablePlacements:Set[Placement] = CatanModule.availablePlacements
+              ):CatanModule =
     _create( test, fileIO, availablePlacements )
 }
 

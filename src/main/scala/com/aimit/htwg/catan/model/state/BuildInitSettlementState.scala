@@ -24,7 +24,7 @@ case class BuildInitSettlementState() extends State {
     "class" -> Json.toJson( BuildInitSettlementState.name )
   )
 
-  override def buildInitSettlement( vID:Int ):Option[Command] = Some(
+  override def build( vID:Int ):Option[Command] = Some(
     BuildInitSettlementCommand( vID, this )
   )
 

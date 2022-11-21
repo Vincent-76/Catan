@@ -17,7 +17,7 @@ import play.api.libs.json.{ Json, Reads, Writes }
 
 class JsonSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( ClassicCatanModule.create( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule.instance( test = true ) )
   "(de)serialized" when {
     "Model" should {
       "Port" in {

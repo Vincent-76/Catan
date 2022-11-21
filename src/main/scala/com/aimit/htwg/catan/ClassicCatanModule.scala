@@ -19,7 +19,7 @@ object ClassicCatanModule extends CatanModuleImpl( "Classic" ) {
     new ClassicCatanModule( test, fileIO, availablePlacements )*/
 
   override def _create( test:Boolean, fileIO:FileIO, availablePlacements:Set[Placement] ):CatanModule =
-    ClassicCatanModule.create( test, fileIO, availablePlacements )
+    new ClassicCatanModule( test, fileIO, availablePlacements )
 }
 
 class ClassicCatanModule( test:Boolean,

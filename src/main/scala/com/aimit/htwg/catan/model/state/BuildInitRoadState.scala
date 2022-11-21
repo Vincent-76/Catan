@@ -31,7 +31,7 @@ case class BuildInitRoadState( settlementVID:Int ) extends State {
     "settlementVID" -> Json.toJson( settlementVID )
   )
 
-  override def buildInitRoad( eID:Int ):Option[Command] = Some(
+  override def build( eID:Int ):Option[Command] = Some(
     BuildInitRoadCommand( eID, this )
   )
 

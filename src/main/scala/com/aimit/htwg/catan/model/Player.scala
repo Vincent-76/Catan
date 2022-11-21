@@ -36,9 +36,7 @@ object PlayerColor extends NamedComponent[PlayerColor] {
   Red.init()
 
   def availableColors( players:Iterable[PlayerColor] = Vector.empty ):Seq[PlayerColor] = {
-    players.red( impls.toList.sortBy( _.name ), ( c:Seq[PlayerColor], p:PlayerColor ) => {
-      c.removed( p )
-    } )
+    impls.toList.diff( players.toSeq ).sortBy( _.name )
   }
 
 }

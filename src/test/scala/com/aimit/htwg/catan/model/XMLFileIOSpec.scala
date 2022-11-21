@@ -18,7 +18,7 @@ class XMLFileIOSpec extends AnyWordSpec with Matchers {
   }
 
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( ClassicCatanModule.create( test = true ) )
+  val injector:Injector = Guice.createInjector( ClassicCatanModule.instance( test = true ) )
   "XMLParseError" when {
     val parseError = XMLParseError( expected = "expected", got = "got" )
     "new" should {

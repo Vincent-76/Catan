@@ -32,10 +32,6 @@ trait State extends XMLSerializable with JsonSerializable {
 
   def setBeginner():Option[Command] = None
 
-  def buildInitSettlement( vID:Int ):Option[Command] = None
-
-  def buildInitRoad( eID:Int ):Option[Command] = None
-
   def startTurn():Option[Command] = None
 
   def rollTheDices():Option[Command] = None
@@ -65,8 +61,6 @@ trait State extends XMLSerializable with JsonSerializable {
   def buyDevCard():Option[Command] = None
 
   def yearOfPlentyAction( resources:ResourceCards ):Option[Command] = None
-
-  def devBuildRoad( eID:Int ):Option[Command] = None
 
   def monopolyAction( r:Resource ):Option[Command] = None
 

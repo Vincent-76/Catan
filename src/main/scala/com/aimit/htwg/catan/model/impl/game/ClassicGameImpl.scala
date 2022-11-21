@@ -96,14 +96,14 @@ case class ClassicGameImpl( gameFieldVal:GameField,
             @Named( "seed" ) seed:Int,
             playerFactory:PlayerFactory,
             @Named( "playerFactoryClass" ) playerFactoryClass:String,
-            @Named( "availablePlacements" ) availablePlacements:List[Placement]
+            @Named( "availablePlacements" ) availablePlacements:Set[Placement]
           ) = this(
     gameFieldVal = gameField,
     turnVal = turn,
     seedVal = seed,
     playerFactory = playerFactory,
     playerFactoryClass = playerFactoryClass,
-    availablePlacementsVal = ClassicGameImpl.availablePlacements.filter( availablePlacements.contains ),
+    availablePlacementsVal = ClassicGameImpl.availablePlacements.intersect( availablePlacements ),
     developmentCards = DevelopmentCard.getStack( new Random( seed ) ),
   )
 

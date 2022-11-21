@@ -12,9 +12,6 @@ import scala.util.{ Failure, Success, Try }
  */
 
 object Placement extends NamedComponent[Placement] {
-  implicit val placementWrites:Writes[Placement] = ( o:Placement ) => Json.toJson( o.name )
-  implicit val placementReads:Reads[Placement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
-
   CityPlacement.init()
   RoadPlacement.init()
   RobberPlacement.init()
@@ -29,10 +26,7 @@ abstract class Placement( title:String ) extends NamedComponentImpl( title ) {
 
 
 
-object StructurePlacement extends NamedComponent[StructurePlacement] {
-  implicit val structurePlacementWrites:Writes[StructurePlacement] = ( o:StructurePlacement ) => Json.toJson( o.name )
-  implicit val structurePlacementReads:Reads[StructurePlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
-}
+object StructurePlacement extends NamedComponent[StructurePlacement]
 
 abstract class StructurePlacement( title:String,
                                    val available:Int,
@@ -52,11 +46,7 @@ abstract class StructurePlacement( title:String,
 
 
 
-object VertexPlacement extends NamedComponent[VertexPlacement] {
-  implicit val vertexPlacementWrites:Writes[VertexPlacement] = ( o:VertexPlacement ) => Json.toJson( o.name )
-  implicit val vertexPlacementReads:Reads[VertexPlacement] = ( json:JsValue ) => JsSuccess( of( json.as[String] ).get )
-
-}
+object VertexPlacement extends NamedComponent[VertexPlacement]
 
 abstract class VertexPlacement( title:String,
                                 available:Int,

@@ -32,7 +32,7 @@ abstract class Component[I] {
 
 abstract class SerialComponent[T, I <: SerialComponentImpl[T]] extends Component[I] {
   implicit val devCardWrites:Writes[I] = ( impl:I ) => Json.toJson( impl.id.toString )
-  implicit val devCardsReads:Reads[I] = ( json:JsValue ) => JsSuccess( impls.find( _.toString == json.as[String] ).get )
+  implicit val devCardsReads:Reads[I] = ( json:JsValue ) => JsSuccess( impls.find( _.id.toString == json.as[String] ).get )
 
   def hasImpl( id:T ):Boolean = impls.exists( _.id == id )
 

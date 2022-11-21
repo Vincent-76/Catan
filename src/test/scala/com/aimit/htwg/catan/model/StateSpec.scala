@@ -34,14 +34,14 @@ class StateSpec extends AnyWordSpec with Matchers {
     }
     "BuildInitRoadState" should {
       val state = BuildInitRoadState( 0 )
-      "buildInitRoad" in {
-        state.buildInitRoad( 0 ) shouldBe a [Some[BuildInitRoadCommand]]
+      "build" in {
+        state.build( 0 ) shouldBe a [Some[BuildInitRoadCommand]]
       }
     }
     "BuildInitSettlement" should {
       val state = BuildInitSettlementState()
-      "buildInitSettlement" in {
-        state.buildInitSettlement( 0 ) shouldBe a [Some[BuildInitSettlementCommand]]
+      "build" in {
+        state.build( 0 ) shouldBe a [Some[BuildInitSettlementCommand]]
       }
     }
     "BuildState" should {
@@ -52,8 +52,8 @@ class StateSpec extends AnyWordSpec with Matchers {
     }
     "DevRoadBuildingState" should {
       val state = DevRoadBuildingState( ActionState(), 1 )
-      "devBuildRoad" in {
-        state.devBuildRoad( 0 ) shouldBe a [Some[DevBuildRoadCommand]]
+      "build" in {
+        state.build( 0 ) shouldBe a [Some[DevBuildRoadCommand]]
       }
     }
     "DiceState" should {
