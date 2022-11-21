@@ -77,7 +77,7 @@ trait GameField extends XMLSerializable with JsonSerializable {
 
 }
 
-sealed trait PlacementPoint
+sealed class PlacementPoint( id:Int )
 
 object Hex extends XMLDeserializer[Hex] {
   //private def apply( id:Int, r:Int, c:Int, area:Area ):Hex = new Hex( id, r, c, area )
@@ -93,7 +93,7 @@ object Hex extends XMLDeserializer[Hex] {
   implicit val hexReads:Reads[Hex] = Json.reads[Hex]
 }
 
-case class Hex /*private[GameField]*/( id:Int, row:Int, col:Int, area:Area ) extends PlacementPoint with XMLSerializable {
+case class Hex /*private[GameField]*/( id:Int, row:Int, col:Int, area:Area ) extends PlacementPoint( id ) with XMLSerializable {
   //private def copy( ):Unit = {}
 
   def toXML:Node = <Hex id={ id.toString } row={ row.toString } col={ col.toString }>
@@ -134,7 +134,7 @@ object Edge {
 }
 
 case class Edge /*private[GameField]*/( id:Int, h1:Hex, h2:Hex, port:Option[Port] = None, road:Option[Road] = None )
-  extends PlacementPoint with XMLSerializable {
+  extends PlacementPoint( id ) with XMLSerializable {
 
   def toXML:Node = <Edge id={ id.toString } h1={ h1.id.toString } h2={ h2.id.toString }>
     <port>{ port.toXML( _.toXML ) }</port>
@@ -178,7 +178,7 @@ object Vertex {
 }
 
 case class Vertex /*private[GameField]*/( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port] = None, building:Option[Building] = None )
-  extends PlacementPoint with XMLSerializable {
+  extends PlacementPoint( id ) with XMLSerializable {
 
   def toXML:Node = <Vertex id={ id.toString } h1={ h1.id.toString } h2={ h2.id.toString } h3={ h3.id.toString }>
     <port>{ port.toXML( _.toXML ) }</port>
