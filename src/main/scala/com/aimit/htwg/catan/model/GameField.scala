@@ -77,13 +77,13 @@ trait GameField extends XMLSerializable with JsonSerializable {
 
 }
 
-sealed class PlacementPoint( id:Int )
+sealed class PlacementPoint( val id:Int )
 
 object Hex extends XMLDeserializer[Hex] {
   //private def apply( id:Int, r:Int, c:Int, area:Area ):Hex = new Hex( id, r, c, area )
 
   def fromXML( node:Node ):Hex = Hex(
-    id = ( node \ "@id" ).content.toInt,
+    hID = ( node \ "@id" ).content.toInt,
     row = ( node \ "@row" ).content.toInt,
     col = ( node \ "@col" ).content.toInt,
     area = Area.fromXML( node.childOf( "area" ) )
@@ -93,7 +93,7 @@ object Hex extends XMLDeserializer[Hex] {
   implicit val hexReads:Reads[Hex] = Json.reads[Hex]
 }
 
-case class Hex /*private[GameField]*/( id:Int, row:Int, col:Int, area:Area ) extends PlacementPoint( id ) with XMLSerializable {
+case class Hex /*private[GameField]*/( hID:Int, row:Int, col:Int, area:Area ) extends PlacementPoint( hID ) with XMLSerializable {
   //private def copy( ):Unit = {}
 
   def toXML:Node = <Hex id={ id.toString } row={ row.toString } col={ col.toString }>
@@ -109,7 +109,7 @@ object Edge {
   //private def apply( id:Int, h1:Hex, h2:Hex, port:Option[Port], building:Option[Road] ):Edge = new Edge( id, h1, h2, port, building )
 
   def fromXML( node:Node, hexList:List[Hex] ):Edge = Edge(
-    id = ( node \ "@id" ).content.toInt,
+    eID = ( node \ "@id" ).content.toInt,
     h1 = hexList.find( _.id == ( node \ "@h1" ).content.toInt ).get,
     h2 = hexList.find( _.id == ( node \ "@h2" ).content.toInt ).get,
     port = node.childOf( "port" ).asOption( n => Port.fromXML( n ) ),
@@ -125,7 +125,7 @@ object Edge {
   )
 
   def fromJson( json:JsValue, hexList:List[Hex] ):Edge = Edge(
-    id = ( json \ "id" ).as[Int],
+    eID = ( json \ "id" ).as[Int],
     h1 = hexList.find( _.id == ( json \ "h1" ).as[Int] ).get,
     h2 = hexList.find( _.id == ( json \ "h2" ).as[Int] ).get,
     port = ( json \ "port" ).asOption[Port],
@@ -133,8 +133,8 @@ object Edge {
   )
 }
 
-case class Edge /*private[GameField]*/( id:Int, h1:Hex, h2:Hex, port:Option[Port] = None, road:Option[Road] = None )
-  extends PlacementPoint( id ) with XMLSerializable {
+case class Edge /*private[GameField]*/( eID:Int, h1:Hex, h2:Hex, port:Option[Port] = None, road:Option[Road] = None )
+  extends PlacementPoint( eID ) with XMLSerializable {
 
   def toXML:Node = <Edge id={ id.toString } h1={ h1.id.toString } h2={ h2.id.toString }>
     <port>{ port.toXML( _.toXML ) }</port>
@@ -150,7 +150,7 @@ object Vertex {
   //private def apply( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port], building:Option[Building] ):Vertex = new Vertex( id, h1, h2, h3, port, building )
 
   def fromXML( node:Node, hexList:List[Hex] ):Vertex = Vertex(
-    id = ( node \ "@id" ).content.toInt,
+    vID = ( node \ "@id" ).content.toInt,
     h1 = hexList.find( _.id == ( node \ "@h1" ).content.toInt ).get,
     h2 = hexList.find( _.id == ( node \ "@h2" ).content.toInt ).get,
     h3 = hexList.find( _.id == ( node \ "@h3" ).content.toInt ).get,
@@ -168,7 +168,7 @@ object Vertex {
   )
 
   def fromJson( json:JsValue, hexList:List[Hex] ):Vertex = Vertex(
-    id = ( json \ "id" ).as[Int],
+    vID = ( json \ "id" ).as[Int],
     h1 = hexList.find( _.id == ( json \ "h1" ).as[Int] ).get,
     h2 = hexList.find( _.id == ( json \ "h2" ).as[Int] ).get,
     h3 = hexList.find( _.id == ( json \ "h3" ).as[Int] ).get,
@@ -177,8 +177,8 @@ object Vertex {
   )
 }
 
-case class Vertex /*private[GameField]*/( id:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port] = None, building:Option[Building] = None )
-  extends PlacementPoint( id ) with XMLSerializable {
+case class Vertex /*private[GameField]*/( vID:Int, h1:Hex, h2:Hex, h3:Hex, port:Option[Port] = None, building:Option[Building] = None )
+  extends PlacementPoint( vID ) with XMLSerializable {
 
   def toXML:Node = <Vertex id={ id.toString } h1={ h1.id.toString } h2={ h2.id.toString } h3={ h3.id.toString }>
     <port>{ port.toXML( _.toXML ) }</port>
