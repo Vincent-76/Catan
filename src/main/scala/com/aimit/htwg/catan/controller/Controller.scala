@@ -79,8 +79,8 @@ class Controller( var game:Game,
     Success( update( Some( GameSavedInfo( path ) ) ) )
   }
 
-  def loadGame( path:String ):Try[Option[Info]] = {
-    val (newGame, undoStack, redoStack) = FileIO.load( path )._2
+  def loadGame( path:String, extension:Option[String] = None ):Try[Option[Info]] = {
+    val (newGame, undoStack, redoStack) = FileIO.load( path, extension )._2
     game = newGame
     undoManager.clear()
     undoManager.undoStack = undoStack
