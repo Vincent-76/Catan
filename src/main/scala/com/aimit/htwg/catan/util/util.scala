@@ -2,7 +2,7 @@ package com.aimit.htwg.catan
 
 import java.util.function.Predicate
 import scala.reflect.ClassTag
-import scala.util.{ Failure, Random, Try }
+import scala.util.{ Failure, Random, Success, Try }
 
 /**
  * @author Vincent76;
@@ -155,6 +155,8 @@ package object util {
 
   implicit class RichOption[T]( val option:Option[T] ) {
     def useOrElse[R]( operation:Function[T, R], default:R ):R = if( option.isDefined ) operation.apply( option.get ) else default
+
+    def toTry( t:Throwable ):Try[T] = option.map( Success( _ ) ).getOrElse( Failure( t ) )
   }
 
   implicit class RichTry[T]( t:Try[T] ) {

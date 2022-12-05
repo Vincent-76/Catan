@@ -16,13 +16,15 @@ object PlayerOrdering extends Ordering[PlayerID] {
   override def compare( x:PlayerID, y:PlayerID ):Int = x.id.compareTo( y.id )
 }
 
-abstract class GameImpl( name:String ) extends DeserializerComponentImpl[Game]( name ) {
-  override def init():Unit = Game.addImpl( this )
-}
+
 
 object Game extends ClassComponent[Game, GameImpl] {
   implicit val turnWrites:Writes[Game] = ( o:Game ) => o.toJson
   implicit val turnReads:Reads[Game] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
+}
+
+abstract class GameImpl( name:String ) extends DeserializerComponentImpl[Game]( name ) {
+  override def init():Unit = Game.addImpl( this )
 }
 
 trait Game extends XMLSerializable with JsonSerializable {
