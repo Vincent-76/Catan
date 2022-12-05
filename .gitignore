@@ -20,6 +20,7 @@ logs/
 project/.sbtserver
 .sbtserver/
 src/main/scala/META-INF
+out/
 
 */target/*
 
