@@ -8,11 +8,11 @@ import scala.xml.Node
 
 
 abstract class ComponentImpl {
-  def init():Unit
+  def init():Unit = {}
 }
 
-abstract class SerialComponentImpl[T]( val id:T ) extends ComponentImpl {
-  override def toString:String = id.toString
+abstract class SerialComponentImpl[T]( val cID:T ) extends ComponentImpl {
+  override def toString:String = cID.toString
 }
 
 abstract class NamedComponentImpl( val name:String ) extends SerialComponentImpl[String]( name )
@@ -31,12 +31,12 @@ abstract class Component[I] {
 }
 
 abstract class SerialComponent[T, I <: SerialComponentImpl[T]] extends Component[I] {
-  implicit val devCardWrites:Writes[I] = ( impl:I ) => Json.toJson( impl.id.toString )
-  implicit val devCardsReads:Reads[I] = ( json:JsValue ) => JsSuccess( impls.find( _.id.toString == json.as[String] ).get )
+  implicit val devCardWrites:Writes[I] = ( impl:I ) => Json.toJson( impl.cID.toString )
+  implicit val devCardsReads:Reads[I] = ( json:JsValue ) => JsSuccess( impls.find( _.cID.toString == json.as[String] ).get )
 
-  def hasImpl( id:T ):Boolean = impls.exists( _.id == id )
+  def hasImpl( id:T ):Boolean = impls.exists( _.cID == id )
 
-  def of( id:T ):Option[I] = impls.find( _.id == id )
+  def of( id:T ):Option[I] = impls.find( _.cID == id )
 }
 
 abstract class NamedComponent[I <: NamedComponentImpl] extends SerialComponent[String, I] {

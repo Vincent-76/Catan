@@ -1,7 +1,5 @@
 package com.aimit.htwg.catan.model.impl.game
 
-import com.google.inject.Inject
-import com.google.inject.name.Named
 import com.aimit.htwg.catan.CatanModule
 import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model._
@@ -11,7 +9,9 @@ import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNo
 import com.aimit.htwg.catan.model.impl.placement.{ CityPlacement, RoadPlacement, RobberPlacement, SettlementPlacement }
 import com.aimit.htwg.catan.model.state.InitState
 import com.aimit.htwg.catan.util._
-import play.api.libs.json.{ JsResult, JsSuccess, JsValue, Json, Reads, Writes }
+import com.google.inject.Inject
+import com.google.inject.name.Named
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.collection.immutable.{ List, SortedMap, TreeMap }
 import scala.util.{ Failure, Random, Success, Try }
@@ -65,7 +65,7 @@ object ClassicGameImpl extends GameImpl( "ClassicGameImpl" ) {
     playerFactoryClass = ( json \ "playerFactoryClass" ).as[String],
     availablePlacementsVal = ( json \ "availablePlacements" ).asSet[Placement],
     stateVal = ( json \ "state" ).as[State],
-    resourceStack = ( json \ "resourceStack" ).as[ResourceCards],
+    resourceStack = ( json \ "resourceStack" ).asMap[Resource, Int],
     developmentCards = ( json \ "developmentCards"  ).asList[DevelopmentCard],
     playersVal = TreeMap( ( json \ "players" ).asMap[PlayerID, Player].toArray:_* )( PlayerOrdering ),
     bonusCardsVal = ( json \ "bonusCards" ).asMapC( _.as[BonusCard], _.asOptionC( _.asTuple[PlayerID, Int] ) ),
@@ -131,16 +131,16 @@ case class ClassicGameImpl( gameFieldVal:GameField,
     "playerFactoryClass" -> Json.toJson( playerFactoryClass ),
     "availablePlacements" -> Json.toJson( availablePlacements ),
     "state" -> Json.toJson( stateVal.asInstanceOf[JsonSerializable] ),
-    "resourceStack" -> Json.toJson( resourceStack ),
+    "resourceStack" -> resourceStack.toJson,
     "developmentCards" -> Json.toJson( developmentCards ),
-    "players" -> Json.toJson( playersVal.asInstanceOf[Map[PlayerID, JsonSerializable]] ),
-    "bonusCards" ->  Json.toJson( bonusCardsVal ),
+    "players" -> playersVal.toJson, //Json.toJson( playersVal.asInstanceOf[Map[PlayerID, JsonSerializable]] ),
+    "bonusCards" -> bonusCardsVal.toJson, // Json.toJson( bonusCardsVal ),
     "winner" -> Json.toJson( winnerVal ),
     "round" -> Json.toJson( roundVal )
   )
 
 
-  def minPlayers:Int = 3
+  def minPlayers:Int = 2 // TODO 3
 
   def maxPlayers:Int = 4
 

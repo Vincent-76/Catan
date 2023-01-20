@@ -27,7 +27,7 @@ case class ClassicGameFieldImpl( _field:Field[Hex],
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( ClassicGameFieldImpl.name ),
-    "field" -> field.toJsonC( _.toJsonC( o => Json.toJson( o ) ) ),
+    "field" -> field.toJson,//field.toJsonC( _.toJsonC( o => Json.toJson( o ) ) ),
     "edges" -> edges.toJsonC( _.toJsonC( h1 => Json.toJson( h1.id ), h2 => Json.toJson( h2.id ) ), e => Json.toJson( e ) ),
     "vertices" -> vertices.toJsonC( _.toJsonC( h1 => Json.toJson( h1.id ), h2 => Json.toJson( h2.id ), h3 => Json.toJson( h3.id ) ), v => Json.toJson( v ) ),
     "robber" -> Json.toJson( robber.id )

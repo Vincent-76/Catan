@@ -1,7 +1,8 @@
 package com.aimit.htwg.catan.model.impl.fileio
 
+import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.{ JsonMap, JsonValue }
 import com.aimit.htwg.catan.model.{ Command, FileIO, Game }
-import play.api.libs.json.{ JsArray, JsDefined, JsLookupResult, JsNull, JsValue, Json, Reads, Writes }
+import play.api.libs.json.{ JsArray, JsDefined, JsLookupResult, JsNull, JsObject, JsResult, JsSuccess, JsValue, Json, Reads, Writes }
 
 import java.io.{ File, PrintWriter }
 import scala.io.Source
@@ -17,6 +18,16 @@ trait JsonDeserializer[+T] {
 case class JsonParseError( expected:String, got:String ) extends RuntimeException {
   override def toString:String = "JsonParseError: Expected -> '" + expected + "', Got -> '" + got + "'"
 }
+
+
+/*class MapWrites[K, V]( implicit fjs:Writes[K], fjs2:Writes[V] ) extends Writes[Map[K, V]] {
+  override def writes( o:Map[K, V] ):JsValue = o.toJson
+}
+
+class MapReads[K, V]( implicit fjs:Reads[K], fjs2:Reads[V] ) extends Reads[Map[K, V]] {
+  override def reads( json:JsValue ):JsResult[Map[K, V]] = JsSuccess( json.asMap[K, V] )
+}*/
+
 
 object JsonFileIO extends FileIO( "JSON", "json" ) {
 
@@ -63,10 +74,12 @@ object JsonFileIO extends FileIO( "JSON", "json" ) {
 
   implicit class JsonMap[K, V]( map:Map[K, V] ) {
     def toJson( implicit fjs:Writes[K], fjs2:Writes[V] ):JsArray =
-      JsArray( map.map( d => JsArray( Seq( Json.toJson( d._1 ), Json.toJson( d._2 ) ) ) ).toSeq )//map.toJson( k => Json.toJson( k ), v => Json.toJson( v ) )
+      //JsArray( map.map( d => JsArray( Seq( Json.toJson( d._1 ), Json.toJson( d._2 ) ) ) ).toSeq )//map.toJson( k => Json.toJson( k ), v => Json.toJson( v ) )
+    JsArray( map.map( e => Json.obj( "k" -> Json.toJson( e._1 ), "v" -> Json.toJson( e._2 ) ) ).toSeq )
 
     def toJsonC( keyBuilder:K => JsValue, valBuilder:V => JsValue ):JsArray =
-      JsArray( map.map( d => JsArray( Seq( keyBuilder( d._1 ), valBuilder( d._2 ) ) ) ).toSeq )
+      //JsArray( map.map( d => JsArray( Seq( keyBuilder( d._1 ), valBuilder( d._2 ) ) ) ).toSeq )
+      JsArray( map.map( e => Json.obj( "k" -> keyBuilder( e._1 ), "v" -> valBuilder( e._2 ) ) ).toSeq )
   }
 
   implicit class JsonTuple2[T1, T2]( tuple:(T1, T2) ) {
@@ -122,8 +135,9 @@ object JsonFileIO extends FileIO( "JSON", "json" ) {
 
     def asMapC[K, V]( keyBuilder:JsValue => K, valBuilder:JsValue => V ):Map[K, V] = json match {
       case arr:JsArray => arr.value.map {
-          case valArr:JsArray => (keyBuilder( valArr( 0 ) ), valBuilder( valArr( 1 ) ))
-          case o => throw JsonParseError( expected = "JsonArray", got = o.toString() )
+          //case valArr:JsArray => (keyBuilder( valArr( 0 ) ), valBuilder( valArr( 1 ) ))
+          case e:JsObject if e.value.contains( "k" ) && e.value.contains( "v" ) => (keyBuilder( e.value( "k" ) ), valBuilder( e.value( "v" ) ))
+          case o => throw JsonParseError( expected = "JsMapObj", got = o.toString() )
         }.toMap
       case o => throw JsonParseError( expected = "JsonArray", got = o.toString() )
     }

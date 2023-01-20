@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
 import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model._
-import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
+import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.{ JsonLookupResult, JsonMap }
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLSequence }
 import com.aimit.htwg.catan.util._
 import play.api.libs.json.{ JsValue, Json }
@@ -28,7 +28,7 @@ object ClassicPlayerImpl extends PlayerImpl( "ClassicPlayerImpl" ) {
     idVal = ( json \ "id" ).as[PlayerID],
     colorVal = ( json \ "color" ).as[PlayerColor],
     nameVal = ( json \ "name" ).as[String],
-    resourcesVal = ( json \ "resources" ).as[ResourceCards],
+    resourcesVal = ( json \ "resources" ).asMap[Resource, Int],
     devCardsVal = ( json \ "devCards" ).as[Vector[DevelopmentCard]],
     usedDevCards = ( json \ "usedDevCards" ).as[Vector[DevelopmentCard]],
     victoryPointsVal = ( json \ "victoryPoints" ).as[Int],
@@ -67,11 +67,11 @@ case class ClassicPlayerImpl( idVal:PlayerID,
     "id" -> Json.toJson( idVal ),
     "color" -> Json.toJson( colorVal ),
     "name" -> Json.toJson( nameVal ),
-    "resources" -> Json.toJson( resourcesVal ),
+    "resources" -> resourcesVal.toJson, //Json.toJson( resourcesVal ),
     "devCards" -> Json.toJson( devCardsVal ),
     "usedDevCards" -> Json.toJson( usedDevCards ),
     "victoryPoints" -> Json.toJson( victoryPointsVal ),
-    "structures" -> Json.toJson( structures )
+    "structures" -> structures.toJson, //Json.toJson( structures )
   )
 
 

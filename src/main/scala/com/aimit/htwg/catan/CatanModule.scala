@@ -87,8 +87,8 @@ object CatanModule extends NamedComponent[CatanModuleImpl] {
     Structure.init()
     Area.init()
 
-    XMLFileIO.init()
     JsonFileIO.init()
+    XMLFileIO.init()
   }
 }
 

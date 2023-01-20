@@ -3,7 +3,7 @@ package com.aimit.htwg.catan.model.state
 import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model.{ Command, PlayerID, Resource, State, StateImpl }
 import com.aimit.htwg.catan.model.commands.PlayerTradeDecisionCommand
-import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
+import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.{ JsonLookupResult, JsonMap }
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq }
 import play.api.libs.json.{ JsValue, Json }
 
@@ -23,8 +23,8 @@ object PlayerTradeState extends StateImpl( "PlayerTradeState" ) {
 
   def fromJson( json:JsValue ):PlayerTradeState = PlayerTradeState(
     pID = ( json \ "pID" ).as[PlayerID],
-    give = ( json \ "give" ).as[ResourceCards],
-    get = ( json \ "get" ).as[ResourceCards],
+    give = ( json \ "give" ).asMap[Resource, Int],
+    get = ( json \ "get" ).asMap[Resource, Int],
     decisions = ( json \ "decisions" ).asMap[PlayerID, Boolean]
   )
 }
@@ -44,9 +44,9 @@ case class PlayerTradeState( pID:PlayerID,
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( PlayerTradeState.name ),
     "pID" -> Json.toJson( pID ),
-    "give" -> Json.toJson( give ),
-    "get" -> Json.toJson( get ),
-    "decisions" -> Json.toJson( decisions )
+    "give" -> give.toJson, // Json.toJson( give ),
+    "get" -> get.toJson, // Json.toJson( get ),
+    "decisions" -> decisions.toJson, //Json.toJson( decisions )
   )
 
   override def playerTradeDecision( decision:Boolean ):Option[Command] = Some(

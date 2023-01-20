@@ -2,9 +2,9 @@ package com.aimit.htwg.catan.model.state
 
 import com.aimit.htwg.catan.model.Card._
 import com.aimit.htwg.catan.model.commands.{ AbortPlayerTradeCommand, PlayerTradeCommand }
-import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
+import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.{ JsonLookupResult, JsonMap }
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq }
-import com.aimit.htwg.catan.model.{ Command, PlayerID, State, StateImpl }
+import com.aimit.htwg.catan.model.{ Command, PlayerID, Resource, State, StateImpl }
 import play.api.libs.json.{ JsValue, Json }
 
 import scala.xml.Node
@@ -21,8 +21,8 @@ object PlayerTradeEndState extends StateImpl( "PlayerTradeEndState" ) {
   )
 
   def fromJson( json:JsValue ):PlayerTradeEndState = PlayerTradeEndState(
-    give = ( json \ "give" ).as[ResourceCards],
-    get = ( json \ "get" ).as[ResourceCards],
+    give = ( json \ "give" ).asMap[Resource, Int],
+    get = ( json \ "get" ).asMap[Resource, Int],
     decisions = ( json \ "decisions" ).asMap[PlayerID, Boolean]
   )
 }
@@ -39,9 +39,9 @@ case class PlayerTradeEndState( give:ResourceCards,
 
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( PlayerTradeEndState.name ),
-    "give" -> Json.toJson( give ),
-    "get" -> Json.toJson( get ),
-    "decisions" -> Json.toJson( decisions )
+    "give" -> give.toJson, // Json.toJson( give ),
+    "get" -> get.toJson, //Json.toJson( get ),
+    "decisions" -> decisions.toJson, // Json.toJson( decisions )
   )
 
   override def playerTrade( tradePlayerID:PlayerID ):Option[Command] = Some(

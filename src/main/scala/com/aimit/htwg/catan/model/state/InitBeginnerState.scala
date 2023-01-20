@@ -2,7 +2,7 @@ package com.aimit.htwg.catan.model.state
 
 import com.aimit.htwg.catan.model.{ Command, PlayerID, State, StateImpl }
 import com.aimit.htwg.catan.model.commands.{ DiceOutBeginnerCommand, SetBeginnerCommand }
-import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.JsonLookupResult
+import com.aimit.htwg.catan.model.impl.fileio.JsonFileIO.{ JsonLookupResult, JsonMap }
 import com.aimit.htwg.catan.model.impl.fileio.XMLFileIO.{ XMLMap, XMLNode, XMLNodeSeq, XMLOption }
 import play.api.libs.json.{ JsValue, Json }
 
@@ -38,7 +38,7 @@ case class InitBeginnerState( beginner:Option[PlayerID] = None,
   def toJson:JsValue = Json.obj(
     "class" -> Json.toJson( InitBeginnerState.name ),
     "beginner" -> Json.toJson( beginner ),
-    "diceValues" -> Json.toJson( diceValues ),
+    "diceValues" -> diceValues.toJson, // Json.toJson( diceValues ),
     "counter" -> Json.toJson( counter )
   )
 
