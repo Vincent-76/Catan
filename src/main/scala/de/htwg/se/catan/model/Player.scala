@@ -1,12 +1,12 @@
 package de.htwg.se.catan.model
 
 import de.htwg.se.catan.model.Card.*
-import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.*
 import de.htwg.se.catan.model.impl.fileio.{ JsonDeserializer, JsonSerializable, XMLDeserializer, XMLSerializable }
 import de.htwg.se.catan.util.*
 import play.api.libs.json.*
 
-import scala.util.Try
+import scala.util.{ Random, Try }
 import scala.xml.Node
 
 /**
@@ -107,6 +107,6 @@ trait Player extends XMLSerializable with JsonSerializable:
   def hasStructure( structure:StructurePlacement ):Boolean
   def getStructure( structure:StructurePlacement ):Try[Player]
   def addStructure( structure:StructurePlacement ):Player
-  def randomHandResource( ):Option[Resource]
+  def randomHandResource( r:Random ):Option[Resource]
   def useDevCard( devCard:DevelopmentCard ):Try[Player]
 

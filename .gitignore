@@ -10,7 +10,6 @@
 .lib/*
 dist/*
 target/*
-*/target/*
 lib_managed/
 src_managed/
 project/boot/
@@ -22,6 +21,7 @@ project/.sbtserver
 .sbtserver/
 src/main/scala/META-INF
 
+*/target/*
 .DS_Store
 
 savegames/

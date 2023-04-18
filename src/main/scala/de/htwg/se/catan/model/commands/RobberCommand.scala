@@ -5,7 +5,7 @@ import de.htwg.se.catan.model.Command.CommandSuccess
 import de.htwg.se.catan.model.info.ResourceChangeInfo
 import de.htwg.se.catan.model._
 
-import scala.util.Try
+import scala.util.{ Try, Random }
 
 /**
  * @author Vincent76;
@@ -16,7 +16,7 @@ abstract class RobberCommand( ) extends Command:
   var robbedResource:Option[Resource] = None
 
   protected def steal( game:Game, stealPlayerID:PlayerID, nextState:State, gameField:Option[GameField] = None ):Try[CommandSuccess] =
-    robbedResource = game.players( stealPlayerID ).randomHandResource()
+    robbedResource = game.players( stealPlayerID ).randomHandResource( Random( game.seed * game.round ) )
     robbedResource match
       case Some( r ) => success(
         game.setState( nextState )

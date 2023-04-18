@@ -23,7 +23,7 @@ import scala.io.StdIn
 object Catan:
   val debug = false
   CatanModule.init()
-  val injector:Injector = Guice.createInjector( CatanModule( test = false ) )
+  val injector:Injector = Guice.createInjector( CatanModule( test = true ) )
   val controller:Controller = injector.getInstance( classOf[Controller] )
   val tui:TUI = TUI( controller )
   val requests:Requests = Requests( controller )

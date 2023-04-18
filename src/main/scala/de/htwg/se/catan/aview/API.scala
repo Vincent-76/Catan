@@ -2,8 +2,9 @@ package de.htwg.se.catan.aview
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.Http
+import akka.http.scaladsl.{ ClientTransport, Http }
 import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpMethod, HttpMethods, HttpRequest, HttpResponse }
+import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.{ ActionResult, Command, CustomError, DevelopmentCard, Game, Info, PlayerColor, PlayerID, Resource, StructurePlacement }
@@ -11,6 +12,7 @@ import de.htwg.se.catan.model.impl.fileio.JsonFileIO
 import de.htwg.se.catan.util.Observable
 import play.api.libs.json.{ Json, Reads, Writes }
 
+import java.net.InetSocketAddress
 import scala.concurrent.{ ExecutionContextExecutor, Future }
 import scala.util.{ Failure, Success, Try }
 
@@ -28,7 +30,7 @@ class API extends Observable:
 
   def toHttpEntity( data:String ):HttpEntity.Strict = HttpEntity( ContentTypes.`application/json`, data )
 
-  def getURI( path:String ):String = "http://" + API.interface + "/" + path
+  def getURI( path:String ):String = "http://" + API.interface + ":" + API.port + "/" + path
 
   def getResult[R]( f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Try[HttpResponse] => Unit = t => t match
     case Success( response ) => Unmarshal( response.entity ).to[String].onComplete {
@@ -43,6 +45,7 @@ class API extends Observable:
       }
       case Failure( t ) => e( t )
     }
+    case Failure( t ) => e( t )
 
   def rawGet[R]( path:String, f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Unit = Http().singleRequest( HttpRequest(
     method = HttpMethods.GET,
@@ -68,11 +71,14 @@ class API extends Observable:
     uri = getURI( path )
   ) ) )
 
-  def cPost[E, R]( path:String, entity:E )( using fjs:Writes[E], fjs2:Reads[R] ):Unit = execute[R]( Http().singleRequest( HttpRequest(
-    method = HttpMethods.POST,
-    uri = getURI( path ),
-    entity = toHttpEntity( Json.stringify( Json.toJson( entity ) ) )
-  ) ) )
+  def cPost[E, R]( path:String, entity:E )( using fjs:Writes[E], fjs2:Reads[R] ):Unit =
+    val entityString = Json.stringify( Json.toJson( entity ) )
+    print( path + ": " + entityString )
+    execute[R]( Http().singleRequest( HttpRequest(
+      method = HttpMethods.POST,
+      uri = getURI( path ),
+      entity = toHttpEntity( entityString )
+    ) ) )
 
   def post( path:String ):Unit = cPost[ActionResult]( path )
 
