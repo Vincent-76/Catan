@@ -35,7 +35,7 @@ class API extends Observable:
   def getResult[R]( f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Try[HttpResponse] => Unit = t => t match
     case Success( response ) => Unmarshal( response.entity ).to[String].onComplete {
       case Success( data ) => try {
-        print( data )
+        //print( data )
         val json = Json.parse( data )
         if response.status.isSuccess() then
           f( json.as[R] )
@@ -73,7 +73,7 @@ class API extends Observable:
 
   def cPost[E, R]( path:String, entity:E )( using fjs:Writes[E], fjs2:Reads[R] ):Unit =
     val entityString = Json.stringify( Json.toJson( entity ) )
-    print( path + ": " + entityString )
+    println( path + ": " + entityString )
     execute[R]( Http().singleRequest( HttpRequest(
       method = HttpMethods.POST,
       uri = getURI( path ),

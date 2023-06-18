@@ -10,6 +10,7 @@ import de.htwg.se.catan.model.*
 import de.htwg.se.catan.model.Info.*
 import de.htwg.se.catan.model.state.*
 import de.htwg.se.catan.util.{ Observer, * }
+import javafx.application.Application
 import javafx.geometry.Side
 import javafx.scene.layout.{ BackgroundImage, BackgroundPosition, BackgroundRepeat, BackgroundSize }
 import scalafx.application.{ JFXApp3, Platform }

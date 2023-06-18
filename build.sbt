@@ -3,7 +3,7 @@ version := "1.0"
 organization := "de.htwg.se.catan"
 
 val scala2Version = "2.13.8"
-val scala3Version = "3.1.1"
+val scala3Version = "3.2.2"
 
 val model = project.in( file( "de.htwg.se.catan.model" ) )
 val util = project.in( file( "de.htwg.se.catan.util" ) )
@@ -18,21 +18,52 @@ lazy val root = project
     Compile / packageBin / mainClass := Some( "de.htwg.se.catan.Catan" ),
     Compile / run / mainClass := Some( "de.htwg.se.catan.Catan" ),
 
-    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
+    libraryDependencies ++= Seq(
+      "org.scalameta" %% "munit" % "0.7.29" % Test,
+      "org.scalactic" %% "scalactic" % "3.2.15",
+      "org.scalatest" %% "scalatest" % "3.2.15" % "test",
+      ( "org.scalafx" %% "scalafx" % "20.0.0-R31" )
+        .exclude( "org.scala-lang.modules", "scala-collection-compat_2.13" ),
+
+      "com.google.inject" % "guice" % "5.1.0",
+      "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
+      ( "net.codingwell" %% "scala-guice" % "5.0.2" ).cross( CrossVersion.for3Use2_13 ),
+
+      "org.scala-lang.modules" %% "scala-xml" % "2.0.1",
+      //( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" ).cross( CrossVersion.for3Use2_13 ),
+      ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" )
+        .cross( CrossVersion.for3Use2_13 )
+        .exclude( "org.scala-lang.modules", "scala-collection-compat_2.13" ),
 
 
-    libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.11",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % "test",
-    libraryDependencies += "org.scalafx" %% "scalafx" % "17.0.1-R26",
+      ( "com.typesafe.akka" %% "akka-http" % "10.2.9" ).cross( CrossVersion.for3Use2_13 ),
+      ( "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
+      ( "com.typesafe.akka" %% "akka-stream" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
+      "com.github.slick.slick" % "slick_3" % "nafg~dottyquery-SNAPSHOT",
+      "mysql" % "mysql-connector-java" % "8.0.29",
+      ( "org.mongodb.scala" %% "mongo-scala-driver" % "4.6.0" ).cross( CrossVersion.for3Use2_13 ),
+    ).map( _.exclude( "org.scala-lang.modules", "scala-collection-compat_2.13") ),
+
+    /*libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
+
+
+    libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.15",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % "test",
+    libraryDependencies += ( "org.scalafx" %% "scalafx" % "17.0.1-R26" )
+      .exclude("org.scala-lang.modules", "scala-collection-compat_2.13"),
 
     libraryDependencies += "com.google.inject" % "guice" % "5.1.0",
     libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
     libraryDependencies += ( "net.codingwell" %% "scala-guice" % "5.0.2" ).cross( CrossVersion.for3Use2_13 ),
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.1",
-    libraryDependencies += ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" ).cross( CrossVersion.for3Use2_13 ),
+    //libraryDependencies += ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" ).cross( CrossVersion.for3Use2_13 ),
+    libraryDependencies += ( "com.typesafe.play" %% "play-json" % "2.10.0-RC1" )
+      .cross( CrossVersion.for3Use2_13 )
+      .exclude( "org.scala-lang.modules", "scala-collection-compat_2.13" ),
 
-    libraryDependencies += ( "com.typesafe.akka" %% "akka-http" % "10.2.9" ).cross( CrossVersion.for3Use2_13 ),
+
+      libraryDependencies += ( "com.typesafe.akka" %% "akka-http" % "10.2.9" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += ( "com.typesafe.akka" %% "akka-stream" % "2.6.19" ).cross( CrossVersion.for3Use2_13 ),
     libraryDependencies += "com.github.slick.slick" % "slick_3" % "nafg~dottyquery-SNAPSHOT",
@@ -43,7 +74,10 @@ lazy val root = project
       ( "com.typesafe.slick" %% "slick" % "3.3.3" ).cross( CrossVersion.for3Use2_13 ),
       "ch.qos.logback" % "logback-classic" % "1.2.11",
       // "org.slf4j" % "slf4j-nop" % "1.6.4",
-    ),*/
+    ),*/*/
+
+    dependencyOverrides += "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0",
+
 
     resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
     resolvers += ( "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/" ).withAllowInsecureProtocol( true ),

@@ -13,6 +13,7 @@ import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.turn.ClassicTurnImpl
 import de.htwg.se.catan.model.state.{ InitBeginnerState, InitState }
 import de.htwg.se.catan.web.Requests
+import javafx.application.Application
 import play.api.libs.json.{ JsSuccess, Json }
 
 import scala.io.StdIn
