@@ -5,6 +5,8 @@ import de.htwg.se.catan.model.{ Command, FileIO, Game }
 import java.io
 import scala.reflect.io.File
 import scala.xml.{ Elem, Node, NodeSeq, PrettyPrinter, Utility }
+import concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ Future, blocking }
 
 trait XMLSerializable:
   def toXML:Node
@@ -27,15 +29,18 @@ object XMLFileIO extends FileIO( "xml" ):
     val redoStack = xml.childOf( "redoStack" ).asList( n => Command.fromXML( n ) )
     (game, undoStack, redoStack)
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String =
-    val file = File( getFileName )
-    val save = <Save>
-      <game>{ game.toXML }</game>
-      <undoStack>{ undoStack.toXML( _.toXML ) }</undoStack>
-      <redoStack>{ redoStack.toXML( _.toXML ) }</redoStack>
-    </Save>
-    scala.xml.XML.save( file.toAbsolute.path, save )
-    file.toAbsolute.path
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):Future[String] = Future {
+    blocking {
+      val file = File( getFileName )
+      val save = <Save>
+        <game>{ game.toXML }</game>
+        <undoStack>{ undoStack.toXML( _.toXML ) }</undoStack>
+        <redoStack>{ redoStack.toXML( _.toXML ) }</redoStack>
+      </Save>
+      scala.xml.XML.save( file.toAbsolute.path, save )
+      file.toAbsolute.path
+    }
+  }
 
   private def wrap( data:io.Serializable ):io.Serializable = data match
     case n:Node => n

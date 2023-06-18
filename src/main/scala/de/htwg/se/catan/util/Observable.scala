@@ -24,7 +24,7 @@ trait Observable:
 
   def update( game:Game, info:Option[Info] = None ):Unit = subscribers.foreach( _.onUpdate( game, info ) )
 
-  //def info( info:Info ):Unit = subscribers.foreach( _.onInfo( info ) )
+  def info( info:Info ):Unit = subscribers.foreach( _.onInfo( info ) )
 
   def error( t:Throwable ):Throwable =
     subscribers.foreach( _.onError( t ) )

@@ -2,7 +2,7 @@ package de.htwg.se.catan.aview
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.{ ClientTransport, Http }
+import akka.http.scaladsl.{ ClientTransport, Http, HttpExt }
 import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpMethod, HttpMethods, HttpRequest, HttpResponse }
 import akka.http.scaladsl.settings.{ ClientConnectionSettings, ConnectionPoolSettings }
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -10,6 +10,7 @@ import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.{ ActionResult, Command, CustomError, DevelopmentCard, Game, Info, PlayerColor, PlayerID, Resource, StructurePlacement }
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO
+import de.htwg.se.catan.model.info.GameSavedInfo
 import de.htwg.se.catan.util.Observable
 import play.api.libs.json.{ Json, Reads, Writes }
 
@@ -31,7 +32,7 @@ class API extends Observable:
 
   var counter:Int = 1
 
-  val http = Http()
+  val http:HttpExt = Http()
 
   /*val proxy:ClientTransport = ClientTransport.httpsProxy( InetSocketAddress.createUnresolved( "127.0.0.1", 8000 ) )
   val settings = ConnectionPoolSettings( system ).withConnectionSettings( ClientConnectionSettings( system ).withTransport( proxy ) )
@@ -46,15 +47,14 @@ class API extends Observable:
   private def log( action:String, path:String, body:Option[String] = None ):Unit =
     println( s".exec( http( \"request_$counter\" ).$action( \"/$path\" )" + body.map( b =>
       s".body( StringBody( \"\"\"$b\"\"\" ) )"
-      //+ ".header( \"content-type\", \"application/json\" )"
     ).getOrElse( "" ) + " )" )
     counter = counter + 1
 
   def toHttpEntity( data:String ):HttpEntity.Strict = HttpEntity( ContentTypes.`application/json`, data )
 
-  def getURI( path:String ):String = "http://" + API.interface + ":" + API.port + "/" + path
+  private def getURI( path:String ):String = "http://" + API.interface + ":" + API.port + "/" + path
 
-  def getResult[R]( f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Try[HttpResponse] => Unit = t => t match
+  private def getResult[R]( f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Try[HttpResponse] => Unit = t => t match
     case Success( response ) => Unmarshal( response.entity ).to[String].onComplete {
       case Success( data ) => try {
         //print( data )
@@ -69,44 +69,59 @@ class API extends Observable:
     }
     case Failure( t ) => e( t )
 
+  private def rawExecute( req:HttpRequest, retries:Int = 3 ):Future[HttpResponse] =
+    val future = http.singleRequest( req /*, settings = settings, connectionContext = httpsConnectionContext*/ )
+    if retries > 0 then
+      future.recoverWith( _ => rawExecute( req, retries - 1 ) )
+    else
+      future
+
   def rawGet[R]( path:String, f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Unit =
     log( "get", path )
-    http.singleRequest( HttpRequest(
+    rawExecute( HttpRequest(
       method = HttpMethods.GET,
       uri = getURI( path )
-    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ).onComplete( getResult[R]( f, e ) )
+    ) ).onComplete( getResult[R]( f, e ) )
+    
+  def rawPost( path:String ):Future[HttpResponse] =
+    log( "post", path )
+    rawExecute( HttpRequest(
+      method = HttpMethods.POST,
+      uri = getURI( path )
+    ) )
 
-  def execute[R]( f:Future[HttpResponse] )( using fjs:Reads[R] ):Unit =
-    f.onComplete( getResult[R](
+  private def execute[R]( req:HttpRequest )( using fjs:Reads[R] ):Unit =
+    rawExecute( req ).onComplete( getResult[R](
       res => res match
         case game:Game => update( game, None )
         case result:ActionResult => update( result.game, result.info )
+        case i:Info => info( i )
         case _ =>
       , e => error( e )
     ) )
 
   def get[R]( path:String )( using fjs:Reads[R] ):Unit =
     log( "get", path )
-    execute[R]( http.singleRequest( HttpRequest(
+    execute[R]( HttpRequest(
       method = HttpMethods.GET,
       uri = getURI( path )
-    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ) )
+    ) )
 
-  def cPost[R]( path:String )( using fjs:Reads[R] ):Unit =
+  private def cPost[R]( path:String )( using fjs:Reads[R] ):Unit =
     log( "post", path )
-    execute[R]( http.singleRequest( HttpRequest(
+    execute[R]( HttpRequest(
       method = HttpMethods.POST,
       uri = getURI( path )
-    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ) )
+    ) )
 
-  def cPost[E, R]( path:String, entity:E )( using fjs:Writes[E], fjs2:Reads[R] ):Unit =
+  private def cPost[E, R]( path:String, entity:E )( using fjs:Writes[E], fjs2:Reads[R] ):Unit =
     val entityString = Json.stringify( Json.toJson( entity ) )
     log( "post", path, Some( entityString ) )
-    execute[R]( http.singleRequest( HttpRequest(
+    execute[R]( HttpRequest(
       method = HttpMethods.POST,
       uri = getURI( path ),
       entity = toHttpEntity( entityString )
-    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ) )
+    ) )
 
   def post( path:String ):Unit = cPost[ActionResult]( path )
 
@@ -118,7 +133,7 @@ class API extends Observable:
   def undoAction():Unit = post( "undoAction" )
   def redoAction():Unit = post( "redoAction" )
 
-  def saveGame():String = ""//post[String]( "saveGame" )
+  def saveGame():Unit = cPost[GameSavedInfo]( "saveGame" )
 
   def loadGame( path:String ):Unit = post( "loadGame" )
 

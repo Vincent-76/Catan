@@ -7,6 +7,8 @@ import de.htwg.se.catan.model.error.WrongState
 import de.htwg.se.catan.model.info.{ GameEndInfo, GameLoadedInfo, GameSavedInfo }
 import de.htwg.se.catan.util.UndoManager
 
+import scala.concurrent.Future
+import concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Success, Try }
 
 /**
@@ -76,10 +78,13 @@ class ClassicControllerImpl @Inject() ( var gameVal:Game, val fileIO:FileIO ) ex
       actionDone( game, head, stack, info )
   }*/
 
-  def saveGame():String =
-    val path = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
-    update( game, info = Some( GameSavedInfo( path ) ) )
-    path
+  def saveGame( ):Future[String] =
+    val future = fileIO.save( game, undoManager.undoStack, undoManager.redoStack )
+    future.onComplete {
+      case Success( path ) => update( game, info = Some( GameSavedInfo( path ) ) )
+      case Failure( f ) => error( f )
+    }
+    future
 
   def loadGame( path:String ):Try[ActionResult] =
     try {

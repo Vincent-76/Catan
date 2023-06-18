@@ -4,7 +4,7 @@ import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.commands.InitGameCommand
 import de.htwg.se.catan.model.impl.fileio.{ JsonFileIO, JsonParseError, JsonSerializable }
-import de.htwg.se.catan.model.impl.fileio.JsonFileIO._
+import de.htwg.se.catan.model.impl.fileio.JsonFileIO.*
 import de.htwg.se.catan.model.impl.fileio.jsonSerializableWrites
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import org.scalatest.matchers.should.Matchers
@@ -12,6 +12,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{ JsDefined, JsUndefined, Json }
 
 import java.io.File
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 class JsonFileIOSpec extends AnyWordSpec with Matchers {
   CatanModule.init()
@@ -30,7 +32,7 @@ class JsonFileIOSpec extends AnyWordSpec with Matchers {
         val game = injector.getInstance( classOf[ClassicGameImpl] )
         val undoStack = List( InitGameCommand() )
         val redoStack = List( InitGameCommand() )
-        val path = JsonFileIO.save( game, undoStack, redoStack )
+        val path = Await.result( JsonFileIO.save( game, undoStack, redoStack ), Duration.Inf )
         val (game2, undoStack2, redoStack2) = JsonFileIO.load( path )
         val file = new File( path )
         if( file.exists )

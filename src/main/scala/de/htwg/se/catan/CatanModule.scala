@@ -148,7 +148,7 @@ class CatanModule( val test:Boolean = false ) extends AbstractModule:
 
   override def configure( ):Unit =
     bind( classOf[Controller] ).to( classOf[ClassicControllerImpl] )
-    bind( classOf[FileIO] ).toInstance( SlickImpl )
+    bind( classOf[FileIO] ).toInstance( JsonFileIO )
     bind( classOf[Game] ).to( classOf[ClassicGameImpl] )
     bind( classOf[Turn] ).to( classOf[ClassicTurnImpl] )
     val seed = if( test ) 1 else Random.nextInt( Int.MaxValue / 1000 )

@@ -9,6 +9,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.io.File
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 
 class FileIOSpec extends AnyWordSpec with Matchers {
@@ -25,7 +27,7 @@ class FileIOSpec extends AnyWordSpec with Matchers {
         )
         val undoStack = List( InitGameCommand() )
         val redoStack = List( InitGameCommand() )
-        val path = JsonFileIO.save( game, undoStack, redoStack )
+        val path = Await.result( JsonFileIO.save( game, undoStack, redoStack ), Duration.Inf )
         val (game2, undoStack2, redoStack2) = FileIO.load( path )
         val file = new File( path )
         if( file.exists )

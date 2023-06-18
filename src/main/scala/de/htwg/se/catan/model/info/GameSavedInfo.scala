@@ -2,7 +2,7 @@ package de.htwg.se.catan.model.info
 
 import de.htwg.se.catan.model.{ Info, InfoImpl }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO.XMLNodeSeq
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{ JsSuccess, JsValue, Json, Reads }
 
 import scala.xml.Node
 
@@ -18,6 +18,8 @@ object GameSavedInfo extends InfoImpl( "GameSavedInfo" ):
   def fromJson( json:JsValue ):GameSavedInfo = GameSavedInfo(
     path = ( json \ "path" ).as[String]
   )
+  
+  given reads:Reads[GameSavedInfo] = ( json:JsValue ) => JsSuccess( fromJson( json ) )
 
 
 case class GameSavedInfo( path:String ) extends Info:

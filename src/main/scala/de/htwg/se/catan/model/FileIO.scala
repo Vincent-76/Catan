@@ -6,6 +6,7 @@ import de.htwg.se.catan.util.^=
 
 import java.text.SimpleDateFormat
 import java.util.{ Calendar, UUID }
+import scala.concurrent.Future
 import scala.reflect.io.File
 
 object FileIO extends ObjectComponent[FileIO]:
@@ -37,4 +38,4 @@ abstract class FileIO( val extension:String ) extends ComponentImpl:
 
   def load( id:String ):(Game, List[Command], List[Command])
 
-  def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String
+  def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):Future[String]

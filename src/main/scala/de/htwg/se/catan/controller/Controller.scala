@@ -4,6 +4,7 @@ import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.*
 import de.htwg.se.catan.util.Observable
 
+import scala.concurrent.Future
 import scala.util.Try
 import scala.xml.Node
 
@@ -26,7 +27,7 @@ trait Controller extends Observable:
   def undoAction():Try[ActionResult]
   def redoAction():Try[ActionResult]
 
-  def saveGame():String
+  def saveGame():Future[String]
 
   def loadGame( path:String ):Try[ActionResult]
 

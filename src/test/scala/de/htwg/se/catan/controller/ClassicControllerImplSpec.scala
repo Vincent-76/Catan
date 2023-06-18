@@ -3,7 +3,7 @@ package de.htwg.se.catan.controller
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.controller.controllerBaseImpl.ClassicControllerImpl
 import de.htwg.se.catan.model.Card.ResourceCards
-import de.htwg.se.catan.model.error.{ NothingToUndo, NothingToRedo }
+import de.htwg.se.catan.model.error.{ NothingToRedo, NothingToUndo }
 import de.htwg.se.catan.model.impl.fileio.XMLFileIO
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
@@ -18,6 +18,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.io.File
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 /**
  * @author Vincent76;
@@ -57,7 +59,7 @@ class ClassicControllerImplSpec extends AnyWordSpec with Matchers {
       }
       "save and load game" in {
         val game = controller.gameVal.asInstanceOf[ClassicGameImpl].copy( playerFactory = null )
-        val path = controller.saveGame()
+        val path = Await.result( controller.saveGame(), Duration.Inf )
         controller.loadGame( path )
         val file = new File( path )
         if( file.exists )

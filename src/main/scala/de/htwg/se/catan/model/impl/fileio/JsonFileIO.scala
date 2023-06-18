@@ -5,11 +5,12 @@ import play.api.libs.json.JsValue.jsValueToJsLookup
 import play.api.libs.json.{ JsArray, JsDefined, JsLookupResult, JsNull, JsSuccess, JsValue, Json, Reads, Writes }
 
 import java.io.{ File, PrintWriter }
+import scala.concurrent.{ Future, blocking }
+import concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
 trait JsonSerializable:
   def toJson:JsValue
-
 
 given jsonSerializableWrites:Writes[JsonSerializable] = ( o:JsonSerializable ) => o.toJson
 
@@ -33,17 +34,20 @@ object JsonFileIO extends FileIO( "json" ):
     source.close()
     (game, undoStack, redoStack)
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String =
-    val file = File( getFileName )
-    val pw = PrintWriter( file )
-    val save = Json.obj(
-      "game" -> Json.toJson( game ),
-      "undoStack" -> Json.toJson( undoStack ),
-      "redoStack" -> Json.toJson( redoStack )
-    )
-    pw.write( Json.prettyPrint( save ) )
-    pw.close()
-    file.getAbsolutePath
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):Future[String] = Future {
+    blocking {
+      val file = File( getFileName )
+      val pw = PrintWriter( file )
+      val save = Json.obj(
+        "game" -> Json.toJson( game ),
+        "undoStack" -> Json.toJson( undoStack ),
+        "redoStack" -> Json.toJson( redoStack )
+      )
+      pw.write( Json.prettyPrint( save ) )
+      pw.close()
+      file.getAbsolutePath
+    }
+  }   
 
 
   implicit class JsonSeq[E]( seq:Seq[E] ):

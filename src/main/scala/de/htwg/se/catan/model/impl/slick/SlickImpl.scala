@@ -7,7 +7,7 @@ import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import de.htwg.se.catan.model.impl.gamefield.ClassicGameFieldImpl
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO.JsonValue
 import de.htwg.se.catan.model.Card.resourceCardsReads
-import de.htwg.se.catan.util._
+import de.htwg.se.catan.util.*
 import play.api.libs.json.Json
 import slick.dbio.{ DBIO, DatabaseAction }
 import slick.jdbc.JdbcBackend
@@ -16,9 +16,10 @@ import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.MySQLProfile.api.*
 
 import scala.collection.immutable.TreeMap
-import scala.concurrent.Await
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
-import scala.util.Try
+import concurrent.ExecutionContext.Implicits.global
+import scala.util.{ Failure, Success, Try }
 
 /**
  * @author Vincent76
@@ -27,17 +28,18 @@ import scala.util.Try
 object SlickImpl extends FileIO( "slick" ):
   private def getConnection:Database = Database.forURL( "jdbc:mysql://localhost:3306/test?useSSL=false", driver = "com.mysql.cj.jdbc.Driver", user = "root", password = "" )
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String = game match
-    case g:ClassicGameImpl => saveClassicGame( g, undoStack, redoStack ).map( _.toString ).get
-    case _ => throw NotImplementedError( game.getClass.toString )
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):Future[String] = game match
+    case g:ClassicGameImpl => saveClassicGame( g, undoStack, redoStack )
+    case _ => Future.failed( NotImplementedError( game.getClass.toString ) )
 
-  def saveClassicGame( game:ClassicGameImpl, undoStack:List[Command], redoStack:List[Command] ):Try[Int] = Try {
+  def saveClassicGame( game:ClassicGameImpl, undoStack:List[Command], redoStack:List[Command] ):Future[String] = Try {
     val db = getConnection
-    val t = Try {
-      val gameQuery:TableQuery[SlickClassicGame] = TableQuery[SlickClassicGame]
-      val commandQuery:TableQuery[SlickCommand] = TableQuery[SlickCommand]
-      Await.result( db.run( ( gameQuery.schema ++ commandQuery.schema ).createIfNotExists ), Duration.Inf )
-      val gameID = Await.result( db.run( gameQuery.returning( gameQuery.map( _.id ) ) += (
+    val gameQuery:TableQuery[SlickClassicGame] = TableQuery[SlickClassicGame]
+    val commandQuery:TableQuery[SlickCommand] = TableQuery[SlickCommand]
+
+
+    db.run( ( gameQuery.schema ++ commandQuery.schema ).createIfNotExists )
+      .flatMap( _ => db.run( gameQuery.returning( gameQuery.map( _.id ) ) += (
         0,
         Json.stringify( game.gameFieldVal.toJson ),
         Json.stringify( game.turnVal.toJson ),
@@ -51,17 +53,18 @@ object SlickImpl extends FileIO( "slick" ):
         Json.stringify( Json.toJson( game.bonusCards ) ),
         Json.stringify( Json.toJson( game.winner ) ),
         game.round
-      ) ), Duration.Inf )
-      val action = DBIO.seq(
-        commandQuery ++= undoStack.zipWithIndex.map( d => (0, gameID, true, d._2, Json.stringify( d._1.toJson )) ),
-        commandQuery ++= redoStack.zipWithIndex.map( d => (0, gameID, false, d._2, Json.stringify( d._1.toJson )) )
-      )
-      Await.result( db.run( action ), Duration.Inf )
-      gameID
-    }
-    db.close()
-    t.get
-  }
+      ) ) )
+      .flatMap( gameID => db.run( DBIO.seq(
+          commandQuery ++= undoStack.zipWithIndex.map( d => (0, gameID, true, d._2, Json.stringify( d._1.toJson )) ),
+          commandQuery ++= redoStack.zipWithIndex.map( d => (0, gameID, false, d._2, Json.stringify( d._1.toJson )) )
+      ) ).map( _ => gameID.toString ) )
+      .andThen( gameID => {
+        db.close()
+        gameID
+      } )
+  } match
+    case Success( f ) => f
+    case Failure( t ) => Future.failed( t )
 
   override def load( id:String ):(Game, List[Command], List[Command]) =
     try {

@@ -11,10 +11,12 @@ import akka.http.scaladsl.server.{ Route, StandardRoute }
 import de.htwg.se.catan.model.*
 import de.htwg.se.catan.model.Card.*
 import de.htwg.se.catan.model.Card.resourceCardsReads
+import de.htwg.se.catan.model.info.GameSavedInfo
 import de.htwg.se.catan.util.use
 import play.api.libs.json.{ JsValue, Json }
 
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration.*
 import scala.util.{ Failure, Success, Try }
 
 /**
@@ -28,19 +30,21 @@ class Requests( controller: Controller ):
 
   def toHttpEntity( data:String ):HttpEntity.Strict = HttpEntity( ContentTypes.`application/json`, data )
 
-  def ok():Route = complete( StatusCodes.OK )
+  private def ok():Route = complete( StatusCodes.OK )
 
-  def ok( s:String ):Route = complete( toHttpEntity( s ) )
+  private def ok( s:String ):Route = complete( toHttpEntity( s ) )
 
-  def ok( actionResult:ActionResult ):Route = complete( toHttpEntity( Json.stringify( actionResult.toJson ) ) )
+  private def ok( json:JsValue ):Route = ok( Json.stringify( json ) )
 
-  def ok( game:Game ):Route = complete( toHttpEntity( Json.stringify( game.toJson ) ) )
+  private def ok( actionResult:ActionResult ):Route = ok( actionResult.toJson )
 
-  def ok( b:Boolean ):Route = complete( toHttpEntity( b.toString ) )
+  private def ok( game:Game ):Route = ok( game.toJson )
 
-  def fail( e:CustomError ):Route = complete( StatusCodes.BadRequest, toHttpEntity( Json.stringify( e.toJson ) ) )
+  private def ok( b:Boolean ):Route = ok( b.toString )
 
-  def ret( result:Try[ActionResult] ):Route = result match
+  private def fail( e:CustomError ):Route = complete( StatusCodes.BadRequest, toHttpEntity( Json.stringify( e.toJson ) ) )
+
+  private def ret( result:Try[ActionResult] ):Route = result match
     case Success( result ) => ok( result )
     case Failure( t ) => t match
       case e:CustomError => fail( e )
@@ -76,7 +80,7 @@ class Requests( controller: Controller ):
     } ~
     pathPrefix( "save" ) {
       post {
-        ok( controller.saveGame() )
+        ok( GameSavedInfo( Await.result( controller.saveGame(), atMost = 15.seconds ) ).toJson )
       }
     } ~
     pathPrefix( "load" ) {

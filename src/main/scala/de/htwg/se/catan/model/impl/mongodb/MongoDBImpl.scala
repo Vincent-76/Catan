@@ -8,7 +8,7 @@ import org.mongodb.scala.result.InsertOneResult
 import play.api.libs.json.{ JsObject, JsValue, Json }
 
 import java.util.UUID
-import scala.concurrent.{ Await, Promise }
+import scala.concurrent.{ Await, Future, Promise }
 import scala.concurrent.duration.Duration
 import scala.reflect.runtime.universe.Try
 import scala.util.Success
@@ -23,7 +23,7 @@ object MongoDBImpl extends FileIO( "mongodb" ):
     val client = MongoClient( "mongodb://localhost:27017" )
     (client, client.getDatabase( "catan" ))
 
-  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):String =
+  override def save( game:Game, undoStack:List[Command], redoStack:List[Command] ):Future[String] =
     val gameID:String = UUID.randomUUID().toString
     val json = Json.obj(
       "id" -> gameID,
@@ -31,17 +31,16 @@ object MongoDBImpl extends FileIO( "mongodb" ):
       "undoStack" -> Json.toJson( undoStack ),
       "redoStack" -> Json.toJson( redoStack )
     )
-    val promise = Promise[Boolean]()
+    val promise = Promise[String]()
     val con = getConnection
     try {
       con._2.getCollection( COLLECTION ).insertOne( Document( Json.stringify( json ) ) ).subscribe( new Observer[InsertOneResult] {
         override def onSubscribe( subscription:Subscription ):Unit = subscription.request( 1 )
-        override def onNext( result:InsertOneResult ):Unit = promise.success( true )
+        override def onNext( result:InsertOneResult ):Unit = promise.success( gameID )
         override def onError( e:Throwable ):Unit = promise.failure( e )
         override def onComplete():Unit = None
       } )
-      Await.result( promise.future, Duration.Inf )
-      gameID
+      promise.future
     } catch {
       case t:Throwable => throw RuntimeException( t )
     } finally {

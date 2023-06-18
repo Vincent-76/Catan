@@ -3,13 +3,15 @@ package de.htwg.se.catan.model
 import com.google.inject.{ Guice, Injector }
 import de.htwg.se.catan.CatanModule
 import de.htwg.se.catan.model.commands.InitGameCommand
-import de.htwg.se.catan.model.impl.fileio.XMLFileIO._
+import de.htwg.se.catan.model.impl.fileio.XMLFileIO.*
 import de.htwg.se.catan.model.impl.fileio.{ XMLFileIO, XMLParseError }
 import de.htwg.se.catan.model.impl.game.ClassicGameImpl
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.io.File
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 import scala.xml.{ Node, Utility }
 
 class XMLFileIOSpec extends AnyWordSpec with Matchers {
@@ -33,7 +35,7 @@ class XMLFileIOSpec extends AnyWordSpec with Matchers {
         val game = injector.getInstance( classOf[ClassicGameImpl] )
         val undoStack = List( InitGameCommand() )
         val redoStack = List( InitGameCommand() )
-        val path = XMLFileIO.save( game, undoStack, redoStack )
+        val path = Await.result( XMLFileIO.save( game, undoStack, redoStack ), Duration.Inf )
         val (game2, undoStack2, redoStack2) = XMLFileIO.load( path )
         val file = new File( path )
         if( file.exists )
