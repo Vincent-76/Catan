@@ -4,8 +4,9 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.{ ClientTransport, Http }
 import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpMethod, HttpMethods, HttpRequest, HttpResponse }
-import akka.http.scaladsl.settings.ConnectionPoolSettings
+import akka.http.scaladsl.settings.{ ClientConnectionSettings, ConnectionPoolSettings }
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import de.htwg.se.catan.model.Card.ResourceCards
 import de.htwg.se.catan.model.{ ActionResult, Command, CustomError, DevelopmentCard, Game, Info, PlayerColor, PlayerID, Resource, StructurePlacement }
 import de.htwg.se.catan.model.impl.fileio.JsonFileIO
@@ -28,6 +29,27 @@ class API extends Observable:
   // needed for the future flatMap/onComplete in the end
   given executionContext:ExecutionContextExecutor = system.executionContext
 
+  var counter:Int = 1
+
+  val http = Http()
+
+  /*val proxy:ClientTransport = ClientTransport.httpsProxy( InetSocketAddress.createUnresolved( "127.0.0.1", 8000 ) )
+  val settings = ConnectionPoolSettings( system ).withConnectionSettings( ClientConnectionSettings( system ).withTransport( proxy ) )
+
+  val badSSLConfig = AkkaSSLConfig( system ).mapSettings( s => s.withLoose(
+    s.loose
+      .withAcceptAnyCertificate( true )
+      .withDisableHostnameVerification( true )
+  ) )
+  val httpsConnectionContext = http.createServerHttpsContext( badSSLConfig )*/
+
+  private def log( action:String, path:String, body:Option[String] = None ):Unit =
+    println( s".exec( http( \"request_$counter\" ).$action( \"/$path\" )" + body.map( b =>
+      s".body( StringBody( \"\"\"$b\"\"\" ) )"
+      //+ ".header( \"content-type\", \"application/json\" )"
+    ).getOrElse( "" ) + " )" )
+    counter = counter + 1
+
   def toHttpEntity( data:String ):HttpEntity.Strict = HttpEntity( ContentTypes.`application/json`, data )
 
   def getURI( path:String ):String = "http://" + API.interface + ":" + API.port + "/" + path
@@ -47,10 +69,12 @@ class API extends Observable:
     }
     case Failure( t ) => e( t )
 
-  def rawGet[R]( path:String, f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Unit = Http().singleRequest( HttpRequest(
-    method = HttpMethods.GET,
-    uri = getURI( path )
-  ) ).onComplete( getResult[R]( f, e ) )
+  def rawGet[R]( path:String, f:R => Unit, e:Throwable => Unit )( using fjs:Reads[R] ):Unit =
+    log( "get", path )
+    http.singleRequest( HttpRequest(
+      method = HttpMethods.GET,
+      uri = getURI( path )
+    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ).onComplete( getResult[R]( f, e ) )
 
   def execute[R]( f:Future[HttpResponse] )( using fjs:Reads[R] ):Unit =
     f.onComplete( getResult[R](
@@ -61,24 +85,28 @@ class API extends Observable:
       , e => error( e )
     ) )
 
-  def get[R]( path:String )( using fjs:Reads[R] ):Unit = execute[R]( Http().singleRequest( HttpRequest(
-    method = HttpMethods.GET,
-    uri = getURI( path )
-  ) ) )
+  def get[R]( path:String )( using fjs:Reads[R] ):Unit =
+    log( "get", path )
+    execute[R]( http.singleRequest( HttpRequest(
+      method = HttpMethods.GET,
+      uri = getURI( path )
+    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ) )
 
-  def cPost[R]( path:String )( using fjs:Reads[R] ):Unit = execute[R]( Http().singleRequest( HttpRequest(
-    method = HttpMethods.POST,
-    uri = getURI( path )
-  ) ) )
+  def cPost[R]( path:String )( using fjs:Reads[R] ):Unit =
+    log( "post", path )
+    execute[R]( http.singleRequest( HttpRequest(
+      method = HttpMethods.POST,
+      uri = getURI( path )
+    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ) )
 
   def cPost[E, R]( path:String, entity:E )( using fjs:Writes[E], fjs2:Reads[R] ):Unit =
     val entityString = Json.stringify( Json.toJson( entity ) )
-    println( path + ": " + entityString )
-    execute[R]( Http().singleRequest( HttpRequest(
+    log( "post", path, Some( entityString ) )
+    execute[R]( http.singleRequest( HttpRequest(
       method = HttpMethods.POST,
       uri = getURI( path ),
       entity = toHttpEntity( entityString )
-    ) ) )
+    )/*, settings = settings, connectionContext = httpsConnectionContext*/ ) )
 
   def post( path:String ):Unit = cPost[ActionResult]( path )
 

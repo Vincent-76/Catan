@@ -53,8 +53,8 @@ class Requests( controller: Controller ):
   val bindingFuture:Future[Http.ServerBinding] = Http().newServerAt( Requests.interface, Requests.port ).bind(
     pathPrefix( "game" ) {
       get {
-        val jsonString = Json.prettyPrint( Json.toJson( controller.game ) )
-        val g = Json.parse( jsonString ).as[Game]
+        //val jsonString = Json.prettyPrint( Json.toJson( controller.game ) )
+        //val g = Json.parse( jsonString ).as[Game]
         ok( controller.game )
       }
     } ~
