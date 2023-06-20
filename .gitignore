@@ -24,4 +24,6 @@ src/main/scala/META-INF
 */target/*
 .DS_Store
 
+*.jar
+
 savegames/

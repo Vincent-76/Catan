@@ -93,6 +93,8 @@ lazy val root = project
 
     assembly / mainClass := Some( "de.htwg.se.catan.Catan" ),
     assembly / assemblyJarName := "CatanLib.jar",
+    //assembly / mainClass := Some( "de.htwg.se.catan.aview.gui.GUIApp" ),
+    //assembly / assemblyJarName := "CatanGUI.jar",
     assembly / assemblyMergeStrategy := {
       case "reference.conf" => MergeStrategy.concat
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard
